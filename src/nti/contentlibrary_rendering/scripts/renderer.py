@@ -9,32 +9,16 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope.container.contained import Contained
-
-from z3c.autoinclude.zcml import includePluginsDirective
-
 from nti.async.utils.processor import Processor
 
 from nti.contentlibrary_rendering import QUEUE_NAMES
 
 from nti.dataserver.utils.base_script import create_context
 
-
-class PluginPoint(Contained):
-
-    def __init__(self, name):
-        self.__name__ = name
-
-PP_CONTENTLIBRARY = PluginPoint('nti.contentlibrary')
-
-
 class Constructor(Processor):
 
     def set_log_formatter(self, args):
         super(Constructor, self).set_log_formatter(args)
-
-    def extend_context(self, context):
-        includePluginsDirective(context, PP_CONTENTLIBRARY)
 
     def create_context(self, env_dir):
         context = create_context(env_dir, with_library=True,
