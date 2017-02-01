@@ -49,6 +49,7 @@ setup(
     tests_require=TESTS_REQUIRE,
     install_requires=[
         'setuptools',
+        'docutils',
         'isodate',
         'nti.async',
         'nti.contentlibrary',
