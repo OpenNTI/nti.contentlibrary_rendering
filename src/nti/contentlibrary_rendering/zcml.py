@@ -19,11 +19,11 @@ from nti.async.redis_queue import RedisQueue
 
 from nti.async import get_job_queue as async_queue
 
+from nti.contentlibrary_rendering import QUEUE_NAMES
+
+from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
+
 from nti.dataserver.interfaces import IRedisClient
-
-from nti.contentlibrary.render import QUEUE_NAMES
-
-from nti.contentlibrary.render.interfaces import IContentQueueFactory
 
 
 class ImmediateQueueRunner(object):

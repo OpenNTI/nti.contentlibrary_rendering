@@ -9,7 +9,7 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
-	<meta:directives namespace="http://nextthought.com/ntp/contentrender">
+	<meta:directives namespace="http://nextthought.com/ntp/renderer">
 
 		<meta:directive	name="registerImmediateProcessingQueue"
 						schema=".interfaces.IContentQueueFactory"
