@@ -5,6 +5,10 @@ entry_points = {
     "z3c.autoinclude.plugin": [
         'target = nti.contentlibrary',
     ],
+    'console_scripts': [
+        "nti_s3put = nti.contentlibrary.nti_s3put:main",
+        "nti_library_renderer = nti.contentlibrary_rendering.scripts.renderer:main",
+    ]
 }
 
 TESTS_REQUIRE = [
@@ -46,10 +50,19 @@ setup(
     tests_require=TESTS_REQUIRE,
     install_requires=[
         'setuptools',
+        'isodate',
+        'nti.async',
         'nti.contentlibrary',
         'nti.contentrendering',
+        'nti.coremetadata',
+        'nti.externalization',
+        'nti.ntiids',
+        'z3c.autoinclude',
+        'zc.blist',
         'zope.component',
+        'zope.container',
         'zope.interface',
+        'zope.location',
         'zope.security',
     ],
     extras_require={

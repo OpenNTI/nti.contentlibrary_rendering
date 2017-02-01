@@ -8,6 +8,28 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 		
-	<include package="nti.contentlibrary" />
+	<include package="zope.location" />
+
+	<include package="." file="meta.zcml" />
+	
+	<!-- Job runner -->
+	<include package="nti.async" />
+	
+	<subscriber handler=".subscribers._content_published"
+				for="nti.contentlibrary.interfaces.IRenderableContentPackage
+				nti.coremetadata.interfaces.IObjectPublishedEvent"/>
+	
+	<subscriber handler=".subscribers._content_updated"
+				for="nti.contentlibrary.interfaces.IRenderableContentPackage
+					 nti.externalization.interfaces.IObjectModifiedFromExternalEvent" />
+	
+	<!-- Rendering -->
+	<configure zcml:condition="have testmode">
+		<content:registerImmediateProcessingQueue />
+	</configure>
+	
+	<configure zcml:condition="not-have testmode">
+		<content:registerProcessingQueue />
+	</configure>
 
 </configure>
