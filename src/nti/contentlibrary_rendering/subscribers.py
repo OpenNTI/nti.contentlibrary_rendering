@@ -25,6 +25,7 @@ from nti.contentlibrary_rendering.processing import queue_modified
 from nti.contentlibrary_rendering.render import render_package
 
 from nti.coremetadata.interfaces import IObjectPublishedEvent
+from nti.coremetadata.interfaces import IObjectUnpublishedEvent
 
 from nti.externalization.interfaces import IObjectModifiedFromExternalEvent
 
@@ -46,3 +47,12 @@ def _content_updated(package, event):
     """
     if is_published(package):
         queue_modified(CONTENT_UNITS_QUEUE, render_package, package)
+
+
+@component.adapter(IRenderableContentPackage, IObjectUnpublishedEvent)
+def _content_unpublished(package, event):
+    """
+    When a persistent content library is unpublished, push
+    it into our processing factory
+    """
+    # TODO: implement
