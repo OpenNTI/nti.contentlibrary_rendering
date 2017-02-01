@@ -6,7 +6,6 @@ entry_points = {
         'target = nti.contentlibrary',
     ],
     'console_scripts': [
-        "nti_s3put = nti.contentlibrary.nti_s3put:main",
         "nti_library_renderer = nti.contentlibrary_rendering.scripts.renderer:main",
     ]
 }

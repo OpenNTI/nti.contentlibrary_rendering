@@ -12,8 +12,8 @@
 
 	<include package="." file="meta.zcml" />
 	
-	<!-- Job runner -->
 	<include package="nti.async" />
+	<include package="nti.contentlibrary" />
 	
 	<subscriber handler=".subscribers._content_published"
 				for="nti.contentlibrary.interfaces.IRenderableContentPackage
