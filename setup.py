@@ -56,6 +56,7 @@ setup(
         'nti.coremetadata',
         'nti.externalization',
         'nti.ntiids',
+        'z3c.autoinclude',
         'zc.blist',
         'zope.component',
         'zope.interface',
