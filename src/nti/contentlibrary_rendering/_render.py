@@ -91,6 +91,7 @@ def _do_render_package(render_job):
     copy_package_data(path, package)
     # 5. marked as rendered
     interface.alsoProvides(package, IContentRendered)
+    return package
 
 
 def render_package_job(render_job):
