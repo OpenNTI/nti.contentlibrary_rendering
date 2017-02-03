@@ -2,37 +2,38 @@
 <configure	xmlns="http://namespaces.zope.org/zope"
 			xmlns:i18n="http://namespaces.zope.org/i18n"
 			xmlns:zcml="http://namespaces.zope.org/zcml"
+			xmlns:ext="http://nextthought.com/ntp/ext"
 			xmlns:renderer="http://nextthought.com/ntp/renderer">
 
 	<include package="zope.component" file="meta.zcml" />
 	<include package="zope.security" file="meta.zcml" />
 	<include package="zope.component" />
 	<include package="zope.security" />
-		
+
 	<include package="zope.location" />
 
 	<include package="." file="meta.zcml" />
-	
+
 	<include package="nti.async" />
 	<include package="nti.contentlibrary" />
-	
-	<subscriber handler=".subscribers._content_published"
-				for="nti.contentlibrary.interfaces.IRenderableContentPackage
-				nti.coremetadata.interfaces.IObjectPublishedEvent"/>
-	
-	<subscriber handler=".subscribers._content_unpublished"
-				for="nti.contentlibrary.interfaces.IRenderableContentPackage
-				nti.coremetadata.interfaces.IObjectUnpublishedEvent"/>
 
-	<subscriber handler=".subscribers._content_updated"
-				for="nti.contentlibrary.interfaces.IRenderableContentPackage
-					 nti.externalization.interfaces.IObjectModifiedFromExternalEvent" />
-	
+    <!-- Adapters -->
+    <adapter factory=".adapters.ContentPackageRenderMetadata" />
+
+    <!-- Externalization -->
+    <include package="nti.externalization" file="meta.zcml" />
+    <include package="nti.externalization" />
+
+    <ext:registerAutoPackageIO
+        root_interfaces=".interfaces.IContentPackageRenderJob
+                         .interfaces.IContentPackageRenderMetadata"
+        modules=".adapters .model" />
+
 	<!-- Rendering -->
 	<configure zcml:condition="have testmode">
 		<renderer:registerImmediateProcessingQueue />
 	</configure>
-	
+
 	<configure zcml:condition="not-have testmode">
 		<renderer:registerProcessingQueue />
 	</configure>

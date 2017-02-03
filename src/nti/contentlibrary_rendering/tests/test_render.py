@@ -14,14 +14,4 @@ from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 
 class TestRender(ContentlibraryRenderingLayerTest):
-
-    def test_render(self):
-        # This would need to be in library (with diff ntiid) to test further.
-        package = RenderableContentPackage()
-        package.ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
-        package.title = u'Cohen vs California'
-        package.description = u'Cohen vs California'
-        package.contentType = b'text/x-rst'
-        package.publishLastModified = 10000
-        package.write_contents(b'foo', b'text/x-rst')
-        package.publish()
+    pass

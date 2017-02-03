@@ -15,6 +15,8 @@ import isodate
 
 from zope.component.hooks import getSite
 
+from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
+
 from nti.coremetadata.interfaces import IPublishable
 
 from nti.ntiids.ntiids import find_object_with_ntiid
@@ -39,3 +41,16 @@ def datetime_isoformat(now=None):
 
 def object_finder(doc_id):
     return find_object_with_ntiid(doc_id)
+
+
+def get_render_job(package_ntiid, job_id):
+    """
+    Get a render job from the given package_ntiid and job_id.
+    """
+    package = find_object_with_ntiid( package_ntiid )
+    meta = IContentPackageRenderMetadata( package, None )
+    try:
+        result = meta[job_id]
+    except (KeyError, TypeError, AttributeError):
+        result = None
+    return result

@@ -19,7 +19,7 @@ from zope.component.hooks import site as current_site
 from nti.async import create_job
 
 from nti.contentlibrary_rendering.common import get_site
-from nti.contentlibrary_rendering.common import object_finder
+from nti.contentlibrary_rendering.common import get_render_job
 
 from nti.dataserver.interfaces import IDataserver
 
@@ -29,18 +29,18 @@ from nti.site.transient import TrivialSite
 
 from nti.contentlibrary_rendering import get_factory
 
-
 def _do_execute_job(*args, **kwargs):
     args = BList(args)
     func = args.pop(0)
-    object_id = kwargs.pop('source')
-    obj = object_finder(object_id)
-    if obj is None:
+    package_ntiid = kwargs.pop('package_ntiid')
+    job_id = kwargs.pop('job_id')
+    render_job = get_render_job(package_ntiid, job_id)
+    if render_job is None:
         logger.info(
-            'Object missing (deleted?) before event could be processed; event dropped. (%s) (%s)',
-            object_id, func)
+            'Job missing (deleted?) before event could be processed; event dropped. (%s) (%s) (%s)',
+            job_id, package_ntiid, func)
         return
-    result = func(obj, *args, **kwargs)
+    result = func(render_job, *args, **kwargs)
     return result
 
 
@@ -76,28 +76,32 @@ def get_job_queue(name):
     return factory.get_queue(name)
 
 
-def put_job(queue_name, func, jid=None, *args, **kwargs):
+def put_job(queue_name, func, job_id=None, *args, **kwargs):
     queue = get_job_queue(queue_name)
-    job = create_job(_execute_job, func, *args, **kwargs)
-    job.id = jid
+    job = create_job(_execute_job, func, job_id=job_id, *args, **kwargs)
+    job.id = job_id
     queue.put(job)
     return job
 
 
-def _get_obj_id(obj):
-    return obj.ntiid
-
-
-def add_to_queue(queue_name, func, obj, jid=None, **kwargs):
+def add_to_queue(queue_name, func, obj, **kwargs):
     site = get_site()
-    doc_id = _get_obj_id(obj)
-    jid = '%s_%s' % (doc_id, jid)
-    return put_job(queue_name, func, jid=jid, source=doc_id, site_name=site, **kwargs)
+    return put_job(queue_name,
+                   func,
+                   package_ntiid=obj.PackageNTIID,
+                   job_id=obj.JobId,
+                   site_name=site, **kwargs)
 
 
 def queue_add(name, func, obj, **kwargs):
-    return add_to_queue(name, func, obj, jid='added', **kwargs)
+    """
+    We expect a `IContentPackageRenderJob` here.
+    """
+    return add_to_queue(name, func, obj, **kwargs)
 
 
 def queue_modified(name, func, obj, **kwargs):
-    return add_to_queue(name, func, obj, jid='modified', **kwargs)
+    """
+    We expect a `IContentPackageRenderJob` here.
+    """
+    return add_to_queue(name, func, obj, **kwargs)
