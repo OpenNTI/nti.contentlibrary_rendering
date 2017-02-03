@@ -12,6 +12,7 @@ logger = __import__('logging').getLogger(__name__)
 import os
 
 from zope import component
+from zope import interface
 
 from nti.contentlibrary.filesystem import FilesystemBucket
 from nti.contentlibrary.filesystem import PersistentFilesystemContentUnit
@@ -20,6 +21,7 @@ from nti.contentlibrary.filesystem import PersistentFilesystemContentPackage
 from nti.contentlibrary.filesystem import package_factory
 
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
 from nti.contentlibrary_rendering import RST_MIMETYPE
@@ -83,8 +85,11 @@ def _do_render_package(render_job):
     render_latex(latex_file, package)
     # 3. TODO: Place in target location
     # 4. copy from target
-    path = os.path.dirname(latex_file) # TODO: Check this
+    path = os.path.dirname(latex_file)  # TODO: Check this
     copy_package_data(path, package)
+    # 5. marked as rendered
+    interface.alsoProvides(package, IContentRendered)
+
 
 def render_package_job(render_job):
     logger.info('Rendering content (%s) (%s)',
