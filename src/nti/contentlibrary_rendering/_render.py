@@ -85,7 +85,9 @@ def _do_render_package(render_job):
     render_latex(latex_file, package)
     # 3. TODO: Place in target location
     # 4. copy from target
-    path = os.path.dirname(latex_file)  # TODO: Check this
+    path, name = os.path.split(latex_file)
+    name_noe, unused = os.path.splitext(name)
+    path = os.path.join(path, name_noe)  # path to rendered contents
     copy_package_data(path, package)
     # 5. marked as rendered
     interface.alsoProvides(package, IContentRendered)
