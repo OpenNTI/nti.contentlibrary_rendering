@@ -46,6 +46,9 @@ def _do_render_package(render_job):
 
 
 def render_package_job(render_job):
+    logger.info( 'Rendering content (%s) (%s)',
+                 render_job.PackageNTIID,
+                 render_job.job_id)
     job_id = render_job.job_id
     try:
         _do_render_package(render_job)
@@ -53,4 +56,7 @@ def render_package_job(render_job):
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))
     else:
+        logger.info( 'Finished rendering content (%s) (%s)',
+                     render_job.PackageNTIID,
+                     render_job.job_id)
         render_job.update_to_success_state()
