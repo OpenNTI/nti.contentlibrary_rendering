@@ -11,6 +11,8 @@ from hamcrest import is_
 from hamcrest import is_not
 from hamcrest import not_none
 from hamcrest import assert_that
+from hamcrest import has_entries
+from hamcrest import has_properties
 does_not = is_not
 
 from nti.externalization import internalization
@@ -49,12 +51,13 @@ class TestExternalization(ContentlibraryRenderingTestLayer):
                                                     require_updater=True)
 
         assert_that(internal, validly_provides(IContentPackageRenderJob))
-        assert_that(internal.job_id, is_(job_id))
-        assert_that(internal.PackageNTIID, is_(ntiid))
-        assert_that(internal.State, is_(PENDING))
-
+        assert_that(internal,
+                    has_properties('JobId', is_(job_id),
+                                   'PackageNTIID', is_(ntiid),
+                                   'State', is_(PENDING)))
         internal.update_to_failed_state()
         ext_obj = to_external_object(internal)
-        assert_that(ext_obj['JobId'], is_(job_id))
-        assert_that(ext_obj['PackageNTIID'], is_(ntiid))
-        assert_that(ext_obj['State'], is_(FAILED))
+        assert_that(ext_obj,
+                    has_entries('JobId', is_(job_id),
+                                'PackageNTIID', is_(ntiid),
+                                'State', is_(FAILED)))
