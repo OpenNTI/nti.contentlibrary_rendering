@@ -11,6 +11,13 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
+from nti.contentlibrary.filesystem import FilesystemBucket
+from nti.contentlibrary.filesystem import PersistentFilesystemContentUnit
+from nti.contentlibrary.filesystem import PersistentFilesystemContentPackage
+
+from nti.contentlibrary.filesystem import package_factory
+
+from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
 from nti.contentlibrary_rendering import RST_MIMETYPE
@@ -18,21 +25,49 @@ from nti.contentlibrary_rendering import RST_MIMETYPE
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 
 from nti.contentrendering import nti_render
- 
+
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+
+def copy_attributes(source, target, names):
+    for name in names or ():
+        value = getattr(source, name, None)
+        if value is not None:
+            setattr(target, name, value)
+
+
+def copy_package_data(path, target):
+    """
+    copy rendered data to target
+    """
+    bucket = FilesystemBucket(name="contents")
+    bucket.absolute_path = path
+    package = package_factory(bucket,
+                              PersistentFilesystemContentPackage,
+                              PersistentFilesystemContentUnit)
+    assert package is not None, "Invalid rendered content directory"
+
+    # all content pacakge attributes
+    copy_attributes(package, target, IContentPackage.names())
+
+    # content unit attributes
+    copy_attributes(package, target, ('icon', 'thumbnail', 'href', 'key'))
+
+    # displayable content
+    copy_attributes(package, target, ('PlatformPresentationResources',))
 
 
 def render_latex(tex_source, unit=None):
     return nti_render.render(tex_source)
 
 
-def transform_content(unit):
-    contentType = unit.contentType or RST_MIMETYPE
-    transformer = component.getUtility(IContentTransformer, 
+def transform_content(context):
+    contentType = context.contentType or RST_MIMETYPE
+    transformer = component.getUtility(IContentTransformer,
                                        name=str(contentType))
-    latex_file = transformer.transform(unit.contents, 
-                                       context=unit)
-    return render_latex(latex_file, unit)
+    latex_file = transformer.transform(context.contents,
+                                       context=context)
+    return render_latex(latex_file, context)
 
 
 def _do_render_package(render_job):
@@ -46,9 +81,9 @@ def _do_render_package(render_job):
 
 
 def render_package_job(render_job):
-    logger.info( 'Rendering content (%s) (%s)',
-                 render_job.PackageNTIID,
-                 render_job.job_id)
+    logger.info('Rendering content (%s) (%s)',
+                render_job.PackageNTIID,
+                render_job.job_id)
     job_id = render_job.job_id
     try:
         _do_render_package(render_job)
@@ -56,7 +91,7 @@ def render_package_job(render_job):
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))
     else:
-        logger.info( 'Finished rendering content (%s) (%s)',
-                     render_job.PackageNTIID,
-                     render_job.job_id)
+        logger.info('Finished rendering content (%s) (%s)',
+                    render_job.PackageNTIID,
+                    render_job.job_id)
         render_job.update_to_success_state()
