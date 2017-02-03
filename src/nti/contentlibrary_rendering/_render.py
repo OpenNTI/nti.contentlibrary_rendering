@@ -9,6 +9,8 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import os
+
 from zope import component
 
 from nti.contentlibrary.filesystem import FilesystemBucket
@@ -65,9 +67,7 @@ def transform_content(context):
     contentType = context.contentType or RST_MIMETYPE
     transformer = component.getUtility(IContentTransformer,
                                        name=str(contentType))
-    latex_file = transformer.transform(context.contents,
-                                       context=context)
-    return render_latex(latex_file, context)
+    return transformer.transform(context.contents, context=context)
 
 
 def _do_render_package(render_job):
@@ -77,8 +77,14 @@ def _do_render_package(render_job):
         raise ValueError("Package not found", ntiid)
     elif not IRenderableContentPackage.providedBy(package):
         raise TypeError("Invalid content package", ntiid)
-    transform_content(package)
-
+    # 1. Transform to latex
+    latex_file = transform_content(package)
+    # 2. Render
+    render_latex(latex_file, package)
+    # 3. TODO: Place in target location
+    # 4. copy from target
+    path = os.path.dirname(latex_file) # TODO: Check this
+    copy_package_data(path, package)
 
 def render_package_job(render_job):
     logger.info('Rendering content (%s) (%s)',
