@@ -15,7 +15,8 @@ from zope.container.interfaces import IContainer
 
 from zope.location.interfaces import IContained as IZContained
 
-from zope.schema import vocabulary
+from zope.schema.vocabulary import SimpleTerm
+from zope.schema.vocabulary import SimpleVocabulary
 
 from nti.base.interfaces import ICreated
 from nti.base.interfaces import ILastModified
@@ -29,8 +30,8 @@ SUCCESS = 'Success'
 PENDING = 'Pending'
 FAILED = 'Failed'
 RENDER_STATES = (SUCCESS, PENDING, FAILED)
-RENDER_STATE_VOCABULARY = \
-    vocabulary.SimpleVocabulary([vocabulary.SimpleTerm(_x) for _x in RENDER_STATES])
+RENDER_STATE_VOCABULARY = SimpleVocabulary([SimpleTerm(_x) for _x in RENDER_STATES])
+
 
 class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
     """
@@ -70,6 +71,7 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
         Mark this job as successful.
         """
 
+
 class IContentPackageRenderMetadata(IContainer):
     """
     Contains information on :class:`IContentPackage` rendering,
@@ -92,7 +94,19 @@ class IContentPackageRenderMetadata(IContainer):
         Returns the most recent render `IContentPackageRenderJob` or None.
         """
 
+
 class IContentQueueFactory(interface.Interface):
     """
     A factory for content rendering queues.
     """
+
+
+class IContentTransformer(interface.Interface):
+    """
+    A utility to transform a piece of content
+    """
+
+    def transform(content, context=None):
+        """
+        Transform the specfied content
+        """
