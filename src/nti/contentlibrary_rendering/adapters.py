@@ -67,6 +67,7 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         if jobs:
             result = jobs[-1]
         return result
+    most_recent_render_job = mostRecentRenderJob
 
 PACKAGE_RENDER_KEY = 'nti.contentlibrary.rendering.ContentPackageRenderMetadata'
 ContentPackageRenderMetadata = an_factory(DefaultContentPackageRenderMetadata, PACKAGE_RENDER_KEY)

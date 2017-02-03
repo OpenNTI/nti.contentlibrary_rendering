@@ -88,11 +88,13 @@ class IContentPackageRenderMetadata(IContainer):
         """
         Creates and returns a `IContentPackageRenderJob`.
         """
+    create_job = createJob
 
     def mostRecentRenderJob(self):
         """
         Returns the most recent render `IContentPackageRenderJob` or None.
         """
+    most_recent_render_job = mostRecentRenderJob
 
 
 class IContentQueueFactory(interface.Interface):
