@@ -84,13 +84,13 @@ class IContentPackageRenderMetadata(IContainer):
                                   default=(),
                                   required=False)
 
-    def createJob(self):
+    def createJob(package, creator):
         """
         Creates and returns a `IContentPackageRenderJob`.
         """
     create_job = createJob
 
-    def mostRecentRenderJob(self):
+    def mostRecentRenderJob():
         """
         Returns the most recent render `IContentPackageRenderJob` or None.
         """

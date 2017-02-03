@@ -28,6 +28,7 @@ from nti.contentlibrary_rendering.model import ContentPackageRenderJob
 
 from nti.zodb.containers import time_to_64bit_int
 
+
 @component.adapter(IRenderableContentPackage)
 @interface.implementer(IContentPackageRenderMetadata)
 class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTreeContainer):
@@ -50,19 +51,21 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         result = '%s.%s.%s' % (job.PackageNTIID, username, current_time)
         return result
 
-    def createJob(self, package, user=None):
+    def createJob(self, package=None, creator=None):
+        package = package if package is not None else self.__parent__
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
-        result.creator = user
+        result.creator = creator
         result.JobId = self._create_unique_job_key(result)
         self[result.JobId] = result
         return result
     create_job = createJob
 
+    @property
     def render_jobs(self):
         return tuple(self.values())
 
     def mostRecentRenderJob(self):
-        jobs = sorted(self.render_jobs())
+        jobs = sorted(self.render_jobs)
         result = None
         if jobs:
             result = jobs[-1]
@@ -70,4 +73,5 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     most_recent_render_job = mostRecentRenderJob
 
 PACKAGE_RENDER_KEY = 'nti.contentlibrary.rendering.ContentPackageRenderMetadata'
-ContentPackageRenderMetadata = an_factory(DefaultContentPackageRenderMetadata, PACKAGE_RENDER_KEY)
+ContentPackageRenderMetadata = an_factory(DefaultContentPackageRenderMetadata,
+                                          PACKAGE_RENDER_KEY)
