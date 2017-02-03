@@ -26,6 +26,8 @@ from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadat
 
 from nti.contentlibrary_rendering.model import ContentPackageRenderJob
 
+from nti.coremetadata.interfaces import SYSTEM_USER_ID
+
 from nti.zodb.containers import time_to_64bit_int
 
 
@@ -51,7 +53,9 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         result = '%s.%s.%s' % (job.PackageNTIID, username, current_time)
         return result
 
-    def createJob(self, package=None, creator=None):
+    def createJob(self, package=None, creator=SYSTEM_USER_ID):
+        creator = getattr(creator, 'username', creator) or SYSTEM_USER_ID
+        creator = getattr(creator, 'id', creator)
         package = package if package is not None else self.__parent__
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
         result.creator = creator
