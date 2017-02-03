@@ -9,26 +9,39 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope import component
+
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
+from nti.contentlibrary_rendering import RST_MIMETYPE
+
+from nti.contentlibrary_rendering.interfaces import IContentTransformer
+
+from nti.contentrendering import nti_render
+ 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 
-def nti_render(tex_source):
-    pass
+def render_latex(tex_source, unit=None):
+    return nti_render.render(tex_source)
 
 
-def transform_content(package):
-    pass
+def transform_content(unit):
+    contentType = unit.contentType or RST_MIMETYPE
+    transformer = component.getUtility(IContentTransformer, 
+                                       name=str(contentType))
+    latex_file = transformer.transform(unit.contents, 
+                                       context=unit)
+    return render_latex(latex_file, unit)
 
 
 def _do_render_package(render_job):
     ntiid = render_job.PackageNTIID
     package = find_object_with_ntiid(ntiid)
     if package is None:
-        raise Exception("Package not found", ntiid)
+        raise ValueError("Package not found", ntiid)
     elif not IRenderableContentPackage.providedBy(package):
-        raise Exception("Invalid content package", ntiid)
+        raise TypeError("Invalid content package", ntiid)
     transform_content(package)
 
 

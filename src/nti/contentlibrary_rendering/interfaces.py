@@ -108,7 +108,12 @@ class IContentTransformer(interface.Interface):
     A utility to transform a piece of content
     """
 
-    def transform(content, context=None):
+    def transform(content, context=None, out_dir=None):
         """
-        Transform the specfied content
+        Transform the specfied content to a latex file for rendering
+        
+        :param content String or buffer withe the content to transform
+        :param context Transformer context (e.g. IContentPacakge)
+        :param out_dir Output directory
+        :return a latex file
         """

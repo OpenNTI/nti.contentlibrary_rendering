@@ -13,6 +13,10 @@ from zope import component
 
 from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
 
+#: reStructuredText mime type
+RST_MIMETYPE = b'text/x-rst'
+
+#: Rendering redis queue name
 CONTENT_UNITS_QUEUE = '++etc++contentlibrary++queue++contentunits'
 
 QUEUE_NAMES = (CONTENT_UNITS_QUEUE,)
