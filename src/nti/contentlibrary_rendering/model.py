@@ -31,6 +31,8 @@ from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
+from nti.property.property import alias
+
 
 @EqHash('JobId')
 @total_ordering
@@ -44,6 +46,8 @@ class ContentPackageRenderJob(SchemaConfigured,
     mime_type = mimeType = u'application/vnd.nextthought.content.packagerenderjob'
 
     creator = SYSTEM_USER_ID
+
+    job_id = alias('JobId')
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)

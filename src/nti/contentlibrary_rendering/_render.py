@@ -33,11 +33,11 @@ def _do_render_package(render_job):
 
 
 def render_package_job(render_job):
-    jid = render_job.JodId
+    job_id = render_job.job_id
     try:
         _do_render_package(render_job)
     except Exception as e:
-        logger.exception('Render job %s failed', jid)
+        logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))
     else:
         render_job.update_to_success_state()
