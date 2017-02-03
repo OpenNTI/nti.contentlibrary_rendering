@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-Adopter implementations.
+Adapter implementations.
 
 .. $Id$
 """
@@ -55,7 +55,7 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
 
     def createJob(self, package=None, creator=SYSTEM_USER_ID):
         creator = getattr(creator, 'username', creator) or SYSTEM_USER_ID
-        creator = getattr(creator, 'id', creator)
+        creator = getattr(creator, 'id', creator) # in case of a principal
         package = package if package is not None else self.__parent__
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
         result.creator = creator
