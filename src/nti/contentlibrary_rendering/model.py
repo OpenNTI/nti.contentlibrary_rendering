@@ -47,7 +47,9 @@ class ContentPackageRenderJob(SchemaConfigured,
 
     creator = SYSTEM_USER_ID
 
-    job_id = alias('JobId')
+    state = alias('State')
+    jobId = job_id = alias('JobId')
+    package = alias('PackageNTIID')
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
