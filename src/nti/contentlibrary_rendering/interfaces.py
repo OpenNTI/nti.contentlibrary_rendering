@@ -30,7 +30,8 @@ SUCCESS = 'Success'
 PENDING = 'Pending'
 FAILED = 'Failed'
 RENDER_STATES = (SUCCESS, PENDING, FAILED)
-RENDER_STATE_VOCABULARY = SimpleVocabulary([SimpleTerm(_x) for _x in RENDER_STATES])
+RENDER_STATE_VOCABULARY = SimpleVocabulary(
+    [SimpleTerm(_x) for _x in RENDER_STATES])
 
 
 class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
@@ -111,9 +112,24 @@ class IContentTransformer(interface.Interface):
     def transform(content, context=None, out_dir=None):
         """
         Transform the specfied content to a latex file for rendering
-        
+
         :param content String or buffer withe the content to transform
-        :param context Transformer context (e.g. IContentPacakge)
+        :param context Transformer context (e.g. :class:`IContentPackage`)
         :param out_dir Output directory
         :return a latex file
+        """
+
+
+class IRenderedContentLocator(interface.Interface):
+    """
+    A utility to [re]locate the files associated with a rendered content
+    """
+
+    def locate(path, context=None):
+        """
+        [re]locate the rendered content
+
+        :param path Rendered content location
+        :param context Locator context (e.g. :class:`IContentPackage`)
+        :return :class:`IBucket' with new location
         """
