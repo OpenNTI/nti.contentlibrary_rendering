@@ -14,7 +14,6 @@ import os
 from zope import component
 from zope import interface
 
-from nti.contentlibrary.filesystem import FilesystemBucket
 from nti.contentlibrary.filesystem import PersistentFilesystemContentUnit
 from nti.contentlibrary.filesystem import PersistentFilesystemContentPackage
 
@@ -27,6 +26,7 @@ from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary_rendering import RST_MIMETYPE
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
+from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
 from nti.contentrendering import nti_render
 
@@ -40,12 +40,10 @@ def copy_attributes(source, target, names):
             setattr(target, name, value)
 
 
-def copy_package_data(path, target):
+def copy_package_data(bucket, target):
     """
     copy rendered data to target
     """
-    bucket = FilesystemBucket(name="contents")
-    bucket.absolute_path = path
     package = package_factory(bucket,
                               PersistentFilesystemContentPackage,
                               PersistentFilesystemContentUnit)
@@ -72,6 +70,14 @@ def transform_content(context):
     return transformer.transform(context.contents, context=context)
 
 
+def locate_rendered_content(latex_file, context=None):
+    path, name = os.path.split(latex_file)
+    name_noe, unused = os.path.splitext(name)
+    path = os.path.join(path, name_noe)  # path to rendered contents
+    locator = component.getUtility(IRenderedContentLocator)
+    return locator.locate(path, context)
+
+
 def _do_render_package(render_job):
     ntiid = render_job.PackageNTIID
     package = find_object_with_ntiid(ntiid)
@@ -83,12 +89,10 @@ def _do_render_package(render_job):
     latex_file = transform_content(package)
     # 2. Render
     render_latex(latex_file, package)
-    # 3. TODO: Place in target location
+    # 3. Place in target location
+    bucket = locate_rendered_content(latex_file, package)
     # 4. copy from target
-    path, name = os.path.split(latex_file)
-    name_noe, unused = os.path.splitext(name)
-    path = os.path.join(path, name_noe)  # path to rendered contents
-    copy_package_data(path, package)
+    copy_package_data(bucket, package)
     # 5. marked as rendered
     interface.alsoProvides(package, IContentRendered)
     return package
