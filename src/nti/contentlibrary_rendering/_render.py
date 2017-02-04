@@ -59,7 +59,7 @@ def copy_package_data(bucket, target):
     copy_attributes(package, target, ('PlatformPresentationResources',))
 
 
-def render_latex(tex_source, unit=None):
+def render_latex(tex_source, context=None):
     return nti_render.render(tex_source)
 
 
