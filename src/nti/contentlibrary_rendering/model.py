@@ -95,6 +95,7 @@ class ContentPackageRenderJob(SchemaConfigured,
         """
         self.updateLastMod()
         self.State = FAILED
+        self.Error = reason
 
     def update_to_success_state(self):
         """

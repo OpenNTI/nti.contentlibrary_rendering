@@ -21,6 +21,7 @@ from zope.schema.vocabulary import SimpleVocabulary
 from nti.base.interfaces import ICreated
 from nti.base.interfaces import ILastModified
 
+from nti.schema.field import Text
 from nti.schema.field import Object
 from nti.schema.field import Choice
 from nti.schema.field import ValidTextLine
@@ -46,6 +47,9 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
                    title='The state for this render job',
                    required=False,
                    default=PENDING)
+
+    Error = Text(title="Renderin error.",
+                 required=False)
 
     def is_finished():
         """

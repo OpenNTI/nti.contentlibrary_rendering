@@ -13,6 +13,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
 
+from nti.contentlibrary_rendering._render import render_package_job
+
 from nti.contentlibrary_rendering.common import is_published
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
@@ -20,12 +22,12 @@ from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadat
 from nti.contentlibrary_rendering.processing import queue_add
 from nti.contentlibrary_rendering.processing import queue_modified
 
-from nti.contentlibrary_rendering._render import render_package_job
 
 def _create_render_job(package, user):
     meta = IContentPackageRenderMetadata(package)
     job = meta.createJob(package, user)
     return job
+
 
 def render_package(package, user):
     """
@@ -33,6 +35,7 @@ def render_package(package, user):
     """
     job = _create_render_job(package, user)
     queue_add(CONTENT_UNITS_QUEUE, render_package_job, job)
+
 
 def render_modified_package(package, user):
     """
