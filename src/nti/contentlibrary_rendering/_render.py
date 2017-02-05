@@ -14,14 +14,10 @@ import os
 from zope import component
 from zope import interface
 
-from nti.contentlibrary.filesystem import PersistentFilesystemContentUnit
-from nti.contentlibrary.filesystem import PersistentFilesystemContentPackage
-
-from nti.contentlibrary.filesystem import package_factory
-
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IRenderableContentPackage
+from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
 from nti.contentlibrary_rendering import RST_MIMETYPE
 
@@ -40,13 +36,12 @@ def copy_attributes(source, target, names):
             setattr(target, name, value)
 
 
-def copy_package_data(bucket, target):
+def copy_package_data(item, target):
     """
     copy rendered data to target
     """
-    package = package_factory(bucket,
-                              PersistentFilesystemContentPackage,
-                              PersistentFilesystemContentUnit)
+    factory = IEclipseContentPackageFactory(item)
+    package = factory.new_instance(item)
     assert package is not None, "Invalid rendered content directory"
 
     # all content pacakge attributes
@@ -90,9 +85,9 @@ def _do_render_package(render_job):
     # 2. Render
     render_latex(latex_file, package)
     # 3. Place in target location
-    bucket = locate_rendered_content(latex_file, package)
+    key_or_bucket = locate_rendered_content(latex_file, package)
     # 4. copy from target
-    copy_package_data(bucket, package)
+    copy_package_data(key_or_bucket, package)
     # 5. marked as rendered
     interface.alsoProvides(package, IContentRendered)
     return package
