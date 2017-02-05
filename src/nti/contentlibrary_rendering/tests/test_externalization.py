@@ -55,9 +55,10 @@ class TestExternalization(ContentlibraryRenderingTestLayer):
                     has_properties('JobId', is_(job_id),
                                    'PackageNTIID', is_(ntiid),
                                    'State', is_(PENDING)))
-        internal.update_to_failed_state()
+        internal.update_to_failed_state('error')
         ext_obj = to_external_object(internal)
         assert_that(ext_obj,
                     has_entries('JobId', is_(job_id),
                                 'PackageNTIID', is_(ntiid),
-                                'State', is_(FAILED)))
+                                'State', is_(FAILED),
+                                'Error', is_('error')))
