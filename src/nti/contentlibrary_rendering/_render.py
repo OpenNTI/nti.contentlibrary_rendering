@@ -55,7 +55,13 @@ def copy_package_data(item, target):
 
 
 def render_latex(tex_source, context=None):
-    return nti_render.render(tex_source)
+    current_dir = os.getcwd()
+    tex_dir = os.path.dirname(tex_source)
+    try:
+        os.chdir(tex_dir)
+        return nti_render.render(tex_source)
+    finally:
+        os.chdir(current_dir)
 
 
 def transform_content(context):
