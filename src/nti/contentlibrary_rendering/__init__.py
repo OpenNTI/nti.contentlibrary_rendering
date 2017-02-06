@@ -13,6 +13,9 @@ from zope import component
 
 from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
 
+#: text mime type
+TEXT_MIMETYPE = b'text/plain'
+
 #: reStructuredText mime type
 RST_MIMETYPE = b'text/x-rst'
 

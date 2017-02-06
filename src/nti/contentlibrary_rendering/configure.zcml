@@ -29,8 +29,15 @@
                          .interfaces.IContentPackageRenderMetadata"
         modules=".adapters .model" />
 
+	<!-- Transformers -->
+	<utility factory=".transformers.TextTransformer" name="text" />
+	<utility factory=".transformers.TextTransformer" name="text/plain" />
+	
 	<!-- Validators -->
-	<utility factory=".validators.ReStructuredTextValidator" />
+	<utility factory=".validators.TextValidator" name="text" />
+	<utility factory=".validators.TextValidator" name="text/plain" />
+
+	<utility factory=".validators.ReStructuredTextValidator" /> <-- default -->
 	<utility factory=".validators.ReStructuredTextValidator" name="text/x-rst" />
 	<utility factory=".validators.ReStructuredTextValidator" name="reStructuredText" />
 

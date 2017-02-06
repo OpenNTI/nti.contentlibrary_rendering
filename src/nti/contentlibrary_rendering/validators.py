@@ -28,13 +28,28 @@ class ValidationError(Exception):
     exc_info = None
 
 
+class EmptyContentError(ValidationError):
+    exc_info = None
+
+
+@interface.implementer(IContentValidator)
+class TextValidator(object):
+
+    def _do_validate(self, content):
+        if not content:
+            raise EmptyContentError("Empty content")
+
+    def validate(self, content=b'', context=None):
+        self._do_validate(content)
+
+
 @interface.implementer(IContentValidator)
 class ReStructuredTextValidator(object):
 
     settings = frontend.OptionParser(
         components=(Parser,)).get_default_values()
 
-    def _do_validate(self, content):
+    def _do_validate(self, content, context=None):
         try:
             parser = Parser()  # XXX: NTI directives should be included
             reporter = new_reporter("contents", self.settings)
@@ -47,6 +62,8 @@ class ReStructuredTextValidator(object):
             exct.exc_info = sys.exc_info()
             raise exct
 
-    def validate(self, content=b''):
+    def validate(self, content=b'', context=None):
         if content:
             self._do_validate(content)
+        else:
+            raise EmptyContentError("Empty content")
