@@ -45,6 +45,7 @@ class TestLocator(ContentlibraryRenderingLayerTest):
             assert_that(bucket.absolute_path, ends_with("1000"))
             assert_that(bucket.absolute_path, starts_with(target_dir))
             assert_that(os.path.exists(bucket.absolute_path), is_(True))
+            assert_that(os.path.isdir(bucket.absolute_path), is_(True))
             assert_that(os.path.exists(source_dir), is_(False))
         finally:
             shutil.rmtree(source_dir, True)
