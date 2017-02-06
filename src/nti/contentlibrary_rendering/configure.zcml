@@ -29,6 +29,11 @@
                          .interfaces.IContentPackageRenderMetadata"
         modules=".adapters .model" />
 
+	<!-- Validators -->
+	<utility factory=".validators.ReStructuredTextValidator" />
+	<utility factory=".validators.ReStructuredTextValidator" name="text/x-rst" />
+	<utility factory=".validators.ReStructuredTextValidator" name="reStructuredText" />
+
 	<!-- Rendering -->
 	<configure zcml:condition="have testmode">
 		<renderer:registerImmediateProcessingQueue />
