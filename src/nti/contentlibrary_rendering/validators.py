@@ -21,39 +21,31 @@ from docutils.utils import new_reporter
 
 from zope import interface
 
-from pyramid import httpexceptions as hexc
-
-from pyramid.threadlocal import get_current_request
-
-from nti.app.contentlibrary import MessageFactory as _
-
-from nti.app.externalization.error import raise_json_error
-
 from nti.contentlibrary.interfaces import IContentValidator
+
+
+class ValidationError(Exception):
+    exc_info = None
 
 
 @interface.implementer(IContentValidator)
 class ReStructuredTextValidator(object):
 
     settings = frontend.OptionParser(
-                    components=(Parser,)).get_default_values()
+        components=(Parser,)).get_default_values()
 
     def _do_validate(self, content):
         try:
             parser = Parser()  # XXX: NTI directives should be included
             reporter = new_reporter("contents", self.settings)
-            document = nodes.document(self.settings, reporter, source='contents')
+            document = nodes.document(self.settings,
+                                      reporter,
+                                      ource='contents')
             parser.parse(content, document)
-        except Exception:
-            exc_info = sys.exc_info()
-            request = get_current_request()
-            raise_json_error(request,
-                             hexc.HTTPUnprocessableEntity,
-                             {
-                                 u'message': _("Cannot parse reStructuredText."),
-                                 u'code': 'CannotParseReStructuredText',
-                             },
-                             exc_info[2])
+        except Exception as e:
+            exct = ValidationError("Invalid reStructuredText", e)
+            exct.exc_info = sys.exc_info()
+            raise exct
 
     def validate(self, content=b''):
         if content:
