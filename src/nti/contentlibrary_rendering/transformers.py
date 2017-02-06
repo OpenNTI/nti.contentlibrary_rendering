@@ -45,6 +45,8 @@ class TextTransformer(TransformerMixin):
         latex_file = os.path.join(out_dir, self._out_file(context))
         with open(latex_file, "wb") as fp:
             fp.write("\\documentclass{book}\n")
+            fp.write("%%% Body\n")
+            fp.write("\\begin{document}\n")
             fp.write(content)
             fp.write("\n\\end{document}\n")
         return latex_file
