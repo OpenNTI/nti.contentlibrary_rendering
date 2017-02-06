@@ -19,8 +19,9 @@ from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
 
+from nti.contentlibrary.filesystem import FilesystemBucket
+
 from nti.contentlibrary.interfaces import IContentPackageLibrary
-from nti.contentlibrary.interfaces import IFilesystemContentPackageLibrary
 
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
@@ -34,26 +35,14 @@ from nti.traversal.traversal import find_interface
 
 
 @interface.implementer(IRenderedContentLocator)
-class FilesystemLocator(object):
-
-    def __init__(self, bucket):
-        self.bucket = bucket
+class LocatorMixin(object):
 
     @Lazy
     def _intids(self):
         return component.getUtility(IIntIds)
 
     def _do_locate(self, path, context, root):
-        intid = str(self._intids.getId(context))
-        child = root.getChildNamed(intid)
-        if child is not None:
-            logger.warn("Removing %s", child)
-            destination = child.absolute_path
-            shutil.rmtree(child.absolute_path)
-        else:
-            destination = os.path.join(root.absolute_path, intid)
-        shutil.move(path, destination)
-        return root.getChildNamed(intid)
+        pass
 
     def locate(self, path, context):
         # validate
@@ -65,5 +54,21 @@ class FilesystemLocator(object):
         folder = find_interface(context, IHostPolicyFolder, strict=False)
         with current_site(get_host_site(folder.__name__)):
             library = component.getUtility(IContentPackageLibrary)
-            assert IFilesystemContentPackageLibrary.providedBy(library)
             return self._do_locate(path, context, library.root)
+
+
+@interface.implementer(IRenderedContentLocator)
+class FilesystemLocator(LocatorMixin):
+
+    def _do_locate(self, path, context, root):
+        assert isinstance(root, FilesystemBucket)
+        intid = str(self._intids.getId(context))
+        child = root.getChildNamed(intid)
+        if child is not None:
+            logger.warn("Removing %s", child)
+            destination = child.absolute_path
+            shutil.rmtree(child.absolute_path)
+        else:
+            destination = os.path.join(root.absolute_path, intid)
+        shutil.move(path, destination)
+        return root.getChildNamed(intid)
