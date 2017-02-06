@@ -48,7 +48,10 @@ class LocatorMixin(object):
     def _intids(self):
         return component.getUtility(IIntIds)
 
-    def _do_locate(self, path, context, root):
+    def _get_id(self, context):
+        return str(self._intids.getId(context))
+
+    def _do_locate(self, path, root, context):
         pass
 
     def locate(self, path, context):
@@ -61,15 +64,15 @@ class LocatorMixin(object):
         folder = find_interface(context, IHostPolicyFolder, strict=False)
         with current_site(get_host_site(folder.__name__)):
             library = component.getUtility(IContentPackageLibrary)
-            return self._do_locate(path, context, library.root)
+            return self._do_locate(path, library.root, context)
 
 
 @interface.implementer(IRenderedContentLocator)
 class FilesystemLocator(LocatorMixin):
 
-    def _do_locate(self, path, context, root):
+    def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
-        intid = str(self._intids.getId(context))
+        intid = self._get_id(context)
         child = root.getChildNamed(intid)
         if child is not None:
             logger.warn("Removing %s", child)
@@ -84,13 +87,9 @@ class FilesystemLocator(LocatorMixin):
 @interface.implementer(IRenderedContentLocator)
 class S3Locator(LocatorMixin):
 
-    @Lazy
+    @property
     def settings(self):
-        try:
-            from nti.appserver.interfaces import IApplicationSettings
-            return component.queryUtility(IApplicationSettings) or {}
-        except ImportError:
-            return {}
+        return {}
 
     @Lazy
     def aws_access_key_id(self):
@@ -100,7 +99,7 @@ class S3Locator(LocatorMixin):
     def aws_secret_access_key(self):
         return self.settings.get('AWS_SECRET_ACCESS_KEY')
 
-    def _do_locate(self, path, context, root, debug=True):
+    def _do_locate(self, path, root, context, debug=True):
         prefix = '/'
         headers = {}
         grant = 'public-read-write'
