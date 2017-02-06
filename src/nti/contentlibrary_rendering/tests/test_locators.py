@@ -47,6 +47,8 @@ class TestLocator(ContentlibraryRenderingLayerTest):
             assert_that(os.path.exists(bucket.absolute_path), is_(True))
             assert_that(os.path.isdir(bucket.absolute_path), is_(True))
             assert_that(os.path.exists(source_dir), is_(False))
+            assert_that(os.path.exists(os.path.join(bucket.absolute_path, 'sample.tex')),
+                        is_(True))
         finally:
             shutil.rmtree(source_dir, True)
             shutil.rmtree(target_dir, True)
