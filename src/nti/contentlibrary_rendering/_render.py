@@ -13,7 +13,8 @@ import os
 
 from zope import component
 from zope import interface
-
+from zope import lifecycleevent
+ 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
@@ -112,6 +113,8 @@ def _do_render_package(render_job):
     copy_package_data(key_or_bucket, package)
     # 5. marked as rendered
     interface.alsoProvides(package, IContentRendered)
+    # marked changed
+    lifecycleevent.modified(package)
     return package
 
 
