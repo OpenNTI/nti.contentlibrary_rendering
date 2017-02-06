@@ -37,10 +37,6 @@
 	<utility factory=".validators.TextValidator" name="text" />
 	<utility factory=".validators.TextValidator" name="text/plain" />
 
-	<utility factory=".validators.ReStructuredTextValidator" /> <-- default -->
-	<utility factory=".validators.ReStructuredTextValidator" name="text/x-rst" />
-	<utility factory=".validators.ReStructuredTextValidator" name="reStructuredText" />
-
 	<!-- Rendering -->
 	<configure zcml:condition="have testmode">
 		<renderer:registerImmediateProcessingQueue />
