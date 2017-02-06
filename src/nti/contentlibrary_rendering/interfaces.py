@@ -126,14 +126,13 @@ class IContentTransformer(interface.Interface):
 
 class IRenderedContentLocator(interface.Interface):
     """
-    A utility to [re]locate the files associated with a rendered content
+    An adapter to [re]locate the files associated with a rendered content
     """
 
-    def locate(path, context=None):
+    def locate(context):
         """
         [re]locate the rendered content
 
-        :param path Rendered content location
         :param context Locator context (e.g. :class:`IContentPackage`)
-        :return :class:`IBucket' with new location
+        :return :class:`IDelimitedHierarchyItem' with new location
         """

@@ -19,6 +19,9 @@ from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
+from nti.contentlibrary.library import register_content_units
+from nti.contentlibrary.library import unregister_content_units
+
 from nti.contentlibrary.zodb import RenderableContentUnit
 from nti.contentlibrary.zodb import RenderableContentPackage
 
@@ -39,10 +42,6 @@ def copy_attributes(source, target, names):
             setattr(target, name, value)
 
 
-def copy_unit_attributes(source, target):
-    copy_attributes(source, target, ('icon', 'thumbnail', 'href', 'key'))
-
-
 def copy_package_data(item, target):
     """
     copy rendered data to target
@@ -55,12 +54,17 @@ def copy_package_data(item, target):
 
     # all content pacakge attributes
     copy_attributes(package, target, IContentPackage.names())
-
-    # content unit attributes
-    copy_unit_attributes(package, target)
-
+    # copy unit attributes
+    copy_attributes(package, target, ('icon', 'thumbnail', 'href', 'key'))
     # displayable content
     copy_attributes(package, target, ('PlatformPresentationResources',))
+
+    if package.children:  # there are children
+        # unregister from target
+        unregister_content_units(target, main=False)
+        # copy to children to target
+        target.children = target.children_iterable_factory(package.children)
+        register_content_units(target)
 
 
 def render_latex(tex_source, context=None):
