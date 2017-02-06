@@ -14,6 +14,7 @@ import os
 from zope import component
 from zope import interface
 
+from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IRenderableContentPackage
@@ -51,28 +52,30 @@ def copy_package_data(item, target):
                                    RenderableContentPackage,
                                    RenderableContentUnit)
     assert package is not None, "Invalid rendered content directory"
-
+ 
     # all content pacakge attributes
     copy_attributes(package, target, IContentPackage.names())
     # copy unit attributes
-    copy_attributes(package, target, ('icon', 'thumbnail', 'href', 'key', 'ntiid'))
+    attributes = set(IContentUnit.names()) - {'children'}
+    copy_attributes(package, target, attributes)
     # displayable content
     copy_attributes(package, target, ('PlatformPresentationResources',))
-
+    # make sure we copy the new ntiid
+    target.ntiid = package.ntiid
     if package.children:  # there are children
         # unregister from target
         unregister_content_units(target, main=False)
         # copy to children to target
         target.children = target.children_iterable_factory(package.children)
-        register_content_units(target)
-
+        register_content_units(target, target)
+    return target
 
 def render_latex(tex_source, context=None):
     current_dir = os.getcwd()
     tex_dir = os.path.dirname(tex_source)
     try:
         os.chdir(tex_dir)
-        return nti_render.render(tex_source)
+        return nti_render.render(tex_source, provider='NTI')
     finally:
         os.chdir(current_dir)
 
@@ -84,7 +87,7 @@ def transform_content(context):
     return transformer.transform(context.contents, context=context)
 
 
-def locate_rendered_content(latex_file, context=None):
+def locate_rendered_content(latex_file, context):
     path, name = os.path.split(latex_file)
     name_noe, unused = os.path.splitext(name)
     path = os.path.join(path, name_noe)  # path to rendered contents
