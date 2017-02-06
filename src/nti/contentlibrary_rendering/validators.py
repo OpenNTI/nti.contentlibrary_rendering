@@ -31,4 +31,3 @@ class TextValidator(object):
 
     def validate(self, content=b'', context=None):
         self._do_validate(content)
-
