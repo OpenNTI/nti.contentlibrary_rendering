@@ -19,6 +19,9 @@ from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
+from nti.contentlibrary.zodb import RenderableContentUnit
+from nti.contentlibrary.zodb import RenderableContentPackage
+
 from nti.contentlibrary_rendering import RST_MIMETYPE
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
@@ -36,19 +39,25 @@ def copy_attributes(source, target, names):
             setattr(target, name, value)
 
 
+def copy_unit_attributes(source, target):
+    copy_attributes(source, target, ('icon', 'thumbnail', 'href', 'key'))
+
+
 def copy_package_data(item, target):
     """
     copy rendered data to target
     """
     factory = IEclipseContentPackageFactory(item)
-    package = factory.new_instance(item)
+    package = factory.new_instance(item,
+                                   RenderableContentPackage,
+                                   RenderableContentUnit)
     assert package is not None, "Invalid rendered content directory"
 
     # all content pacakge attributes
     copy_attributes(package, target, IContentPackage.names())
 
     # content unit attributes
-    copy_attributes(package, target, ('icon', 'thumbnail', 'href', 'key'))
+    copy_unit_attributes(package, target)
 
     # displayable content
     copy_attributes(package, target, ('PlatformPresentationResources',))
