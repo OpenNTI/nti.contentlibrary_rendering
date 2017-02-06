@@ -17,6 +17,8 @@ import boto
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import readproperty
+
 from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
@@ -91,11 +93,11 @@ class S3Locator(LocatorMixin):
     def settings(self):
         return {}
 
-    @Lazy
+    @readproperty
     def aws_access_key_id(self):
         return self.settings.get('AWS_ACCESS_KEY_ID')
 
-    @Lazy
+    @readproperty
     def aws_secret_access_key(self):
         return self.settings.get('AWS_SECRET_ACCESS_KEY')
 

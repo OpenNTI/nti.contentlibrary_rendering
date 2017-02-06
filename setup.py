@@ -60,6 +60,7 @@ setup(
         'nti.ntiids',
         'z3c.autoinclude',
         'zc.blist',
+        'zope.cachedescriptors',
         'zope.component',
         'zope.interface',
         'zope.location',
