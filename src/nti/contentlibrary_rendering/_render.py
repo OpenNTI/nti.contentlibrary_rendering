@@ -55,7 +55,7 @@ def copy_package_data(item, target):
     # all content pacakge attributes
     copy_attributes(package, target, IContentPackage.names())
     # copy unit attributes
-    copy_attributes(package, target, ('icon', 'thumbnail', 'href', 'key'))
+    copy_attributes(package, target, ('icon', 'thumbnail', 'href', 'key', 'ntiid'))
     # displayable content
     copy_attributes(package, target, ('PlatformPresentationResources',))
 

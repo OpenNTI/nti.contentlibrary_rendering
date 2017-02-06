@@ -12,6 +12,8 @@ logger = __import__('logging').getLogger(__name__)
 import os
 import shutil
 
+import boto
+
 from zope import component
 from zope import interface
 
@@ -22,6 +24,11 @@ from zope.intid.interfaces import IIntIds
 from nti.contentlibrary.filesystem import FilesystemBucket
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+
+from nti.contentlibrary.nti_s3put import IGNORED_DOTFILES
+
+from nti.contentlibrary.nti_s3put import get_key_name
+from nti.contentlibrary.nti_s3put import s3_upload_file
 
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
@@ -72,3 +79,56 @@ class FilesystemLocator(LocatorMixin):
             destination = os.path.join(root.absolute_path, intid)
         shutil.move(path, destination)
         return root.getChildNamed(intid)
+
+
+@interface.implementer(IRenderedContentLocator)
+class S3Locator(LocatorMixin):
+
+    @Lazy
+    def settings(self):
+        try:
+            from nti.appserver.interfaces import IApplicationSettings
+            return component.queryUtility(IApplicationSettings) or {}
+        except ImportError:
+            return {}
+
+    @Lazy
+    def aws_access_key_id(self):
+        return self.settings.get('AWS_ACCESS_KEY_ID')
+
+    @Lazy
+    def aws_secret_access_key(self):
+        return self.settings.get('AWS_SECRET_ACCESS_KEY')
+
+    def _do_locate(self, path, context, root, debug=True):
+        prefix = '/'
+        headers = {}
+        grant = 'public-read-write'
+        bucket_name = str(self._intids.getId(context))
+        connection = boto.connect_s3(aws_access_key_id=self.aws_access_key_id,
+                                     aws_secret_access_key=self.aws_secret_access_key)
+        connection.debug = debug
+        bucket = connection.get_bucket(bucket_name)
+        for root, _, files in os.walk(path):
+            for filename in files:
+                if filename in IGNORED_DOTFILES:
+                    continue
+
+                fullpath = os.path.join(root, filename)
+                key_name = get_key_name(fullpath, prefix)
+                logger.info('Copying %s to %s/%s',
+                            filename, bucket_name, key_name)
+
+                key = bucket.new_key(key_name)
+                file_headers = s3_upload_file(key,
+                                              fullpath,
+                                              policy=grant,
+                                              headers=headers)
+
+                logger.info('Copied %s to %s/%s as type %s encoding %s',
+                            filename, bucket_name, key_name,
+                            file_headers.get(
+                                'Content-Type',
+                                'application/octet-stream'),
+                            file_headers.get('Content-Encoding', 'identity'))
+        return bucket
