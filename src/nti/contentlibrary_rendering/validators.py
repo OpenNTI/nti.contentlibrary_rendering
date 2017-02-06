@@ -40,7 +40,7 @@ class ReStructuredTextValidator(object):
             reporter = new_reporter("contents", self.settings)
             document = nodes.document(self.settings,
                                       reporter,
-                                      ource='contents')
+                                      source='contents')
             parser.parse(content, document)
         except Exception as e:
             exct = ValidationError("Invalid reStructuredText", e)
