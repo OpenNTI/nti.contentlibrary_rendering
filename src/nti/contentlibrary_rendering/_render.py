@@ -14,10 +14,11 @@ import os
 from zope import component
 from zope import interface
 from zope import lifecycleevent
- 
+
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
+from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
@@ -48,28 +49,44 @@ def copy_package_data(item, target):
     """
     copy rendered data to target
     """
+    ntiid = target.ntiid
     factory = IEclipseContentPackageFactory(item)
     package = factory.new_instance(item,
                                    RenderableContentPackage,
                                    RenderableContentUnit)
     assert package is not None, "Invalid rendered content directory"
- 
-    # all content pacakge attributes
+
+    # 1. remove package in case ntiids change
+    library = component.queryUtility(IContentPackageLibrary)
+    if library is not None and ntiid != package.ntiid:
+        library.remove(package, event=False, unregister=False)
+
+    # 2. copy all new content package attributes
     copy_attributes(package, target, IContentPackage.names())
-    # copy unit attributes
+
+    # 3. copy unit attributes
     attributes = set(IContentUnit.names()) - {'children'}
     copy_attributes(package, target, attributes)
-    # displayable content
+
+    # 4. copy displayable content attributes
     copy_attributes(package, target, ('PlatformPresentationResources',))
-    # make sure we copy the new ntiid
+
+    # 5. make sure we copy the new ntiid
     target.ntiid = package.ntiid
-    if package.children:  # there are children
-        # unregister from target
-        unregister_content_units(target, main=False)
-        # copy to children to target
-        target.children = target.children_iterable_factory(package.children)
-        register_content_units(target, target)
+
+    # 6. unregister old units from target
+    unregister_content_units(target, main=False)
+    
+    # 7. register new children
+    target.children = target.children_iterable_factory(package.children or ())
+    register_content_units(target, target)
+
+    # 8. [re]register in the library if the ntiids changed
+    if library is not None and ntiid != package.ntiid:
+        library.add(package, event=False)
+
     return target
+
 
 def render_latex(tex_source, context=None):
     current_dir = os.getcwd()
@@ -103,16 +120,22 @@ def _do_render_package(render_job):
         raise ValueError("Package not found", ntiid)
     elif not IRenderableContentPackage.providedBy(package):
         raise TypeError("Invalid content package", ntiid)
+
     # 1. Transform to latex
     latex_file = transform_content(package)
+
     # 2. Render
     render_latex(latex_file, package)
+
     # 3. Place in target location
     key_or_bucket = locate_rendered_content(latex_file, package)
+
     # 4. copy from target
     copy_package_data(key_or_bucket, package)
+
     # 5. marked as rendered
     interface.alsoProvides(package, IContentRendered)
+
     # marked changed
     lifecycleevent.modified(package)
     return package
