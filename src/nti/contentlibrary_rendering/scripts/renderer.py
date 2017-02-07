@@ -42,8 +42,9 @@ class Constructor(Processor):
         includePluginsDirective(context, PP_CONTENT_RENDERING)
 
     def create_context(self, env_dir):
-        context = create_context(env_dir, with_library=True,
-                                 plugins=False,
+        context = create_context(env_dir, 
+                                 with_library=True,
+                                 plugins=True,
                                  slugs=True,
                                  slugs_files=("*content_render.zcml", "*features.zcml"))
         self.extend_context(context)
