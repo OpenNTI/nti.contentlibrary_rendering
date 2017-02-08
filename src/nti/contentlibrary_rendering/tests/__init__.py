@@ -54,7 +54,7 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
         annotations = component.getUtility(IContentUnitAnnotationUtility)
         annotations.annotations.clear()
         shutil.rmtree(cls.new_data_dir, True)
-        os.environ['DATASERVER_DATA_DIR'] = cls.old_cache
+        os.environ['CHAMELEON_CACHE'] = cls.old_cache
         os.environ['DATASERVER_DATA_DIR'] = cls.old_data_dir or '/tmp'
 
     @classmethod
