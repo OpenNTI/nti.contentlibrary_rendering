@@ -49,16 +49,15 @@ def copy_package_data(item, target):
     """
     copy rendered data to target
     """
-    ntiid = target.ntiid
     factory = IEclipseContentPackageFactory(item)
     package = factory.new_instance(item,
                                    RenderableContentPackage,
                                    RenderableContentUnit)
     assert package is not None, "Invalid rendered content directory"
 
-    # 1. remove package in case ntiids change
+    # 1. remove package to clear internal structures
     library = component.queryUtility(IContentPackageLibrary)
-    if library is not None and ntiid != package.ntiid:
+    if library is not None:
         library.remove(package, event=False, unregister=False)
 
     # 2. copy all new content package attributes
@@ -74,15 +73,16 @@ def copy_package_data(item, target):
     # 5. make sure we copy the new ntiid
     target.ntiid = package.ntiid
 
-    # 6. unregister old units from target
-    unregister_content_units(target, main=False)
+    # 6. unregister from the intid facility the target old children
+    for unit in target.children or ():
+        unregister_content_units(unit)
     
-    # 7. register new children
+    # 7. register with the intid facility the new children
     target.children = target.children_iterable_factory(package.children or ())
     register_content_units(target, target)
 
-    # 8. [re]register in the library if the ntiids changed
-    if library is not None and ntiid != package.ntiid:
+    # 8. [re]register in the library to populate internal structures
+    if library is not None:
         library.add(package, event=False)
 
     return target
