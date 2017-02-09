@@ -38,6 +38,15 @@ from nti.contentrendering import nti_render
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 
+def clean_attributes(target, names):
+    for name in names or ():
+        if name in ('ntiid', 'NTIID'):
+            continue
+        value = getattr(target, name, None)
+        if value is not None:
+            setattr(target, name, None)
+
+
 def copy_attributes(source, target, names):
     for name in names or ():
         value = getattr(source, name, None)
@@ -64,7 +73,7 @@ def copy_package_data(item, target):
     copy_attributes(package, target, IContentPackage.names())
 
     # 3. copy unit attributes
-    attributes = set(IContentUnit.names()) - {'children'}
+    attributes = set(IContentUnit.names()) - {'children', 'ntiid'}
     copy_attributes(package, target, attributes)
 
     # 4. copy displayable content attributes
@@ -76,7 +85,7 @@ def copy_package_data(item, target):
     # 6. unregister from the intid facility the target old children
     for unit in target.children or ():
         unregister_content_units(unit)
-    
+
     # 7. register with the intid facility the new children
     target.children = target.children_iterable_factory(package.children or ())
     register_content_units(target, target)
