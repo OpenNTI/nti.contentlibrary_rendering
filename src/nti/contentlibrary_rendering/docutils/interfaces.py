@@ -14,11 +14,21 @@ from zope import interface
 
 class IRolesModule(interface.Interface):
     """
-    Marker interface for a docutils roles module
+    Interface to register docutil roles
     """
+
+    def register_roles():
+        """
+        register toles
+        """
 
 
 class IDirectivesModule(interface.Interface):
     """
-    Marker interface for a docutils directives module
+    Interface to regiter docutil directives
     """
+
+    def register_directives():
+        """
+        register directives
+        """

@@ -15,7 +15,7 @@ from docutils.nodes import Inline
 from docutils.nodes import TextElement
 
 from docutils.parsers.rst import roles
-from docutils.parsers.rst import languages 
+from docutils.parsers.rst import languages
 
 
 class bolditalic(Inline, TextElement):
@@ -37,12 +37,15 @@ class bolditalicunderlined(Inline, TextElement):
 def register_role(name, cls):
     languages.en.roles[name] = name
     roles.register_generic_role(name, cls)
+    return cls
 
-register_role('bolditalic', bolditalic)
-register_role('boldunderlined', boldunderlined)
-register_role('italicunderlined', italicunderlined)
-register_role('bolditalicunderlined', bolditalicunderlined)
 
+def register_roles():
+    register_role('bolditalic', bolditalic)
+    register_role('boldunderlined', boldunderlined)
+    register_role('italicunderlined', italicunderlined)
+    register_role('bolditalicunderlined', bolditalicunderlined)
+register_roles()
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRolesModule
 interface.moduleProvides(IRolesModule)
