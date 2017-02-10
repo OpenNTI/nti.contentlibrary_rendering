@@ -10,10 +10,13 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
+import tempfile
 
 from zope import component
 from zope import interface
 from zope import lifecycleevent
+
+from zope.intid.interfaces import IIntIds
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
@@ -35,8 +38,19 @@ from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
 from nti.contentrendering import nti_render
 
+from nti.contentrendering.plastexids import patch_all
+
+from nti.contentrendering.render_document import prepare_document_settings
+from nti.contentrendering.render_document import prepare_rendering_context
+
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+# Patch our plastex early.
+patch_all()
+
+
+def _intids(self):
+    return component.getUtility(IIntIds)
 
 def clean_attributes(target, names):
     for name in names or ():
@@ -97,12 +111,17 @@ def copy_package_data(item, target):
     return target
 
 
-def render_latex(tex_source, context=None):
+def render_plastex_dom(tex_dom, jobname=None, context=None, outfile_dir=None):
     current_dir = os.getcwd()
-    tex_dir = os.path.dirname(tex_source)
+    tex_dir = outfile_dir or tempfile.mkdtemp()
     try:
         os.chdir(tex_dir)
-        return nti_render.render(tex_source, provider='NTI')
+        # Pull in all necessary plugins/configs.
+        prepare_rendering_context()
+        # Prep and render
+        prepare_document_settings(tex_dom)
+        jobname = jobname or _intids.getId(context)
+        return nti_render.process_document(tex_dom, jobname)
     finally:
         os.chdir(current_dir)
 
@@ -130,14 +149,15 @@ def _do_render_package(render_job):
     elif not IRenderableContentPackage.providedBy(package):
         raise TypeError("Invalid content package", ntiid)
 
-    # 1. Transform to latex
-    latex_file = transform_content(package)
+    # 1. Transform to plastex_dom
+    plastex_dom = transform_content(package)
 
     # 2. Render
-    render_latex(latex_file, package)
+    render_plastex_dom(plastex_dom, context=package)
 
     # 3. Place in target location
-    key_or_bucket = locate_rendered_content(latex_file, package)
+    key_or_bucket = None
+    #key_or_bucket = locate_rendered_content(latex_file, package)
 
     # 4. copy from target
     copy_package_data(key_or_bucket, package)
