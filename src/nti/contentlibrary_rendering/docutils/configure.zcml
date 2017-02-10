@@ -8,7 +8,11 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
-	<module module=".roles" />
-	<module module=".directives" />
-	
+	<module module=".roles">
+		<allow interface=".interfaces.IRolesModule" />
+	</module>
+	<module module=".directives">
+		<allow interface=".interfaces.IDirectivesModule" />
+	</module>
+
 </configure>
