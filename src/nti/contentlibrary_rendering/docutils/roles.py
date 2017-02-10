@@ -14,7 +14,8 @@ from zope import interface
 from docutils.nodes import Inline
 from docutils.nodes import TextElement
 
-from docutils.parsers.rst import roles, languages
+from docutils.parsers.rst import roles
+from docutils.parsers.rst import languages 
 
 
 class bolditalic(Inline, TextElement):

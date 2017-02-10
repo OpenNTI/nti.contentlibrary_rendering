@@ -46,4 +46,6 @@
 		<renderer:registerProcessingQueue />
 	</configure>
 
+	<include package=".docutils" />
+
 </configure>
