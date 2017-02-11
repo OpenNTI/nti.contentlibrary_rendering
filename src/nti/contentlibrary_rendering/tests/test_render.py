@@ -16,7 +16,6 @@ from hamcrest import has_property
 import os
 import shutil
 import tempfile
-import unittest
 
 from nti.contentlibrary.filesystem import FilesystemBucket
 
@@ -24,29 +23,32 @@ from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.contentlibrary_rendering._render import copy_package_data
 
+from nti.contentrendering.nti_render import process_document
+
+from nti.contentrendering.render_document import parse_tex
+
+
 from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 
-@unittest.SkipTest
 class TestRender(ContentlibraryRenderingLayerTest):
 
-    def _render_sample(self, tmp_dir):
+    def _parse_sample(self, tmp_dir):
         source = os.path.join(os.path.dirname(__file__), 'sample.tex')
-        sample_tex = os.path.join(tmp_dir, "sample.tex")
-        shutil.copy(source, sample_tex)
-        return None
-        # return render_latex(sample_tex)
+        document, _, jobname, _ = parse_tex(source,
+                                            outdir=tmp_dir,
+                                            provider='NTI')
+        return process_document(document, jobname=jobname)
 
     def test_render_copy(self):
         tmp_dir = tempfile.mkdtemp()
         try:
             # render
-            document = self._render_sample(tmp_dir)
+            document = self._parse_sample(tmp_dir)
             assert_that(document, is_not(none()))
             # copy to target data
-            sample = os.path.join(tmp_dir, "sample")
             bucket = FilesystemBucket(name="sample")
-            bucket.absolute_path = sample
+            bucket.absolute_path = tmp_dir
             target = RenderableContentPackage()
             copy_package_data(bucket, target)
             # check
