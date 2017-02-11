@@ -19,6 +19,10 @@ from zope.intid.interfaces import IIntIds
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 
+from nti.contentrendering.nti_render import process_document
+
+from nti.contentrendering.render_document import parse_tex
+
 from nti.property.property import Lazy
 
 
@@ -36,17 +40,36 @@ class TransformerMixin(object):
 
 
 @interface.implementer(IContentTransformer)
-class TextTransformer(TransformerMixin):
+class LaTeXTransformer(TransformerMixin):
 
-    def transform(self, content, context, out_dir=None):
-        out_dir = out_dir or tempfile.mkdtemp()
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
-        latex_file = os.path.join(out_dir, self._out_file(context))
+    @classmethod
+    def render_latex(cls, source, out_dir):
+        document, _, jobname, _ = parse_tex(source,
+                                            outdir=out_dir,
+                                            provider='NTI')
+        return process_document(document, jobname=jobname)
+
+    def write_out(self, content, latex_file):
         with open(latex_file, "wb") as fp:
-            fp.write("\\documentclass{book}\n")
-            fp.write("%%% Body\n")
-            fp.write("\\begin{document}\n")
             fp.write(content)
-            fp.write("\n\\end{document}\n")
-        return latex_file
+
+    def transform(self, content, context):
+        out_dir = tempfile.mkdtemp()
+        latex_file = os.path.join(out_dir, self._out_file(context))
+        try:
+            self.write_out(content, latex_file)
+            return self.render_latex(latex_file, out_dir)
+        finally:
+            os.remove(latex_file)
+
+
+@interface.implementer(IContentTransformer)
+class TextTransformer(LaTeXTransformer):
+
+    def write_out(self, content, latex_file):
+        with open(latex_file, "wb") as fp:
+            fp.write(b"\\documentclass{book}\n")
+            fp.write(b"%%% Body\n")
+            fp.write(b"\\begin{document}\n")
+            fp.write(content)
+            fp.write(b"\n\\end{document}\n")
