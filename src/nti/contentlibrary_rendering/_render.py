@@ -52,10 +52,9 @@ patch_all()
 def _intids(self):
     return component.getUtility(IIntIds)
 
+
 def clean_attributes(target, names):
     for name in names or ():
-        if name in ('ntiid', 'NTIID'):
-            continue
         value = getattr(target, name, None)
         if value is not None:
             setattr(target, name, None)
@@ -111,7 +110,7 @@ def copy_package_data(item, target):
     return target
 
 
-def render_plastex_dom(tex_dom, jobname=None, context=None, outfile_dir=None):
+def render_plastex_dom(tex_dom, context=None, outfile_dir=None):
     current_dir = os.getcwd()
     tex_dir = outfile_dir or tempfile.mkdtemp()
     try:
@@ -120,7 +119,7 @@ def render_plastex_dom(tex_dom, jobname=None, context=None, outfile_dir=None):
         prepare_rendering_context()
         # Prep and render
         prepare_document_settings(tex_dom)
-        jobname = jobname or _intids.getId(context)
+        jobname = _intids.getId(context)
         return nti_render.process_document(tex_dom, jobname)
     finally:
         os.chdir(current_dir)

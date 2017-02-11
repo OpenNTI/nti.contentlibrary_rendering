@@ -11,5 +11,9 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
+
+def register_directives():
+    pass
+
 from nti.contentlibrary_rendering.docutils.interfaces import IDirectivesModule
 interface.moduleProvides(IDirectivesModule)
