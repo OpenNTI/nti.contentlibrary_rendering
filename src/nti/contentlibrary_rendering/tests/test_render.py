@@ -41,9 +41,11 @@ class TestRender(ContentlibraryRenderingLayerTest):
         return process_document(document, jobname=jobname)
 
     def test_render_copy(self):
+        cwd = os.getcwd()
         tmp_dir = tempfile.mkdtemp()
         try:
             # render
+            os.chdir(tmp_dir)
             document = self._parse_sample(tmp_dir)
             assert_that(document, is_not(none()))
             # copy to target data
@@ -57,4 +59,5 @@ class TestRender(ContentlibraryRenderingLayerTest):
             assert_that(target,
                         has_property('children', has_length(3)))
         finally:
+            os.chdir(cwd)
             shutil.rmtree(tmp_dir, True)
