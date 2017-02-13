@@ -18,6 +18,8 @@ from zope.component.hooks import site as current_site
 
 from nti.async import create_job
 
+from nti.contentlibrary_rendering import get_factory
+
 from nti.contentlibrary_rendering.common import get_site
 from nti.contentlibrary_rendering.common import get_render_job
 
@@ -27,7 +29,11 @@ from nti.site.site import get_site_for_site_names
 
 from nti.site.transient import TrivialSite
 
-from nti.contentlibrary_rendering import get_factory
+
+def _dataserver_folder():
+    dataserver = component.getUtility(IDataserver)
+    return dataserver.root_folder['dataserver2']
+
 
 def _do_execute_job(*args, **kwargs):
     args = BList(args)
@@ -40,8 +46,7 @@ def _do_execute_job(*args, **kwargs):
             'Job missing (deleted?) before event could be processed; event dropped. (%s) (%s) (%s)',
             job_id, package_ntiid, func)
         return
-    result = func(render_job, *args, **kwargs)
-    return result
+    return func(render_job, *args, **kwargs)
 
 
 def _get_job_site(job_site_name=None):
@@ -49,8 +54,7 @@ def _get_job_site(job_site_name=None):
     if job_site_name is None:
         job_site = old_site
     else:
-        dataserver = component.getUtility(IDataserver)
-        ds_folder = dataserver.root_folder['dataserver2']
+        ds_folder = _dataserver_folder()
         with current_site(ds_folder):
             job_site = get_site_for_site_names((job_site_name,))
 
