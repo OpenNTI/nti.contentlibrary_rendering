@@ -43,14 +43,12 @@ from nti.contentrendering.plastexids import patch_all
 from nti.contentrendering.render_document import prepare_document_settings
 from nti.contentrendering.render_document import prepare_rendering_context
 
+from nti.externalization.proxy import removeAllProxies
+
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 # Patch our plastex early.
 patch_all()
-
-
-def _intids(self):
-    return component.getUtility(IIntIds)
 
 
 def clean_attributes(target, names):
@@ -110,16 +108,20 @@ def copy_package_data(item, target):
     return target
 
 
-def render_plastex_dom(tex_dom, context=None, outfile_dir=None):
+def render_plastex_dom(tex_dom, context=None, outfile_dir=None, jobname=None):
     current_dir = os.getcwd()
     tex_dir = outfile_dir or tempfile.mkdtemp()
     try:
+        # XXX: Do we need to read in render_conf? How about
+        # cross-document refs?
         os.chdir(tex_dir)
         # Pull in all necessary plugins/configs.
         prepare_rendering_context()
         # Prep and render
         prepare_document_settings(tex_dom)
-        jobname = _intids.getId(context)
+        intids = component.getUtility(IIntIds)
+        jobname = str(jobname or intids.getId(context))
+        tex_dom.userdata['jobname'] = jobname
         return nti_render.process_document(tex_dom, jobname)
     finally:
         os.chdir(current_dir)
@@ -143,6 +145,7 @@ def locate_rendered_content(latex_file, context):
 def _do_render_package(render_job):
     ntiid = render_job.PackageNTIID
     package = find_object_with_ntiid(ntiid)
+    package = removeAllProxies( package )
     if package is None:
         raise ValueError("Package not found", ntiid)
     elif not IRenderableContentPackage.providedBy(package):

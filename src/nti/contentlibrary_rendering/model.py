@@ -15,6 +15,8 @@ from zope import interface
 
 from zope.container.contained import Contained
 
+from nti.common.string import to_unicode
+
 from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
 from nti.contentlibrary_rendering.interfaces import SUCCESS
@@ -95,7 +97,7 @@ class ContentPackageRenderJob(SchemaConfigured,
         """
         self.updateLastMod()
         self.State = FAILED
-        self.Error = reason
+        self.Error = to_unicode(reason)
 
     def update_to_success_state(self):
         """

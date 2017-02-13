@@ -48,7 +48,7 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
                    required=False,
                    default=PENDING)
 
-    Error = Text(title="Renderin error.",
+    Error = Text(title="Rendering error.",
                  required=False)
 
     def is_finished():
@@ -115,12 +115,25 @@ class IContentTransformer(interface.Interface):
 
     def transform(content, context=None, out_dir=None):
         """
-        Transform the specfied content to a latex file for rendering
+        Transform the specified content to a latex file for rendering
 
-        :param content String or buffer withe the content to transform
+        :param content String or buffer with the content to transform
         :param context Transformer context (e.g. :class:`IContentPackage`)
         :param out_dir Output directory
         :return a latex file
+        """
+
+class IRSTToPlastexDocumentTransformer(interface.Interface):
+    """
+    A utility to transform an RST document into a plasTeX document.
+    """
+
+    def transform(rst_document):
+        """
+        Transform the specfied content to a latex file for rendering
+
+        :param rst_document The RST document to transform
+        :return a plasTeX document
         """
 
 
