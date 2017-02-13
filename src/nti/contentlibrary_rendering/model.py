@@ -15,7 +15,7 @@ from zope import interface
 
 from zope.container.contained import Contained
 
-from nti.common.string import to_unicode
+from nti.base._compat import to_unicode
 
 from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
