@@ -23,24 +23,24 @@ from nti.contentlibrary_rendering.processing import queue_add
 from nti.contentlibrary_rendering.processing import queue_modified
 
 
-def _create_render_job(package, user):
+def _create_render_job(package, user, mark_rendered=True):
     meta = IContentPackageRenderMetadata(package)
-    job = meta.createJob(package, user)
+    job = meta.createJob(package, user, mark_rendered)
     return job
 
 
-def render_package(package, user):
+def render_package(package, user, mark_rendered=True):
     """
     Render the given package. This may not be performed synchronously.
     """
-    job = _create_render_job(package, user)
+    job = _create_render_job(package, user, mark_rendered)
     queue_add(CONTENT_UNITS_QUEUE, render_package_job, job)
 
 
-def render_modified_package(package, user):
+def render_modified_package(package, user, mark_rendered=True):
     """
     Render the updated package (if published). This may not be performed synchronously.
     """
-    job = _create_render_job(package, user)
+    job = _create_render_job(package, user, mark_rendered)
     if is_published(package):
         queue_modified(CONTENT_UNITS_QUEUE, render_package_job, job)

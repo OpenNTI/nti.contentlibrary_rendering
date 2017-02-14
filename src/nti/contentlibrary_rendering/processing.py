@@ -38,13 +38,12 @@ def _dataserver_folder():
 def _do_execute_job(*args, **kwargs):
     args = BList(args)
     func = args.pop(0)
-    package_ntiid = kwargs.pop('package_ntiid')
     job_id = kwargs.pop('job_id')
+    package_ntiid = kwargs.pop('package_ntiid', None)
     render_job = get_render_job(package_ntiid, job_id)
     if render_job is None:
-        logger.info(
-            'Job missing (deleted?) before event could be processed; event dropped. (%s) (%s) (%s)',
-            job_id, package_ntiid, func)
+        logger.info('Job missing (deleted?); event dropped. (%s) (%s) (%s)',
+                    job_id, package_ntiid, func)
         return
     return func(render_job, *args, **kwargs)
 
@@ -82,7 +81,10 @@ def get_job_queue(name):
 
 def put_job(queue_name, func, job_id=None, *args, **kwargs):
     queue = get_job_queue(queue_name)
-    job = create_job(_execute_job, func, job_id=job_id, *args, **kwargs)
+    job = create_job(_execute_job,
+                     func,
+                     job_id=job_id,
+                     *args, **kwargs)
     job.id = job_id
     queue.put(job)
     return job
@@ -92,9 +94,10 @@ def add_to_queue(queue_name, func, obj, **kwargs):
     site = get_site()
     return put_job(queue_name,
                    func,
-                   package_ntiid=obj.PackageNTIID,
+                   site_name=site,
                    job_id=obj.JobId,
-                   site_name=site, **kwargs)
+                   package_ntiid=obj.PackageNTIID,
+                   **kwargs)
 
 
 def queue_add(name, func, obj, **kwargs):

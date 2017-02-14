@@ -47,8 +47,8 @@ def get_render_job(package_ntiid, job_id):
     """
     Get a render job from the given package_ntiid and job_id.
     """
-    package = find_object_with_ntiid( package_ntiid )
-    meta = IContentPackageRenderMetadata( package, None )
+    package = find_object_with_ntiid(package_ntiid)
+    meta = IContentPackageRenderMetadata(package, None)
     try:
         result = meta[job_id]
     except (KeyError, TypeError, AttributeError):

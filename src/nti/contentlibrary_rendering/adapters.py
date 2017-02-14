@@ -18,6 +18,8 @@ from zope import interface
 
 from zope.annotation.factory import factory as an_factory
 
+from zope.location.interfaces import IContained
+
 from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
 
 from nti.contentlibrary.interfaces import IRenderableContentPackage
@@ -31,7 +33,7 @@ from nti.coremetadata.interfaces import SYSTEM_USER_ID
 from nti.zodb.containers import time_to_64bit_int
 
 
-@component.adapter(IRenderableContentPackage)
+@component.adapter(IRenderableContentPackage, IContained)
 @interface.implementer(IContentPackageRenderMetadata)
 class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTreeContainer):
     """
@@ -53,12 +55,16 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         result = '%s.%s.%s' % (job.PackageNTIID, username, current_time)
         return result
 
-    def createJob(self, package=None, creator=SYSTEM_USER_ID):
+    def _creator(self, creator=None):
         creator = getattr(creator, 'username', creator) or SYSTEM_USER_ID
-        creator = getattr(creator, 'id', creator) # in case of a principal
+        creator = getattr(creator, 'id', creator)  # in case of a principal
+        return creator
+
+    def createJob(self, package=None, creator=None, mark_rendered=True):
         package = package if package is not None else self.__parent__
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
-        result.creator = creator
+        result.MarkRendered = mark_rendered
+        result.creator = self._creator(creator)
         result.JobId = self._create_unique_job_key(result)
         self[result.JobId] = result
         return result

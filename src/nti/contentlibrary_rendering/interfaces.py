@@ -21,6 +21,7 @@ from zope.schema.vocabulary import SimpleVocabulary
 from nti.base.interfaces import ICreated
 from nti.base.interfaces import ILastModified
 
+from nti.schema.field import Bool
 from nti.schema.field import Text
 from nti.schema.field import Object
 from nti.schema.field import Choice
@@ -47,6 +48,10 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
                    title='The state for this render job',
                    required=False,
                    default=PENDING)
+
+    MarkRendered = Bool(title="Mark package as rendered.",
+                        required=False,
+                        default=True)
 
     Error = Text(title="Rendering error.",
                  required=False)
@@ -89,7 +94,7 @@ class IContentPackageRenderMetadata(IContainer):
                                   default=(),
                                   required=False)
 
-    def createJob(package, creator):
+    def createJob(package, creator, mark_rendered=True):
         """
         Creates and returns a `IContentPackageRenderJob`.
         """
@@ -122,6 +127,7 @@ class IContentTransformer(interface.Interface):
         :param out_dir Output directory
         :return a latex file
         """
+
 
 class IRSTToPlastexDocumentTranslator(interface.Interface):
     """

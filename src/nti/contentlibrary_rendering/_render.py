@@ -174,7 +174,8 @@ def _do_render_package(render_job):
     copy_package_data(key_or_bucket, package)
 
     # 5. marked as rendered
-    interface.alsoProvides(package, IContentRendered)
+    if render_job.MarkRendered:
+        interface.alsoProvides(package, IContentRendered)
 
     # marked changed
     lifecycleevent.modified(package)
