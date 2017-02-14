@@ -142,8 +142,9 @@ def transform_content(context):
     return transformer.transform(context.contents, context=context)
 
 
-def locate_rendered_content(latex_file, context):
-    path, name = os.path.split(latex_file)
+def locate_rendered_content(tex_dom, context):
+    output_dir = tex_dom.userdata['working-dir']
+    path, name = os.path.split(output_dir)
     name_noe, unused = os.path.splitext(name)
     path = os.path.join(path, name_noe)  # path to rendered contents
     locator = component.getUtility(IRenderedContentLocator)
@@ -163,12 +164,10 @@ def _do_render_package(render_job):
     rst_dom = transform_content(package)
 
     # 2. Render
-    render_document(rst_dom, context=package)
+    tex_dom = render_document(rst_dom, context=package)
 
     # 3. Place in target location
-    key_or_bucket = None
-    # FIXME
-    #key_or_bucket = locate_rendered_content(latex_file, package)
+    key_or_bucket = locate_rendered_content(tex_dom, package)
 
     # 4. copy from target
     copy_package_data(key_or_bucket, package)
