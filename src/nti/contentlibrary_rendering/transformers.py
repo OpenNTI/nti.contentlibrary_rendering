@@ -17,6 +17,8 @@ from zope import interface
 
 from zope.intid.interfaces import IIntIds
 
+from nti.contentlibrary_rendering.docutils import get_rst_dom
+
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 
 from nti.contentrendering.nti_render import process_document
@@ -73,3 +75,13 @@ class TextTransformer(LaTeXTransformer):
             fp.write(b"\\begin{document}\n")
             fp.write(content)
             fp.write(b"\n\\end{document}\n")
+
+@interface.implementer(IContentTransformer)
+class RSTTransformer(TransformerMixin):
+    """
+    Transforms an RST textual source into an RST DOM.
+    """
+
+    def transform(self, content, context):
+        rst_dom = get_rst_dom(source=content)
+        return rst_dom

@@ -123,16 +123,17 @@ class IContentTransformer(interface.Interface):
         :return a latex file
         """
 
-class IRSTToPlastexDocumentTransformer(interface.Interface):
+class IRSTToPlastexDocumentTranslator(interface.Interface):
     """
-    A utility to transform an RST document into a plasTeX document.
+    A utility to translate an RST document into a plasTeX document.
     """
 
-    def transform(rst_document):
+    def translate(rst_document, tex_doc=None):
         """
-        Transform the specfied content to a latex file for rendering
+        Translate the specified RST document into a plasTeX document.
 
         :param rst_document The RST document to transform
+        :param tex_doc If provided, the plasTeX document to build.
         :return a plasTeX document
         """
 

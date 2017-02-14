@@ -32,7 +32,9 @@
 	<!-- Transformers -->
 	<utility factory=".transformers.TextTransformer" name="text" />
 	<utility factory=".transformers.TextTransformer" name="text/plain" />
-	
+	<utility factory=".transformers.RSTTransformer" name="rst" />
+    <utility factory=".transformers.RSTTransformer" name="text/x-rst" />
+
 	<utility factory=".transformers.LaTeXTransformer" name="TeX" />
 	<utility factory=".transformers.LaTeXTransformer" name="LaTeX" />
 	<utility factory=".transformers.LaTeXTransformer" name="application/x-latex" />

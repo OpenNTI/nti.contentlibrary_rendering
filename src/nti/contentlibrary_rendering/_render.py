@@ -12,6 +12,8 @@ logger = __import__('logging').getLogger(__name__)
 import os
 import tempfile
 
+from plasTeX import TeXDocument
+
 from zope import component
 from zope import interface
 from zope import lifecycleevent
@@ -35,6 +37,7 @@ from nti.contentlibrary_rendering import RST_MIMETYPE
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
+from nti.contentlibrary_rendering.interfaces import IRSTToPlastexDocumentTranslator
 
 from nti.contentrendering import nti_render
 
@@ -108,20 +111,25 @@ def copy_package_data(item, target):
     return target
 
 
-def render_plastex_dom(tex_dom, context=None, outfile_dir=None, jobname=None):
+def render_document(rst_dom, context=None, outfile_dir=None, jobname=None):
     current_dir = os.getcwd()
     tex_dir = outfile_dir or tempfile.mkdtemp()
     try:
         # XXX: Do we need to read in render_conf? How about
         # cross-document refs?
         os.chdir(tex_dir)
+        tex_dom = TeXDocument()
         # Pull in all necessary plugins/configs.
         prepare_rendering_context()
-        # Prep and render
+        # Prep our doc
         prepare_document_settings(tex_dom)
         intids = component.getUtility(IIntIds)
         jobname = str(jobname or intids.getId(context))
         tex_dom.userdata['jobname'] = jobname
+
+        # Translate into a plasTeX DOM and render.
+        transformer = component.getUtility(IRSTToPlastexDocumentTranslator)
+        transformer.translate(rst_dom, tex_dom)
         return nti_render.process_document(tex_dom, jobname)
     finally:
         os.chdir(current_dir)
@@ -152,13 +160,14 @@ def _do_render_package(render_job):
         raise TypeError("Invalid content package", ntiid)
 
     # 1. Transform to plastex_dom
-    plastex_dom = transform_content(package)
+    rst_dom = transform_content(package)
 
     # 2. Render
-    render_plastex_dom(plastex_dom, context=package)
+    render_document(rst_dom, context=package)
 
     # 3. Place in target location
     key_or_bucket = None
+    # FIXME
     #key_or_bucket = locate_rendered_content(latex_file, package)
 
     # 4. copy from target
