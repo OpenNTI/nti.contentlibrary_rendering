@@ -11,6 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from docutils.core import publish_doctree
 
+
 def get_rst_dom(source):
     rst_dom = publish_doctree(source=source)
     return rst_dom

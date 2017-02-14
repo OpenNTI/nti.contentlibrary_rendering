@@ -76,6 +76,7 @@ class TextTransformer(LaTeXTransformer):
             fp.write(content)
             fp.write(b"\n\\end{document}\n")
 
+
 @interface.implementer(IContentTransformer)
 class RSTTransformer(TransformerMixin):
     """
