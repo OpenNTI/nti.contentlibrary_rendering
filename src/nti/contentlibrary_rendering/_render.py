@@ -123,8 +123,9 @@ def render_document(rst_dom, context=None, outfile_dir=None, jobname=None):
         prepare_rendering_context()
         # Prep our doc
         prepare_document_settings(tex_dom)
-        intids = component.getUtility(IIntIds)
-        jobname = str(jobname or intids.getId(context))
+        if jobname is None:
+            intids = component.getUtility(IIntIds)
+            jobname = intids.getId(context)
         tex_dom.userdata['jobname'] = jobname
 
         # Translate into a plasTeX DOM and render.
