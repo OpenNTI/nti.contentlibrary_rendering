@@ -12,6 +12,7 @@ logger = __import__('logging').getLogger(__name__)
 import os
 import tempfile
 
+from plasTeX import Base
 from plasTeX import TeXDocument
 
 from zope import component
@@ -43,8 +44,9 @@ from nti.contentrendering import nti_render
 
 from nti.contentrendering.plastexids import patch_all
 
+from nti.contentrendering.render_document import load_packages
+from nti.contentrendering.render_document import setup_environ
 from nti.contentrendering.render_document import prepare_document_settings
-from nti.contentrendering.render_document import prepare_rendering_context
 
 from nti.externalization.proxy import removeAllProxies
 
@@ -111,24 +113,37 @@ def copy_package_data(item, target):
     return target
 
 
+def _get_and_prepare_doc(context, jobname=None):
+    """
+    Build and prepare context for our plasTeX document.
+    """
+    # XXX: Do we need to read in render_conf? How about cross-document refs?
+    tex_dom = TeXDocument()
+    Base.document.filenameoverride = property(lambda unused: 'index')
+    # Prep our doc
+    prepare_document_settings(tex_dom, provider='NTI')
+    # Pull in all necessary plugins/configs/templates.
+    context, packages_path = load_packages(context=context)
+    setup_environ(tex_dom, jobname, packages_path)
+    if jobname is None:
+        intids = component.getUtility(IIntIds)
+        jobname = intids.getId(context)
+    tex_dom.userdata['jobname'] = jobname
+    return tex_dom
+
+
 def render_document(rst_dom, context=None, outfile_dir=None, jobname=None):
+    """
+    Render the given RST document.
+    """
+    # XXX: do we need to patch_all here?
     current_dir = os.getcwd()
     tex_dir = outfile_dir or tempfile.mkdtemp()
     try:
-        # XXX: Do we need to read in render_conf? How about
-        # cross-document refs?
         os.chdir(tex_dir)
-        tex_dom = TeXDocument()
-        # Pull in all necessary plugins/configs.
-        prepare_rendering_context()
-        # Prep our doc
-        prepare_document_settings(tex_dom)
-        if jobname is None:
-            intids = component.getUtility(IIntIds)
-            jobname = intids.getId(context)
-        tex_dom.userdata['jobname'] = jobname
+        tex_dom = _get_and_prepare_doc(context, jobname)
 
-        # Translate into a plasTeX DOM and render.
+        # Translate into our plasTeX DOM and render.
         transformer = component.getUtility(IRSTToPlastexDocumentTranslator)
         transformer.translate(rst_dom, tex_dom)
         return nti_render.process_document(tex_dom, jobname)
