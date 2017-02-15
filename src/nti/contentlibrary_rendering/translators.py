@@ -129,7 +129,7 @@ class RSTToPlastexDocumentTranslator(object):
 
     def translate(self, rst_document, tex_doc=None):
         # XXX: By default, we skip any preamble and start directly in the
-        # default. docutils stores the title info in the preamble.
+        # body. docutils stores the title info in the preamble.
         document = TeXDocument() if tex_doc is None else tex_doc
         self.build_nodes(rst_document, document, document)
         return document
