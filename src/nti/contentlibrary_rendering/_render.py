@@ -38,7 +38,7 @@ from nti.contentlibrary_rendering import RST_MIMETYPE
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
-from nti.contentlibrary_rendering.interfaces import IRSTToPlastexDocumentTranslator
+from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
 from nti.contentrendering import nti_render
 
@@ -126,10 +126,10 @@ def _get_and_prepare_doc(context, provider='NTI', jobname=None):
     return tex_dom
 
 
-def render_document(rst_dom, context=None, outfile_dir=None,
-                    provider='NTI', jobname=None):
+def render_document(source_doc, context=None, outfile_dir=None,
+                    provider='NTI', jobname=None, content_type=RST_MIMETYPE):
     """
-    Render the given RST document.
+    Render the given source document.
     """
     # XXX: do we need to patch_all here?
     current_dir = os.getcwd()
@@ -137,16 +137,16 @@ def render_document(rst_dom, context=None, outfile_dir=None,
     try:
         os.chdir(tex_dir)
         tex_dom = _get_and_prepare_doc(context, provider, jobname)
-        # Translate into our plasTeX DOM and render.
-        transformer = component.getUtility(IRSTToPlastexDocumentTranslator)
-        transformer.translate(rst_dom, tex_dom)
+        # Generate our plasTeX DOM and render.
+        generator = component.getUtility(IPlastexDocumentGenerator,
+                                           name=str(content_type))
+        generator.generate(source_doc, tex_dom)
         return nti_render.process_document(tex_dom, jobname)
     finally:
         os.chdir(current_dir)
 
 
-def transform_content(context):
-    contentType = context.contentType or RST_MIMETYPE
+def transform_content(context, contentType):
     transformer = component.getUtility(IContentTransformer,
                                        name=str(contentType))
     return transformer.transform(context.contents, context=context)
@@ -166,17 +166,20 @@ def _do_render_package(render_job):
     provider = render_job.Provider
     package = find_object_with_ntiid(ntiid)
     package = removeAllProxies(package)
-
+    contentType = package.contentType or RST_MIMETYPE
     if package is None:
         raise ValueError("Package not found", ntiid)
     elif not IRenderableContentPackage.providedBy(package):
         raise TypeError("Invalid content package", ntiid)
 
-    # 1. Transform to plastex_dom
-    rst_dom = transform_content(package)
+    # 1. Transform content into dom
+    source_doc = transform_content(package, contentType)
 
     # 2. Render
-    tex_dom = render_document(rst_dom, provider=provider, context=package)
+    tex_dom = render_document(source_doc,
+                              provider=provider,
+                              context=package,
+                              content_type=contentType)
 
     # 3. Place in target location
     key_or_bucket = locate_rendered_content(tex_dom, package)

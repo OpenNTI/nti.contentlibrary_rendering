@@ -133,34 +133,20 @@ class IContentTransformer(interface.Interface):
         """
 
 
-class IRSTToPlastexDocumentTranslator(interface.Interface):
+class IPlastexDocumentGenerator(interface.Interface):
     """
-    A utility to translate an RST document into a plasTeX document.
+    A utility that generates a plasTeX document from a given source
+    document.
     """
 
-    def translate(rst_document, tex_doc=None):
+    def generate(source_doc, tex_doc=None):
         """
-        Translate the specified RST document into a plasTeX document.
+        Translate the specified source document into a plasTeX document.
 
-        :param rst_document The RST document to transform
+        :param source_doc The source document
         :param tex_doc If provided, the plasTeX document to build.
         :return a plasTeX document
         """
-
-class IRSTToPlastexNodeTranslator(interface.Interface):
-    """
-    A utility to translate an RST node into a plasTeX node.
-    """
-
-    def translate(rst_node, tex_doc):
-        """
-        Translate the specified RST node into a plasTeX document.
-
-        :param rst_node The RST node to transform
-        :param tex_doc The plasTeX document
-        :return the new plasTeX node
-        """
-
 
 class IRenderedContentLocator(interface.Interface):
     """
@@ -175,7 +161,7 @@ class IRenderedContentLocator(interface.Interface):
         :param context Locator context (e.g. :class:`IContentPackage`)
         :return :class:`IDelimitedHierarchyItem' with new location
         """
-        
+
     def remove(context):
         """
         [re]remove the rendered content

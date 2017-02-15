@@ -15,4 +15,23 @@
 		<allow interface=".interfaces.IDirectivesModule" />
 	</module>
 
+    <!-- PlasTeX Generators -->
+    <utility factory=".translators.RSTToPlastexDocumentGenerator" name="rst" />
+    <utility factory=".translators.RSTToPlastexDocumentGenerator" name="text/x-rst" />
+
+    <!-- RSTToPlastexTranslators -->
+    <utility factory=".translators.DefaultRSTToPlastexNodeTranslator" />
+    <utility factory=".translators.MathRSTToPlastexNodeTranslator" name="math" />
+    <utility factory=".translators.TextRSTToPlastexNodeTranslator" name="#text" />
+    <utility factory=".translators.ImageRSTToPlastexNodeTranslator" name="image" />
+    <utility factory=".translators.TitleRSTToPlastexNodeTranslator" name="title" />
+    <utility factory=".translators.SectionRSTToPlastexNodeTranslator" name="section" />
+    <utility factory=".translators.DocumentRSTToPlastexNodeTranslator" name="document" />
+    <utility factory=".translators.SubtitleRSTToPlastexNodeTranslator" name="subtitle" />
+    <utility factory=".translators.ParagraphRSTToPlastexNodeTranslator" name="paragraph" />
+
+    <!-- Transformers -->
+    <utility factory=".transformers.RSTTransformer" name="rst" />
+    <utility factory=".transformers.RSTTransformer" name="text/x-rst" />
+
 </configure>
