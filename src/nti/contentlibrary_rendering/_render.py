@@ -166,6 +166,7 @@ def _do_render_package(render_job):
     provider = render_job.Provider
     package = find_object_with_ntiid(ntiid)
     package = removeAllProxies(package)
+
     if package is None:
         raise ValueError("Package not found", ntiid)
     elif not IRenderableContentPackage.providedBy(package):

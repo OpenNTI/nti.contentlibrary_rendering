@@ -22,6 +22,8 @@ from nti.contentlibrary.library import unregister_content_units
 
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
+from nti.ntiids.ntiids import find_object_with_ntiid
+
 
 def clean_attributes(target, names):
     for name in names or ():
@@ -62,13 +64,21 @@ def remove_package_data(package):
     return package
 
 
-def remove_rendered_content(context):
-    locator = component.getUtility(IRenderedContentLocator)
-    return locator.remove(context)
+def delete_package_data(context):
+    if      IRenderableContentPackage.providedBy(context) \
+        and not context.is_published():
+        locator = component.getUtility(IRenderedContentLocator)
+        return locator.remove(context)
+    return False
 
 
 def unpublish_package(context, remove=False):
     remove_package_data(context)
     if remove:
-        remove_rendered_content(context)
+        delete_package_data(context)
     interface.noLongerProvides(context, IContentRendered)
+
+
+def remove_rendered_package(ntiid):
+    context = find_object_with_ntiid(ntiid)
+    delete_package_data(context)

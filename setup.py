@@ -58,6 +58,8 @@ setup(
         'nti.coremetadata',
         'nti.externalization',
         'nti.ntiids',
+        'nti.site',
+        'nti.traversal',
         'z3c.autoinclude',
         'zc.blist',
         'zope.cachedescriptors',
