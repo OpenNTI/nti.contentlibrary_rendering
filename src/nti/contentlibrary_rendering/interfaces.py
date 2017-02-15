@@ -147,6 +147,20 @@ class IRSTToPlastexDocumentTranslator(interface.Interface):
         :return a plasTeX document
         """
 
+class IRSTToPlastexNodeTranslator(interface.Interface):
+    """
+    A utility to translate an RST node into a plasTeX node.
+    """
+
+    def translate(rst_node, tex_doc):
+        """
+        Translate the specified RST node into a plasTeX document.
+
+        :param rst_node The RST node to transform
+        :param tex_doc The plasTeX document
+        :return the new plasTeX node
+        """
+
 
 class IRenderedContentLocator(interface.Interface):
     """

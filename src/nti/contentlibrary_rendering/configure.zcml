@@ -40,6 +40,19 @@
 	<utility factory=".transformers.LaTeXTransformer" name="LaTeX" />
 	<utility factory=".transformers.LaTeXTransformer" name="application/x-latex" />
 
+    <!-- RSTToPlastexTranslators -->
+    <utility factory=".translators.RSTToPlastexDocumentTranslator" />
+
+    <utility factory=".translators.DefaultRSTToPlastexNodeTranslator" />
+    <utility factory=".translators.MathRSTToPlastexNodeTranslator" name="math"/>
+    <utility factory=".translators.TextRSTToPlastexNodeTranslator" name="#text"/>
+    <utility factory=".translators.ImageRSTToPlastexNodeTranslator" name="image"/>
+    <utility factory=".translators.TitleRSTToPlastexNodeTranslator" name="title"/>
+    <utility factory=".translators.SectionRSTToPlastexNodeTranslator" name="section"/>
+    <utility factory=".translators.DocumentRSTToPlastexNodeTranslator" name="document"/>
+    <utility factory=".translators.SubtitleRSTToPlastexNodeTranslator" name="subtitle"/>
+    <utility factory=".translators.ParagraphRSTToPlastexNodeTranslator" name="paragraph"/>
+
 	<!-- Validators -->
 	<utility factory=".validators.TextValidator" name="text" />
 	<utility factory=".validators.TextValidator" name="text/plain" />
