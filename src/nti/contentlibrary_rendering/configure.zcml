@@ -16,6 +16,7 @@
 
 	<include package="nti.async" />
 	<include package="nti.contentlibrary" />
+	<include package="nti.contentrendering"/ >
 
     <!-- Adapters -->
     <adapter factory=".adapters.ContentPackageRenderMetadata" />
