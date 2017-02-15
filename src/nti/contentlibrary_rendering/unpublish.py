@@ -10,9 +10,11 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 from zope import component
+from zope import interface
 
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
+from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
@@ -69,3 +71,4 @@ def unpublish_package(context, remove=False):
     remove_package_data(context)
     if remove:
         remove_rendered_content(context)
+    interface.noLongerProvides(context, IContentRendered)
