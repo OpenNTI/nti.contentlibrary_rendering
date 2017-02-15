@@ -123,7 +123,8 @@ def _get_and_prepare_doc(context, jobname=None):
     # Prep our doc
     prepare_document_settings(tex_dom, provider='NTI')
     # Pull in all necessary plugins/configs/templates.
-    context, packages_path = load_packages(context=context)
+    unused_ctx, packages_path = load_packages(context=context,
+                                              load_configs=False)
     setup_environ(tex_dom, jobname, packages_path)
     if jobname is None:
         intids = component.getUtility(IIntIds)
