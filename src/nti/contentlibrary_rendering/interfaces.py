@@ -25,8 +25,8 @@ from nti.schema.field import Bool
 from nti.schema.field import Text
 from nti.schema.field import Object
 from nti.schema.field import Choice
-from nti.schema.field import ValidTextLine
 from nti.schema.field import IndexedIterable
+from nti.schema.field import TextLine as ValidTextLine
 
 SUCCESS = 'Success'
 PENDING = 'Pending'
@@ -43,6 +43,10 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
     PackageNTIID = ValidTextLine(title="The package ntiid.")
 
     JobId = ValidTextLine(title="The unique job identifier.")
+
+    Provider = ValidTextLine(title="Render provider",
+                             required=True,
+                             default='NTI')
 
     State = Choice(vocabulary=RENDER_STATE_VOCABULARY,
                    title='The state for this render job',

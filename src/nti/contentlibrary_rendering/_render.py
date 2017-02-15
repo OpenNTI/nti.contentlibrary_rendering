@@ -113,7 +113,7 @@ def copy_package_data(item, target):
     return target
 
 
-def _get_and_prepare_doc(context, jobname=None):
+def _get_and_prepare_doc(context, provider='NTI', jobname=None):
     """
     Build and prepare context for our plasTeX document.
     """
@@ -121,7 +121,7 @@ def _get_and_prepare_doc(context, jobname=None):
     tex_dom = TeXDocument()
     Base.document.filenameoverride = property(lambda unused: 'index')
     # Prep our doc
-    prepare_document_settings(tex_dom, provider='NTI')
+    prepare_document_settings(tex_dom, provider=provider)
     # Pull in all necessary plugins/configs/templates.
     unused_ctx, packages_path = load_packages(context=context,
                                               load_configs=False)
@@ -133,7 +133,8 @@ def _get_and_prepare_doc(context, jobname=None):
     return tex_dom
 
 
-def render_document(rst_dom, context=None, outfile_dir=None, jobname=None):
+def render_document(rst_dom, context=None, outfile_dir=None,
+                    provider='NTI', jobname=None):
     """
     Render the given RST document.
     """
@@ -142,8 +143,7 @@ def render_document(rst_dom, context=None, outfile_dir=None, jobname=None):
     tex_dir = outfile_dir or tempfile.mkdtemp()
     try:
         os.chdir(tex_dir)
-        tex_dom = _get_and_prepare_doc(context, jobname)
-
+        tex_dom = _get_and_prepare_doc(context, provider, jobname)
         # Translate into our plasTeX DOM and render.
         transformer = component.getUtility(IRSTToPlastexDocumentTranslator)
         transformer.translate(rst_dom, tex_dom)
@@ -170,8 +170,9 @@ def locate_rendered_content(tex_dom, context):
 
 def _do_render_package(render_job):
     ntiid = render_job.PackageNTIID
+    provider = render_job.Provider
     package = find_object_with_ntiid(ntiid)
-    package = removeAllProxies( package )
+    package = removeAllProxies(package)
     if package is None:
         raise ValueError("Package not found", ntiid)
     elif not IRenderableContentPackage.providedBy(package):
@@ -181,7 +182,7 @@ def _do_render_package(render_job):
     rst_dom = transform_content(package)
 
     # 2. Render
-    tex_dom = render_document(rst_dom, context=package)
+    tex_dom = render_document(rst_dom, provider=provider, context=package)
 
     # 3. Place in target location
     key_or_bucket = locate_rendered_content(tex_dom, package)
