@@ -50,6 +50,7 @@ class ContentPackageRenderJob(SchemaConfigured,
     creator = SYSTEM_USER_ID
 
     state = alias('State')
+    provider = alias('Provider')
     jobId = job_id = alias('JobId')
     ntiid = package = alias('PackageNTIID')
 

@@ -98,7 +98,7 @@ class IContentPackageRenderMetadata(IContainer):
                                   default=(),
                                   required=False)
 
-    def createJob(package, creator, mark_rendered=True):
+    def createJob(package, creator, provider=None, mark_rendered=True):
         """
         Creates and returns a `IContentPackageRenderJob`.
         """

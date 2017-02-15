@@ -60,10 +60,11 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         creator = getattr(creator, 'id', creator)  # in case of a principal
         return creator
 
-    def createJob(self, package=None, creator=None, mark_rendered=True):
+    def createJob(self, package=None, creator=None, provider='NTI', mark_rendered=True):
         package = package if package is not None else self.__parent__
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
         result.MarkRendered = mark_rendered
+        result.Provider = provider
         result.creator = self._creator(creator)
         result.JobId = self._create_unique_job_key(result)
         self[result.JobId] = result
