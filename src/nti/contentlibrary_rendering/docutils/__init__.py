@@ -9,9 +9,20 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope import component
+
 from docutils.core import publish_doctree
+
+from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
 
 def get_rst_dom(source):
     rst_dom = publish_doctree(source=source)
     return rst_dom
+
+
+def translator(name):
+    result = component.queryUtility(IRSTToPlastexNodeTranslator, name=name)
+    if result is None:
+        result = component.getUtility(IRSTToPlastexNodeTranslator)
+    return result
