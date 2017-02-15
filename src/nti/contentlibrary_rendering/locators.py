@@ -56,6 +56,9 @@ class LocatorMixin(object):
     def _do_locate(self, path, root, context):
         pass
 
+    def _do_remove(self, root, context):
+        pass
+
     def locate(self, path, context):
         # validate
         if not os.path.exists(path):
@@ -67,6 +70,12 @@ class LocatorMixin(object):
         with current_site(get_host_site(folder.__name__)):
             library = component.getUtility(IContentPackageLibrary)
             return self._do_locate(path, library.root, context)
+
+    def remove(self, context):
+        folder = find_interface(context, IHostPolicyFolder, strict=False)
+        with current_site(get_host_site(folder.__name__)):
+            library = component.getUtility(IContentPackageLibrary)
+            return self._do_remove(library.root, context)
 
 
 @interface.implementer(IRenderedContentLocator)
@@ -84,6 +93,15 @@ class FilesystemLocator(LocatorMixin):
             destination = os.path.join(root.absolute_path, intid)
         shutil.move(path, destination)
         return root.getChildNamed(intid)
+
+    def _do_remove(self, root, context):
+        assert isinstance(root, FilesystemBucket)
+        intid = self._get_id(context)
+        child = root.getChildNamed(intid)
+        if child is not None:
+            shutil.rmtree(child.absolute_path)
+            return True
+        return False
 
 
 @interface.implementer(IRenderedContentLocator)

@@ -150,7 +150,7 @@ class IRSTToPlastexDocumentTranslator(interface.Interface):
 
 class IRenderedContentLocator(interface.Interface):
     """
-    Utility to [re]locate the files associated with a rendered content
+    Utility to manipulate the files associated with a rendered content
     """
 
     def locate(path, context):
@@ -160,4 +160,9 @@ class IRenderedContentLocator(interface.Interface):
         :param path Location of the rendered content
         :param context Locator context (e.g. :class:`IContentPackage`)
         :return :class:`IDelimitedHierarchyItem' with new location
+        """
+        
+    def remove(context):
+        """
+        [re]remove the rendered content
         """
