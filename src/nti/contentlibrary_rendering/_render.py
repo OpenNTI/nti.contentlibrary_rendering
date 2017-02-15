@@ -56,13 +56,6 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 patch_all()
 
 
-def clean_attributes(target, names):
-    for name in names or ():
-        value = getattr(target, name, None)
-        if value is not None:
-            setattr(target, name, None)
-
-
 def copy_attributes(source, target, names):
     for name in names or ():
         value = getattr(source, name, None)
