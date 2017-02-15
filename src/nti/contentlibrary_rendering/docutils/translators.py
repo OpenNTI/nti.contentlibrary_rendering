@@ -14,12 +14,13 @@ from plasTeX import TeXDocument
 from plasTeX.Logging import getLogger
 logger = getLogger(__name__)
 
-from zope import component
 from zope import interface
 
-from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
+from nti.contentlibrary_rendering.docutils import translator
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
+
+from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
 @interface.implementer(IRSTToPlastexNodeTranslator)
 class DefaultRSTToPlastexNodeTranslator(object):
@@ -105,12 +106,7 @@ class RSTToPlastexDocumentGenerator(object):
     """
 
     def _get_node_translator(self, node_name):
-        result = component.queryUtility(IRSTToPlastexNodeTranslator,
-                                        name=node_name)
-        if not result:
-            # Default it
-            result = component.getUtility(IRSTToPlastexNodeTranslator)
-        return result
+        return translator(node_name)
 
     def _handle_node(self, rst_node, tex_parent, tex_doc):
         node_translator = self._get_node_translator( rst_node.tagname )
