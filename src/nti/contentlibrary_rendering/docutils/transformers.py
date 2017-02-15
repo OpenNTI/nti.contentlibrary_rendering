@@ -17,6 +17,7 @@ from nti.contentlibrary_rendering.interfaces import IContentTransformer
 
 from nti.contentlibrary_rendering.transformers import TransformerMixin
 
+
 @interface.implementer(IContentTransformer)
 class RSTTransformer(TransformerMixin):
     """
