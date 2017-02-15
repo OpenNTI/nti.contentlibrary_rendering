@@ -107,6 +107,8 @@ class FilesystemLocator(LocatorMixin):
 @interface.implementer(IRenderedContentLocator)
 class S3Locator(LocatorMixin):
 
+    grant = 'public-read-write'
+
     @property
     def settings(self):
         return {}
@@ -122,7 +124,6 @@ class S3Locator(LocatorMixin):
     def _do_locate(self, path, root, context, debug=True):
         prefix = '/'
         headers = {}
-        grant = 'public-read-write'
         bucket_name = str(self._intids.getId(context))
         connection = boto.connect_s3(aws_access_key_id=self.aws_access_key_id,
                                      aws_secret_access_key=self.aws_secret_access_key)
@@ -135,19 +136,33 @@ class S3Locator(LocatorMixin):
 
                 fullpath = os.path.join(root, filename)
                 key_name = get_key_name(fullpath, prefix)
-                logger.info('Copying %s to %s/%s',
-                            filename, bucket_name, key_name)
+                if debug:
+                    logger.info('Copying %s to %s/%s',
+                                filename, bucket_name, key_name)
 
                 key = bucket.new_key(key_name)
                 file_headers = s3_upload_file(key,
                                               fullpath,
-                                              policy=grant,
+                                              policy=self.grant,
                                               headers=headers)
 
-                logger.info('Copied %s to %s/%s as type %s encoding %s',
-                            filename, bucket_name, key_name,
-                            file_headers.get(
-                                'Content-Type',
-                                'application/octet-stream'),
-                            file_headers.get('Content-Encoding', 'identity'))
+                if debug:
+                    logger.info('Copied %s to %s/%s as type %s encoding %s',
+                                filename, bucket_name, key_name,
+                                file_headers.get(
+                                    'Content-Type',
+                                    'application/octet-stream'),
+                                file_headers.get('Content-Encoding', 'identity'))
         return bucket
+
+    def _do_remove(self, root, context, debug=True):
+        bucket_name = str(self._intids.getId(context))
+        connection = boto.connect_s3(aws_access_key_id=self.aws_access_key_id,
+                                     aws_secret_access_key=self.aws_secret_access_key)
+        connection.debug = debug
+        try:
+            connection.delete_bucket(bucket_name)
+        except Exception:
+            logger.exception("Could not remove bucket %s", bucket_name)
+            return False
+        return True
