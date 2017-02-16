@@ -119,6 +119,9 @@ class BuilderMixin(object):
         return get_translator(node_name)
 
     def handle_node(self, rst_node, tex_parent, tex_doc):
+        """
+        Handle our node by translating it and adding it to the doc.
+        """
         node_translator = self.translator(rst_node.tagname)
         result = node_translator.translate(rst_node, tex_doc, tex_parent)
         if result is not None:
@@ -129,12 +132,17 @@ class BuilderMixin(object):
             result = tex_parent
         return result
 
-    def process_children(self, rst_node, tex_node, text_doc):
+    def process_children(self, rst_node, tex_node, tex_doc):
         for rst_child in rst_node.children or ():
-            self.build_nodes(rst_child, tex_node, text_doc)
+            self.build_nodes(rst_child, tex_node, tex_doc)
 
     def build_nodes(self, rst_node, tex_parent, tex_doc):
+        """
+        Handle our node by translating it and adding it to the doc
+        and then processing the children.
+        """
         tex_node = self.handle_node(rst_node, tex_parent, tex_doc)
+        self.process_children(rst_node, tex_node, tex_doc)
         return tex_node
 
 
@@ -143,7 +151,6 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin,
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('par')
-        self.process_children(rst_node, tex_node, tex_doc)
         return tex_node
 
 
@@ -151,9 +158,7 @@ class BlockTypeToPlastexNodeTranslator(TranslatorMixin,
                                        BuilderMixin):
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
-        tex_node = tex_doc.createElement('par')
-        self.process_children(rst_node, tex_node, tex_doc)
-        return tex_node
+        pass
 
 
 class ListItemToPlastexNodeTranslator(BuilderMixin,
@@ -161,7 +166,6 @@ class ListItemToPlastexNodeTranslator(BuilderMixin,
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('list_item')
-        self.process_children(rst_node, tex_node, tex_doc)
         return tex_node
 
 
@@ -170,7 +174,6 @@ class BulletListToPlastexNodeTranslator(BuilderMixin,
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('itemize')
-        self.process_children(rst_node, tex_node, tex_doc)
         return tex_node
 
 
