@@ -91,10 +91,10 @@ class DocumentToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createElement(rst_node.tagname)
-        # This should always have a title right...?
-        #title = tex_doc.createTextNode(rst_node.attributes['title'])
-        # The document root (and sections?) will need a title element.
-        #result.setAttribute('title', title)
+        title = rst_node.attributes.get('title')
+        if title:
+            title = tex_doc.createTextNode(title)
+            result.setAttribute('title', title)
         return result
 
 
