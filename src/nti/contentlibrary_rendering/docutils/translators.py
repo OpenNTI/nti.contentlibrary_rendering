@@ -57,21 +57,21 @@ class NoopPlastexNodeTranslator(TranslatorMixin):
     """
 
 
-class DefaultPlastexNodeTranslator(TranslatorMixin):
+class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         result = tex_doc.createElement(rst_node.tagname)
         return result
 
 
-class TextPlastexNodeTranslator(TranslatorMixin):
+class TextToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         result = tex_doc.createTextNode(rst_node.astext())
         return result
 
 
-class TitlePlastexNodeTranslator(TranslatorMixin):
+class TitleToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         result = tex_doc.createElement(rst_node.tagname)
@@ -80,20 +80,20 @@ class TitlePlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class ImagePlastexNodeTranslator(NoopPlastexNodeTranslator):
+class ImageToPlastexNodeTranslator(NoopPlastexNodeTranslator):
     pass
 
 
-class MathPlastexNodeTranslator(NoopPlastexNodeTranslator):
+class MathToPlastexNodeTranslator(NoopPlastexNodeTranslator):
     pass
 
 
-class SectionPlastexNodeTranslator(NoopPlastexNodeTranslator):
+class SectionToPlastexNodeTranslator(NoopPlastexNodeTranslator):
     # XXX: if we include sections, we'll need title attributes.
     pass
 
 
-class DocumentPlastexNodeTranslator(TranslatorMixin):
+class DocumentToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         result = tex_doc.createElement(rst_node.tagname)
@@ -129,8 +129,8 @@ class BuilderMixin(object):
         return tex_node
 
 
-class ParagraphPlastexNodeTranslator(TranslatorMixin,
-                                     BuilderMixin):
+class ParagraphToPlastexNodeTranslator(TranslatorMixin,
+                                       BuilderMixin):
 
     def translate(self, rst_node, tex_doc):
         tex_node = tex_doc.createElement('par')
@@ -138,7 +138,7 @@ class ParagraphPlastexNodeTranslator(TranslatorMixin,
         return tex_node
 
 
-class SubtitlePlastexNodeTranslator(TranslatorMixin):
+class SubtitleToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         # XXX: Do we want a new section here?
@@ -153,8 +153,8 @@ class SubtitlePlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class ListItemPlastexNodeTranslator(BuilderMixin,
-                                    TranslatorMixin):
+class ListItemToPlastexNodeTranslator(BuilderMixin,
+                                      TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         tex_node = tex_doc.createElement('list_item')
@@ -162,8 +162,8 @@ class ListItemPlastexNodeTranslator(BuilderMixin,
         return tex_node
 
 
-class BulletListPlastexNodeTranslator(BuilderMixin,
-                                      TranslatorMixin):
+class BulletListToPlastexNodeTranslator(BuilderMixin,
+                                        TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         tex_node = tex_doc.createElement('itemize')

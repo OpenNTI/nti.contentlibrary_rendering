@@ -20,20 +20,20 @@
     <utility factory=".translators.PlastexDocumentGenerator" name="text/x-rst" />
 
     <!-- Plastex Translators -->
-    <utility factory=".translators.DefaultPlastexNodeTranslator" />
-    <utility factory=".translators.MathPlastexNodeTranslator" name="math" />
-    <utility factory=".translators.TextPlastexNodeTranslator" name="#text" />
-    <utility factory=".translators.ImagePlastexNodeTranslator" name="image" />
+    <utility factory=".translators.DefaultNodeToPlastexNodeTranslator" />
+    <utility factory=".translators.MathToPlastexNodeTranslator" name="math" />
+    <utility factory=".translators.TextToPlastexNodeTranslator" name="#text" />
+    <utility factory=".translators.ImageToPlastexNodeTranslator" name="image" />
     
-    <utility factory=".translators.TitlePlastexNodeTranslator" name="title" />
-    <utility factory=".translators.SubtitlePlastexNodeTranslator" name="subtitle" />
+    <utility factory=".translators.TitleToPlastexNodeTranslator" name="title" />
+    <utility factory=".translators.SubtitleToPlastexNodeTranslator" name="subtitle" />
     
-    <utility factory=".translators.SectionPlastexNodeTranslator" name="section" />
-    <utility factory=".translators.DocumentPlastexNodeTranslator" name="document" />
-    <utility factory=".translators.ParagraphPlastexNodeTranslator" name="paragraph" />
+    <utility factory=".translators.SectionToPlastexNodeTranslator" name="section" />
+    <utility factory=".translators.DocumentToPlastexNodeTranslator" name="document" />
+    <utility factory=".translators.ParagraphToPlastexNodeTranslator" name="paragraph" />
 
-	<utility factory=".translators.ListItemPlastexNodeTranslator" name="list_item" />
-   	<utility factory=".translators.BulletListPlastexNodeTranslator" name="bullet_list" />
+	<utility factory=".translators.ListItemToPlastexNodeTranslator" name="list_item" />
+   	<utility factory=".translators.BulletListToPlastexNodeTranslator" name="bullet_list" />
    	
     <!-- Transformers -->
     <utility factory=".transformers.RSTTransformer" name="rst" />
