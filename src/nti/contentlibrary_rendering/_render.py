@@ -50,6 +50,8 @@ from nti.contentrendering.render_document import prepare_document_settings
 
 from nti.externalization.proxy import removeAllProxies
 
+from nti.ntiids.ntiids import TYPE_OID
+from nti.ntiids.ntiids import is_ntiid_of_type
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 # Patch our plastex early.
@@ -89,7 +91,8 @@ def copy_package_data(item, target):
     copy_attributes(package, target, ('PlatformPresentationResources',))
 
     # 5. make sure we copy the new ntiid
-    target.ntiid = package.ntiid
+    if is_ntiid_of_type(target.ntiid, TYPE_OID):
+        target.ntiid = package.ntiid
 
     # 6. unregister from the intid facility the target old children
     for unit in target.children or ():
