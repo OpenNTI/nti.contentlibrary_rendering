@@ -41,7 +41,7 @@ class IRSTToPlastexNodeTranslator(interface.Interface):
 
     def translate(rst_node, tex_doc, tex_parent=None):
         """
-        Translate the specified RST node into a plasTeX document.
+        Translate the specified RST node into a plasTeX node.
 
         :param rst_node The RST node to transform
         :param tex_doc The plasTeX document
