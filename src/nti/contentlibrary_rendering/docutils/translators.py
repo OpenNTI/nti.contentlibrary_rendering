@@ -20,6 +20,7 @@ from nti.contentlibrary_rendering.docutils import get_translator
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
+from nti.contentlibrary_rendering.docutils.utils import ObjectProxy
 from nti.contentlibrary_rendering.docutils.utils import rst_traversal_count
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
@@ -98,15 +99,16 @@ class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
 class SectionToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'section'
+
     SECTION_DEPTH_MAX = 3
-    SECTION_MAP = {1:'section',
-                   2:'subsection',
-                   3:'subsubsection'}
+    SECTION_MAP = {1: 'section',
+                   2: 'subsection',
+                   3: 'subsubsection'}
 
     def _get_section_tag(self, rst_node):
         parent_section_count = rst_traversal_count(rst_node, 'section')
         if parent_section_count >= self.SECTION_DEPTH_MAX:
-            raise ValueError( 'Only three levels of sections are allowed.' )
+            raise ValueError('Only three levels of sections are allowed.')
         section_level = parent_section_count + 1
         section_val = self.SECTION_MAP[section_level]
         return section_val
@@ -127,6 +129,7 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
         result = tex_doc.createElement(section_tag)
         self._set_title(rst_node, tex_doc, result)
         return result
+
 
 class SubtitleToPlastexNodeTranslator(TranslatorMixin):
 
@@ -262,5 +265,5 @@ class PlastexDocumentGenerator(BuilderMixin):
             tex_doc = TeXDocument()
         if 'idgen' not in tex_doc.userdata:
             tex_doc.userdata['idgen'] = IdGen()
-            self.build_nodes(rst_document, tex_doc, tex_doc)
+        self.build_nodes(rst_document, tex_doc, ObjectProxy(tex_doc))
         return tex_doc
