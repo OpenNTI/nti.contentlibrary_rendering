@@ -35,8 +35,7 @@ def _rst_traversal(rst_node, tagname):
     while parent is not None:
         if parent.tagname == tagname:
             count += 1
-        rst_node = parent
-        parent = rst_node.parent
+        parent = parent.parent
     return count
 
 
@@ -294,7 +293,7 @@ class PlastexDocumentGenerator(BuilderMixin):
         # XXX: By default, we skip any preamble and start directly in the
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
-            tex_doc = self.create_document()
+            tex_doc = TeXDocument()
         self.build_nodes(rst_document, tex_doc, tex_doc)
 #         if 'idgen' not in tex_doc.userdata['idgen']:
 #             tex_doc.userdata['idgen'] = IdGen()
