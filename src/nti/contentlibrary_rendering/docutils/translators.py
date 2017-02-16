@@ -142,7 +142,7 @@ class EmphasisToPlastexNodeTranslator(TranslatorMixin):
     __name__ = 'emphasis'
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
-        result = tex_doc.createElement("emph")
+        result = tex_doc.createElement("textit")
         return result
 
 
