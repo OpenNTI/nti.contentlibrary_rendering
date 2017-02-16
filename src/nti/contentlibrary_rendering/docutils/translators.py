@@ -22,16 +22,9 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTr
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
-try:
-    from gevent.local import local
-except ImportError:
-    from threading import local
-
-
-class IdGen(local):
+class IdGen(object):
 
     def __init__(self):
-        local.__init__(self)
         self.counter = 0
 
     def __iter__(self):
@@ -40,8 +33,6 @@ class IdGen(local):
     def __next__(self):
         self.counter += 1
         return self.counter
-
-idgen = IdGen()
 
 
 @interface.implementer(IRSTToPlastexNodeTranslator)
@@ -189,7 +180,7 @@ class PlastexDocumentGenerator(BuilderMixin):
     @classmethod
     def create_document(cls):
         document = TeXDocument()
-        document.userdata['idgen'] = idgen
+        document.userdata['idgen'] = IdGen()
         return document
 
     def generate(self, rst_document=None, tex_doc=None):
