@@ -21,7 +21,7 @@ def get_rst_dom(source):
     return rst_dom
 
 
-def translator(name):
+def get_translator(name):
     result = component.queryUtility(IRSTToPlastexNodeTranslator, name=name)
     if result is None:
         result = component.queryUtility(IRSTToPlastexNodeTranslator)

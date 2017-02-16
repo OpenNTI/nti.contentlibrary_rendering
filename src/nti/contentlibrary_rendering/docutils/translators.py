@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 
 from zope import interface
 
-from nti.contentlibrary_rendering.docutils import translator
+from nti.contentlibrary_rendering.docutils import get_translator
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
@@ -30,27 +30,27 @@ class TranslatorMixin(object):
         pass
 
 
-class NoopRSTToPlastexNodeTranslator(TranslatorMixin):
+class NoopPlastexNodeTranslator(TranslatorMixin):
     """
     A translator that excludes this node from translation.
     """
 
 
-class DefaultRSTToPlastexNodeTranslator(TranslatorMixin):
+class DefaultPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         result = tex_doc.createElement(rst_node.tagname)
         return result
 
 
-class TextRSTToPlastexNodeTranslator(TranslatorMixin):
+class TextPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         result = tex_doc.createTextNode(rst_node.astext())
         return result
 
 
-class TitleRSTToPlastexNodeTranslator(TranslatorMixin):
+class TitlePlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         result = tex_doc.createElement(rst_node.tagname)
@@ -59,27 +59,65 @@ class TitleRSTToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class ImageRSTToPlastexNodeTranslator(NoopRSTToPlastexNodeTranslator):
+class ImagePlastexNodeTranslator(NoopPlastexNodeTranslator):
     pass
 
 
-class MathRSTToPlastexNodeTranslator(NoopRSTToPlastexNodeTranslator):
+class MathPlastexNodeTranslator(NoopPlastexNodeTranslator):
     pass
 
 
-class SectionRSTToPlastexNodeTranslator(NoopRSTToPlastexNodeTranslator):
+class SectionPlastexNodeTranslator(NoopPlastexNodeTranslator):
     # XXX: if we include sections, we'll need title attributes.
     pass
 
 
-class ParagraphRSTToPlastexNodeTranslator(TranslatorMixin):
+class DocumentPlastexNodeTranslator(TranslatorMixin):
 
-    def translate(self, unused_rst_node, tex_doc):
-        result = tex_doc.createElement('par')
+    def translate(self, rst_node, tex_doc):
+        result = tex_doc.createElement(rst_node.tagname)
+        # This should always have a title right...?
+        title = tex_doc.createTextNode(rst_node.attributes['title'])
+        # The document root (and sections?) will need a title element.
+        result.setAttribute('title', title)
         return result
 
 
-class SubtitleRSTToPlastexNodeTranslator(TranslatorMixin):
+class BuilderMixin(object):
+
+    def translator(self, node_name):
+        return get_translator(node_name)
+
+    def handle_node(self, rst_node, tex_parent, tex_doc):
+        node_translator = self.translator(rst_node.tagname)
+        result = node_translator.translate(rst_node, tex_doc)
+        if result is not None:
+            tex_parent.append(result)
+        # If no-op, keep parsing but do so for our tex_parent.
+        # XXX: Is this what we want?
+        if result is None:
+            result = tex_parent
+        return result
+
+    def process_children(self, rst_node, tex_node, text_doc):
+        for rst_child in rst_node.children or ():
+            self.build_nodes(rst_child, tex_node, text_doc)
+
+    def build_nodes(self, rst_node, tex_parent, tex_doc):
+        tex_node = self.handle_node(rst_node, tex_parent, tex_doc)
+        return tex_node
+
+
+class ParagraphPlastexNodeTranslator(TranslatorMixin,
+                                     BuilderMixin):
+
+    def translate(self, rst_node, tex_doc):
+        tex_node = tex_doc.createElement('par')
+        self.process_children(rst_node, tex_node, tex_doc)
+        return tex_node
+
+
+class SubtitlePlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
         # XXX: Do we want a new section here?
@@ -94,41 +132,29 @@ class SubtitleRSTToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class DocumentRSTToPlastexNodeTranslator(TranslatorMixin):
+class ListItemPlastexNodeTranslator(BuilderMixin,
+                                    TranslatorMixin):
 
     def translate(self, rst_node, tex_doc):
-        result = tex_doc.createElement(rst_node.tagname)
-        # This should always have a title right...?
-        title = tex_doc.createTextNode(rst_node.attributes['title'])
-        # The document root (and sections?) will need a title element.
-        result.setAttribute('title', title)
-        return result
+        tex_node = tex_doc.createElement('list_item')
+        self.process_children(rst_node, tex_node, tex_doc)
+        return tex_node
+
+
+class BulletListPlastexNodeTranslator(BuilderMixin,
+                                      TranslatorMixin):
+
+    def translate(self, rst_node, tex_doc):
+        tex_node = tex_doc.createElement('itemize')
+        self.process_children(rst_node, tex_node, tex_doc)
+        return tex_node
 
 
 @interface.implementer(IPlastexDocumentGenerator)
-class RSTToPlastexDocumentGenerator(object):
+class PlastexDocumentGenerator(BuilderMixin):
     """
     Transforms an RST document into a plasTeX document.
     """
-
-    def _get_node_translator(self, node_name):
-        return translator(node_name)
-
-    def _handle_node(self, rst_node, tex_parent, tex_doc):
-        node_translator = self._get_node_translator(rst_node.tagname)
-        tex_node = node_translator.translate(rst_node, tex_doc)
-        if tex_node is not None:
-            tex_parent.append(tex_node)
-        # If no-op, keep parsing but do so for our tex_parent.
-        # XXX: Is this what we want?
-        if tex_node is None:
-            tex_node = tex_parent
-        return tex_node
-
-    def build_nodes(self, rst_parent, tex_parent, tex_doc):
-        tex_node = self._handle_node(rst_parent, tex_parent, tex_doc)
-        for rst_child in rst_parent.children or ():
-            self.build_nodes(rst_child, tex_node, tex_doc)
 
     def generate(self, rst_document=None, tex_doc=None):
         # XXX: By default, we skip any preamble and start directly in the

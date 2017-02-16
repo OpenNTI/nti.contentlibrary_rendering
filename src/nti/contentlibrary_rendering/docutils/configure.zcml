@@ -16,20 +16,25 @@
 	</module>
 
     <!-- PlasTeX Generators -->
-    <utility factory=".translators.RSTToPlastexDocumentGenerator" name="rst" />
-    <utility factory=".translators.RSTToPlastexDocumentGenerator" name="text/x-rst" />
+    <utility factory=".translators.PlastexDocumentGenerator" name="rst" />
+    <utility factory=".translators.PlastexDocumentGenerator" name="text/x-rst" />
 
-    <!-- RSTToPlastexTranslators -->
-    <utility factory=".translators.DefaultRSTToPlastexNodeTranslator" />
-    <utility factory=".translators.MathRSTToPlastexNodeTranslator" name="math" />
-    <utility factory=".translators.TextRSTToPlastexNodeTranslator" name="#text" />
-    <utility factory=".translators.ImageRSTToPlastexNodeTranslator" name="image" />
-    <utility factory=".translators.TitleRSTToPlastexNodeTranslator" name="title" />
-    <utility factory=".translators.SectionRSTToPlastexNodeTranslator" name="section" />
-    <utility factory=".translators.DocumentRSTToPlastexNodeTranslator" name="document" />
-    <utility factory=".translators.SubtitleRSTToPlastexNodeTranslator" name="subtitle" />
-    <utility factory=".translators.ParagraphRSTToPlastexNodeTranslator" name="paragraph" />
+    <!-- Plastex Translators -->
+    <utility factory=".translators.DefaultPlastexNodeTranslator" />
+    <utility factory=".translators.MathPlastexNodeTranslator" name="math" />
+    <utility factory=".translators.TextPlastexNodeTranslator" name="#text" />
+    <utility factory=".translators.ImagePlastexNodeTranslator" name="image" />
+    
+    <utility factory=".translators.TitlePlastexNodeTranslator" name="title" />
+    <utility factory=".translators.SubtitlePlastexNodeTranslator" name="subtitle" />
+    
+    <utility factory=".translators.SectionPlastexNodeTranslator" name="section" />
+    <utility factory=".translators.DocumentPlastexNodeTranslator" name="document" />
+    <utility factory=".translators.ParagraphPlastexNodeTranslator" name="paragraph" />
 
+	<utility factory=".translators.ListItemPlastexNodeTranslator" name="list_item" />
+   	<utility factory=".translators.BulletListPlastexNodeTranslator" name="bullet_list" />
+   	
     <!-- Transformers -->
     <utility factory=".transformers.RSTTransformer" name="rst" />
     <utility factory=".transformers.RSTTransformer" name="text/x-rst" />
