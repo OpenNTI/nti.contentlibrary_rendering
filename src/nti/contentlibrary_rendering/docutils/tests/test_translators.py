@@ -13,8 +13,6 @@ from hamcrest import has_property
 
 import os
 
-from plasTeX import TeXDocument
-
 from zope import component
 
 from nti.contentlibrary_rendering.docutils import get_translator
@@ -22,6 +20,8 @@ from nti.contentlibrary_rendering.docutils import get_translator
 from nti.contentlibrary_rendering.docutils import publish_doctree
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
+
+from nti.contentlibrary_rendering.docutils.translators import PlastexDocumentGenerator
 
 from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
@@ -40,6 +40,5 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         tree = publish_doctree(source)
         assert_that(tree, has_property('children', has_length(1)))
         translator = get_translator("bullet_list")
-        translator.translate(tree[0], TeXDocument())
-        
-        
+        translator.translate(tree[0], 
+                             PlastexDocumentGenerator.create_document())

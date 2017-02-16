@@ -22,6 +22,27 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTr
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
+try:
+    from gevent.local import local
+except ImportError:
+    from threading import local
+
+
+class IdGen(local):
+
+    def __init__(self):
+        local.__init__(self)
+        self.counter = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self.counter += 1
+        return self.counter
+
+idgen = IdGen()
+
 
 @interface.implementer(IRSTToPlastexNodeTranslator)
 class TranslatorMixin(object):
@@ -156,9 +177,16 @@ class PlastexDocumentGenerator(BuilderMixin):
     Transforms an RST document into a plasTeX document.
     """
 
+    @classmethod
+    def create_document(cls):
+        document = TeXDocument()
+        document.userdata['idgen'] = idgen
+        return document
+
     def generate(self, rst_document=None, tex_doc=None):
         # XXX: By default, we skip any preamble and start directly in the
         # body. docutils stores the title info in the preamble.
-        document = TeXDocument() if tex_doc is None else tex_doc
+        if tex_doc is None:
+            document = self.create_document()
         self.build_nodes(rst_document, document, document)
         return document
