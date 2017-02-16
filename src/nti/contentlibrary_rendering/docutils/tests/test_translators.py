@@ -17,8 +17,6 @@ import os
 
 from zope import component
 
-from nti.contentlibrary_rendering.docutils import get_translator
-
 from nti.contentlibrary_rendering.docutils import publish_doctree
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
@@ -47,6 +45,6 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
             source = fp.read()
         tree = publish_doctree(source)
         assert_that(tree, has_property('children', has_length(1)))
-        translator = get_translator("bullet_list")
-        translator.translate(tree[0],
-                             PlastexDocumentGenerator.create_document())
+        generator = PlastexDocumentGenerator()
+        from IPython.core.debugger import Tracer; Tracer()()
+        generator.generate(tree)
