@@ -9,7 +9,6 @@ __docformat__ = "restructuredtext en"
 
 from hamcrest import has_length
 from hamcrest import assert_that
-from hamcrest import has_property
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
 
@@ -31,28 +30,24 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
     def test_registered(self):
         translators = component.getUtilitiesFor(IRSTToPlastexNodeTranslator)
         translators = list(translators)
-        assert_that(translators, has_length(12))
+        assert_that(translators, has_length(13))
         for _, translator in translators:
             assert_that(translator,
                         validly_provides(IRSTToPlastexNodeTranslator))
             assert_that(translator,
                         verifiably_provides(IRSTToPlastexNodeTranslator))
 
-    def test_bullet_list(self):
-        name = os.path.join(os.path.dirname(__file__),
-                            'data/bullet_list.rst')
+    def _generate_from_file(self, source):
+        name = os.path.join(os.path.dirname(__file__), 'data/%s' % source)
         with open(name, "rb") as fp:
-            source = fp.read()
-        tree = publish_doctree(source)
-        assert_that(tree, has_property('children', has_length(1)))
+            tree = publish_doctree(fp.read())
         generator = PlastexDocumentGenerator()
-        generator.generate(tree)
+        tex_doc = generator.generate(tree)
+        tex_doc.toXML()
+        return tex_doc
+
+    def test_bullet_list(self):
+        self._generate_from_file('bullet_list.rst')
 
     def test_ordered_list(self):
-        name = os.path.join(os.path.dirname(__file__),
-                            'data/ordered_list.rst')
-        with open(name, "rb") as fp:
-            source = fp.read()
-        tree = publish_doctree(source)
-        generator = PlastexDocumentGenerator()
-        generator.generate(tree)
+        self._generate_from_file('ordered_list.rst')

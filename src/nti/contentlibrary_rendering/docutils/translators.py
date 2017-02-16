@@ -212,7 +212,5 @@ class PlastexDocumentGenerator(BuilderMixin):
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
             tex_doc = self.create_document()
-        from IPython.core.debugger import Tracer
-        Tracer()()
         self.build_nodes(rst_document, tex_doc, tex_doc)
         return tex_doc
