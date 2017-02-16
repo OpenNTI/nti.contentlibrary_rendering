@@ -47,3 +47,12 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         assert_that(tree, has_property('children', has_length(1)))
         generator = PlastexDocumentGenerator()
         generator.generate(tree)
+
+    def test_ordered_list(self):
+        name = os.path.join(os.path.dirname(__file__),
+                            'data/ordered_list.rst')
+        with open(name, "rb") as fp:
+            source = fp.read()
+        tree = publish_doctree(source)
+        generator = PlastexDocumentGenerator()
+        generator.generate(tree)

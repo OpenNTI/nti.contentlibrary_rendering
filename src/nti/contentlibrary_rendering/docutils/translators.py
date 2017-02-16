@@ -41,6 +41,8 @@ class IdGen(object):
 @interface.implementer(IRSTToPlastexNodeTranslator)
 class TranslatorMixin(object):
 
+    __name__ = None
+
     def translate(self, rst_node, tex_doc, tex_parent=None):
         pass
 
@@ -53,6 +55,8 @@ class NoOpPlastexNodeTranslator(TranslatorMixin):
 
 class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
 
+    __name__ = u''
+
     def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createElement(rst_node.tagname)
         return result
@@ -60,12 +64,16 @@ class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
 
 class TextToPlastexNodeTranslator(TranslatorMixin):
 
+    __name__ = "#text"
+
     def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createTextNode(rst_node.astext())
         return result
 
 
 class TitleToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "title"
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createElement(rst_node.tagname)
@@ -75,27 +83,15 @@ class TitleToPlastexNodeTranslator(TranslatorMixin):
 
 
 class ImageToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
-    pass
+    __name__ = "image"
 
 
 class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
-    pass
+    __name__ = "math"
 
 
 class SectionToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
-    # XXX: if we include sections, we'll need title attributes.
-    pass
-
-
-class DocumentToPlastexNodeTranslator(TranslatorMixin):
-
-    def translate(self, rst_node, tex_doc, tex_parent=None):
-        result = tex_doc.createElement(rst_node.tagname)
-        title = rst_node.attributes.get('title')
-        if title:
-            title = tex_doc.createTextNode(title)
-            result.setAttribute('title', title)
-        return result
+    __name__ = 'section'
 
 
 class SubtitleToPlastexNodeTranslator(TranslatorMixin):
@@ -113,11 +109,26 @@ class SubtitleToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
+class DocumentToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'document'
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        result = tex_doc.createElement(rst_node.tagname)
+        title = rst_node.attributes.get('title')
+        if title:
+            title = tex_doc.createTextNode(title)
+            result.setAttribute('title', title)
+        return result
+
+
 class BlockQuoteToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
-    pass
+    __name__ = 'block_quote'
 
 
 class ParagraphToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'paragraph'
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('par')
@@ -126,12 +137,25 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
 class ListItemToPlastexNodeTranslator(TranslatorMixin):
 
+    __name__ = 'list_item'
+
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('list_item')
         return tex_node
 
 
+class EnumeratedListToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'enumerated_list'
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        tex_node = tex_doc.createElement('enumerate')
+        return tex_node
+
+
 class BulletListToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'bullet_list'
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('itemize')
@@ -188,5 +212,7 @@ class PlastexDocumentGenerator(BuilderMixin):
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
             tex_doc = self.create_document()
+        from IPython.core.debugger import Tracer
+        Tracer()()
         self.build_nodes(rst_document, tex_doc, tex_doc)
         return tex_doc
