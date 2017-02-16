@@ -97,7 +97,7 @@ class SectionToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
 class SubtitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'subtitle'
-     
+
     def translate(self, rst_node, tex_doc, tex_parent=None):
         # XXX: Do we want a new section here?
         result = tex_doc.createElement('section')
@@ -134,6 +134,15 @@ class StrongToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createElement("textbf")
+        return result
+
+
+class EmphasisToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'emphasis'
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        result = tex_doc.createElement("emph")
         return result
 
 

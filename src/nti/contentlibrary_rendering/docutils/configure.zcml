@@ -25,7 +25,8 @@
 	<utility factory=".translators.TextToPlastexNodeTranslator" name="#text" />
 	<utility factory=".translators.ImageToPlastexNodeTranslator" name="image" />
 	<utility factory=".translators.StrongToPlastexNodeTranslator" name="strong" />
-	        
+	<utility factory=".translators.EmphasisToPlastexNodeTranslator" name="emphasis" />
+   
 	<utility factory=".translators.TitleToPlastexNodeTranslator" name="title" />
 	<utility factory=".translators.SubtitleToPlastexNodeTranslator" name="subtitle" />
 	    
