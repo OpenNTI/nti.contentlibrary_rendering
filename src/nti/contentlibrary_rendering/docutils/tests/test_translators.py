@@ -31,7 +31,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
     def test_registered(self):
         translators = component.getUtilitiesFor(IRSTToPlastexNodeTranslator)
         translators = list(translators)
-        assert_that(translators, has_length(11))
+        assert_that(translators, has_length(12))
         for _, translator in translators:
             assert_that(translator,
                         validly_provides(IRSTToPlastexNodeTranslator))

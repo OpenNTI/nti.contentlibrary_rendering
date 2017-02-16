@@ -113,6 +113,31 @@ class SubtitleToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
+class BlockQuoteToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
+    pass
+
+
+class ParagraphToPlastexNodeTranslator(TranslatorMixin):
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        tex_node = tex_doc.createElement('par')
+        return tex_node
+
+
+class ListItemToPlastexNodeTranslator(TranslatorMixin):
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        tex_node = tex_doc.createElement('list_item')
+        return tex_node
+
+
+class BulletListToPlastexNodeTranslator(TranslatorMixin):
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        tex_node = tex_doc.createElement('itemize')
+        return tex_node
+
+
 class BuilderMixin(object):
 
     def translator(self, node_name):
@@ -143,37 +168,6 @@ class BuilderMixin(object):
         """
         tex_node = self.handle_node(rst_node, tex_parent, tex_doc)
         self.process_children(rst_node, tex_node, tex_doc)
-        return tex_node
-
-
-class ParagraphToPlastexNodeTranslator(TranslatorMixin,
-                                       BuilderMixin):
-
-    def translate(self, rst_node, tex_doc, tex_parent=None):
-        tex_node = tex_doc.createElement('par')
-        return tex_node
-
-
-class BlockTypeToPlastexNodeTranslator(TranslatorMixin,
-                                       BuilderMixin):
-
-    def translate(self, rst_node, tex_doc, tex_parent=None):
-        pass
-
-
-class ListItemToPlastexNodeTranslator(BuilderMixin,
-                                      TranslatorMixin):
-
-    def translate(self, rst_node, tex_doc, tex_parent=None):
-        tex_node = tex_doc.createElement('list_item')
-        return tex_node
-
-
-class BulletListToPlastexNodeTranslator(BuilderMixin,
-                                        TranslatorMixin):
-
-    def translate(self, rst_node, tex_doc, tex_parent=None):
-        tex_node = tex_doc.createElement('itemize')
         return tex_node
 
 
