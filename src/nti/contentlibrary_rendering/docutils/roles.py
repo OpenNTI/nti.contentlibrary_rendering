@@ -18,6 +18,10 @@ from docutils.parsers.rst import roles
 from docutils.parsers.rst import languages
 
 
+class underlined(Inline, TextElement):
+    pass
+
+
 class bolditalic(Inline, TextElement):
     pass
 
@@ -41,6 +45,7 @@ def register_role(name, cls):
 
 
 def register_roles():
+    register_role('underlined', underlined)
     register_role('bolditalic', bolditalic)
     register_role('boldunderlined', boldunderlined)
     register_role('italicunderlined', italicunderlined)
