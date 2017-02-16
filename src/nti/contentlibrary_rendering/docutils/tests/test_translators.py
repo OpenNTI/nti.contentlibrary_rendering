@@ -46,5 +46,4 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         tree = publish_doctree(source)
         assert_that(tree, has_property('children', has_length(1)))
         generator = PlastexDocumentGenerator()
-        from IPython.core.debugger import Tracer; Tracer()()
         generator.generate(tree)
