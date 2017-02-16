@@ -7,8 +7,10 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-from hamcrest import has_length
+from hamcrest import is_
 from hamcrest import assert_that
+from hamcrest import has_property
+
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
 
@@ -27,11 +29,12 @@ from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 class TestTranslators(ContentlibraryRenderingLayerTest):
 
-    def xtest_registered(self):
+    def test_registered(self):
         translators = component.getUtilitiesFor(IRSTToPlastexNodeTranslator)
         translators = list(translators)
-        assert_that(translators, has_length(13))
-        for _, translator in translators:
+        for name, translator in translators:
+            assert_that(translator,
+                        has_property('__name__', is_(name)))
             assert_that(translator,
                         validly_provides(IRSTToPlastexNodeTranslator))
             assert_that(translator,

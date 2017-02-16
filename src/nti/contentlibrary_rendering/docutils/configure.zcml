@@ -32,7 +32,7 @@
 	<utility factory=".translators.SectionToPlastexNodeTranslator" name="section" />
 	<utility factory=".translators.DocumentToPlastexNodeTranslator" name="document" />
 	<utility factory=".translators.ParagraphToPlastexNodeTranslator" name="paragraph" />
-	<utility factory=".translators.ParagraphToPlastexNodeTranslator" name="block_quote" />
+	<utility factory=".translators.BlockQuoteToPlastexNodeTranslator" name="block_quote" />
 	 
 	<utility factory=".translators.ListItemToPlastexNodeTranslator" name="list_item" />
 	<utility factory=".translators.BulletListToPlastexNodeTranslator" name="bullet_list" />
