@@ -22,7 +22,10 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTr
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
+
 class IdGen(object):
+
+    __slots__ = ('counter',)
 
     def __init__(self):
         self.counter = 0
