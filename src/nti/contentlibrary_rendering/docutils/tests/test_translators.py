@@ -10,6 +10,8 @@ __docformat__ = "restructuredtext en"
 from hamcrest import has_length
 from hamcrest import assert_that
 from hamcrest import has_property
+from nti.testing.matchers import validly_provides
+from nti.testing.matchers import verifiably_provides
 
 import os
 
@@ -29,16 +31,22 @@ from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 class TestTranslators(ContentlibraryRenderingLayerTest):
 
     def test_registered(self):
-        translators = list(component.getUtilitiesFor(IRSTToPlastexNodeTranslator))
+        translators = component.getUtilitiesFor(IRSTToPlastexNodeTranslator)
+        translators = list(translators)
         assert_that(translators, has_length(11))
+        for _, translator in translators:
+            assert_that(translator,
+                        validly_provides(IRSTToPlastexNodeTranslator))
+            assert_that(translator,
+                        verifiably_provides(IRSTToPlastexNodeTranslator))
 
     def test_bullet_list(self):
-        name = os.path.join(os.path.dirname(__file__), 
+        name = os.path.join(os.path.dirname(__file__),
                             'data/bullet_list.rst')
         with open(name, "rb") as fp:
             source = fp.read()
         tree = publish_doctree(source)
         assert_that(tree, has_property('children', has_length(1)))
         translator = get_translator("bullet_list")
-        translator.translate(tree[0], 
+        translator.translate(tree[0],
                              PlastexDocumentGenerator.create_document())

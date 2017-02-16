@@ -47,7 +47,7 @@ idgen = IdGen()
 @interface.implementer(IRSTToPlastexNodeTranslator)
 class TranslatorMixin(object):
 
-    def translate(self, rst_node, tex_doc):
+    def translate(self, rst_node, tex_doc, tex_parent=None):
         pass
 
 
@@ -59,21 +59,21 @@ class NoopPlastexNodeTranslator(TranslatorMixin):
 
 class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
 
-    def translate(self, rst_node, tex_doc):
+    def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createElement(rst_node.tagname)
         return result
 
 
 class TextToPlastexNodeTranslator(TranslatorMixin):
 
-    def translate(self, rst_node, tex_doc):
+    def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createTextNode(rst_node.astext())
         return result
 
 
 class TitleToPlastexNodeTranslator(TranslatorMixin):
 
-    def translate(self, rst_node, tex_doc):
+    def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createElement(rst_node.tagname)
         title_text = tex_doc.createTextNode(rst_node.astext())
         result.append(title_text)
@@ -95,11 +95,26 @@ class SectionToPlastexNodeTranslator(NoopPlastexNodeTranslator):
 
 class DocumentToPlastexNodeTranslator(TranslatorMixin):
 
-    def translate(self, rst_node, tex_doc):
+    def translate(self, rst_node, tex_doc, tex_parent=None):
         result = tex_doc.createElement(rst_node.tagname)
         # This should always have a title right...?
         title = tex_doc.createTextNode(rst_node.attributes['title'])
         # The document root (and sections?) will need a title element.
+        result.setAttribute('title', title)
+        return result
+
+
+class SubtitleToPlastexNodeTranslator(TranslatorMixin):
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        # XXX: Do we want a new section here?
+        result = tex_doc.createElement('section')
+        names = rst_node.attributes.get('names')
+        if names:
+            title = names[0]
+        else:
+            title = rst_node.astext()
+        title = tex_doc.createTextNode(title)
         result.setAttribute('title', title)
         return result
 
@@ -111,7 +126,7 @@ class BuilderMixin(object):
 
     def handle_node(self, rst_node, tex_parent, tex_doc):
         node_translator = self.translator(rst_node.tagname)
-        result = node_translator.translate(rst_node, tex_doc)
+        result = node_translator.translate(rst_node, tex_doc, tex_parent)
         if result is not None:
             tex_parent.append(result)
         # If no-op, keep parsing but do so for our tex_parent.
@@ -132,31 +147,25 @@ class BuilderMixin(object):
 class ParagraphToPlastexNodeTranslator(TranslatorMixin,
                                        BuilderMixin):
 
-    def translate(self, rst_node, tex_doc):
+    def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('par')
         self.process_children(rst_node, tex_node, tex_doc)
         return tex_node
 
 
-class SubtitleToPlastexNodeTranslator(TranslatorMixin):
+class BlockTypeToPlastexNodeTranslator(TranslatorMixin,
+                                       BuilderMixin):
 
-    def translate(self, rst_node, tex_doc):
-        # XXX: Do we want a new section here?
-        result = tex_doc.createElement('section')
-        names = rst_node.attributes.get('names')
-        if names:
-            title = names[0]
-        else:
-            title = rst_node.astext()
-        title = tex_doc.createTextNode(title)
-        result.setAttribute('title', title)
-        return result
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        tex_node = tex_doc.createElement('par')
+        self.process_children(rst_node, tex_node, tex_doc)
+        return tex_node
 
 
 class ListItemToPlastexNodeTranslator(BuilderMixin,
                                       TranslatorMixin):
 
-    def translate(self, rst_node, tex_doc):
+    def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('list_item')
         self.process_children(rst_node, tex_node, tex_doc)
         return tex_node
@@ -165,7 +174,7 @@ class ListItemToPlastexNodeTranslator(BuilderMixin,
 class BulletListToPlastexNodeTranslator(BuilderMixin,
                                         TranslatorMixin):
 
-    def translate(self, rst_node, tex_doc):
+    def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('itemize')
         self.process_children(rst_node, tex_node, tex_doc)
         return tex_node
