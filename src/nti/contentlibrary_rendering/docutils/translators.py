@@ -16,11 +16,33 @@ logger = getLogger(__name__)
 
 from zope import interface
 
+from zope.proxy import ProxyBase
+
 from nti.contentlibrary_rendering.docutils import get_translator
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
+
+
+class ObjectProxy(ProxyBase):
+
+    def __new__(cls, *args, **kwds):
+        return super(ObjectProxy, cls).__new__(cls, *args, **kwds)
+
+    def __init__(self, *args, **kwds):
+        super(ObjectProxy, self).__init__(*args, **kwds)
+
+    def __getattr__(self, name):
+        if name.startswith('_v'):
+            return self.__dict__[name]
+        return ProxyBase.__getattr__(self, name)
+
+    def __setattr__(self, name, value):
+        if name.startswith('_v'):
+            self.__dict__[name] = value
+        else:
+            return ProxyBase.__setattr__(self, name, value)
 
 
 class IdGen(object):
@@ -221,16 +243,12 @@ class PlastexDocumentGenerator(BuilderMixin):
     Transforms an RST document into a plasTeX document.
     """
 
-    @classmethod
-    def create_document(cls):
-        document = TeXDocument()
-        document.userdata['idgen'] = IdGen()
-        return document
-
     def generate(self, rst_document=None, tex_doc=None):
         # XXX: By default, we skip any preamble and start directly in the
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
-            tex_doc = self.create_document()
-        self.build_nodes(rst_document, tex_doc, tex_doc)
+            tex_doc = TeXDocument()
+        if 'idgen' not in tex_doc.userdata['idgen']:
+            tex_doc.userdata['idgen'] = IdGen()
+        self.build_nodes(rst_document, tex_doc, ObjectProxy(tex_doc))
         return tex_doc
