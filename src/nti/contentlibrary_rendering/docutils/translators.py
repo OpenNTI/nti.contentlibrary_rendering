@@ -25,13 +25,15 @@ from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
 @interface.implementer(IRSTToPlastexNodeTranslator)
 class TranslatorMixin(object):
-    """
-    A translator that excludes this node from translation.
-    """
 
     def translate(self, rst_node, tex_doc):
         pass
-_NoopRSTToPlastexNodeTranslator = TranslatorMixin
+
+
+class NoopRSTToPlastexNodeTranslator(TranslatorMixin):
+    """
+    A translator that excludes this node from translation.
+    """
 
 
 class DefaultRSTToPlastexNodeTranslator(TranslatorMixin):
@@ -57,15 +59,15 @@ class TitleRSTToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class ImageRSTToPlastexNodeTranslator(TranslatorMixin):
+class ImageRSTToPlastexNodeTranslator(NoopRSTToPlastexNodeTranslator):
     pass
 
 
-class MathRSTToPlastexNodeTranslator(TranslatorMixin):
+class MathRSTToPlastexNodeTranslator(NoopRSTToPlastexNodeTranslator):
     pass
 
 
-class SectionRSTToPlastexNodeTranslator(TranslatorMixin):
+class SectionRSTToPlastexNodeTranslator(NoopRSTToPlastexNodeTranslator):
     # XXX: if we include sections, we'll need title attributes.
     pass
 
