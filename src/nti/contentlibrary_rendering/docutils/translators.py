@@ -45,7 +45,7 @@ class TranslatorMixin(object):
         pass
 
 
-class NoopPlastexNodeTranslator(TranslatorMixin):
+class NoOpPlastexNodeTranslator(TranslatorMixin):
     """
     A translator that excludes this node from translation.
     """
@@ -74,15 +74,15 @@ class TitleToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class ImageToPlastexNodeTranslator(NoopPlastexNodeTranslator):
+class ImageToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     pass
 
 
-class MathToPlastexNodeTranslator(NoopPlastexNodeTranslator):
+class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     pass
 
 
-class SectionToPlastexNodeTranslator(NoopPlastexNodeTranslator):
+class SectionToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     # XXX: if we include sections, we'll need title attributes.
     pass
 
@@ -190,6 +190,6 @@ class PlastexDocumentGenerator(BuilderMixin):
         # XXX: By default, we skip any preamble and start directly in the
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
-            document = self.create_document()
-        self.build_nodes(rst_document, document, document)
-        return document
+            tex_doc = self.create_document()
+        self.build_nodes(rst_document, tex_doc, tex_doc)
+        return tex_doc
