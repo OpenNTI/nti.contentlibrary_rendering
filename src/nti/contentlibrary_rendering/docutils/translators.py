@@ -16,47 +16,13 @@ logger = getLogger(__name__)
 
 from zope import interface
 
-from zope.proxy import ProxyBase
-
 from nti.contentlibrary_rendering.docutils import get_translator
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
+from nti.contentlibrary_rendering.docutils.utils import rst_traversal_count
+
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
-
-
-def _rst_traversal(rst_node, tagname):
-    """
-    Traverse the RST tree, returning a count of how many elements
-    are found for tagname.
-    """
-    count = 0
-    parent = rst_node.parent
-    while parent is not None:
-        if parent.tagname == tagname:
-            count += 1
-        parent = parent.parent
-    return count
-
-
-class ObjectProxy(ProxyBase):
-
-    def __new__(cls, *args, **kwds):
-        return super(ObjectProxy, cls).__new__(cls, *args, **kwds)
-
-    def __init__(self, *args, **kwds):
-        super(ObjectProxy, self).__init__(*args, **kwds)
-
-    def __getattr__(self, name):
-        if name.startswith('_v'):
-            return self.__dict__[name]
-        return ProxyBase.__getattr__(self, name)
-
-    def __setattr__(self, name, value):
-        if name.startswith('_v'):
-            self.__dict__[name] = value
-        else:
-            return ProxyBase.__setattr__(self, name, value)
 
 
 class IdGen(object):
@@ -138,7 +104,7 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
                    3:'subsubsection'}
 
     def _get_section_tag(self, rst_node):
-        parent_section_count = _rst_traversal(rst_node, 'section')
+        parent_section_count = rst_traversal_count(rst_node, 'section')
         if parent_section_count >= self.SECTION_DEPTH_MAX:
             raise ValueError( 'Only three levels of sections are allowed.' )
         section_level = parent_section_count + 1
@@ -294,8 +260,7 @@ class PlastexDocumentGenerator(BuilderMixin):
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
             tex_doc = TeXDocument()
-        self.build_nodes(rst_document, tex_doc, tex_doc)
-#         if 'idgen' not in tex_doc.userdata['idgen']:
-#             tex_doc.userdata['idgen'] = IdGen()
-#         self.build_nodes(rst_document, tex_doc, ObjectProxy(tex_doc))
+        if 'idgen' not in tex_doc.userdata:
+            tex_doc.userdata['idgen'] = IdGen()
+            self.build_nodes(rst_document, tex_doc, tex_doc)
         return tex_doc
