@@ -25,6 +25,21 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTr
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
 
+def _rst_traversal(rst_node, tagname):
+    """
+    Traverse the RST tree, returning a count of how many elements
+    are found for tagname.
+    """
+    count = 0
+    parent = rst_node.parent
+    while parent is not None:
+        if parent.tagname == tagname:
+            count += 1
+        rst_node = parent
+        parent = rst_node.parent
+    return count
+
+
 class ObjectProxy(ProxyBase):
 
     def __new__(cls, *args, **kwds):
@@ -64,6 +79,9 @@ class IdGen(object):
 class TranslatorMixin(object):
 
     __name__ = None
+
+    def translator(self, node_name):
+        return get_translator(node_name)
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         pass
@@ -112,16 +130,45 @@ class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     __name__ = "math"
 
 
-class SectionToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
-    __name__ = 'section'
+class SectionToPlastexNodeTranslator(TranslatorMixin):
 
+    __name__ = 'section'
+    SECTION_DEPTH_MAX = 3
+    SECTION_MAP = {1:'section',
+                   2:'subsection',
+                   3:'subsubsection'}
+
+    def _get_section_tag(self, rst_node):
+        parent_section_count = _rst_traversal(rst_node, 'section')
+        if parent_section_count >= self.SECTION_DEPTH_MAX:
+            raise ValueError( 'Only three levels of sections are allowed.' )
+        section_level = parent_section_count + 1
+        section_val = self.SECTION_MAP[section_level]
+        return section_val
+
+    def _set_title(self, rst_node, tex_doc, tex_node):
+        """
+        Titles are required by sections.
+        """
+        assert rst_node.children
+        title_child = rst_node.children[0]
+        assert title_child.tagname == 'title'
+        translator = self.translator('title')
+        title_node = translator.translate(title_child, tex_doc, tex_node)
+        tex_node.setAttribute('title', title_node)
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        section_tag = self._get_section_tag(rst_node)
+        result = tex_doc.createElement(section_tag)
+        self._set_title(rst_node, tex_doc, result)
+        return result
 
 class SubtitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'subtitle'
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
-        # XXX: Do we want a new section here?
+        # TODO: Do we want a new section here?
         result = tex_doc.createElement('section')
         names = rst_node.attributes.get('names')
         if names:
@@ -247,8 +294,9 @@ class PlastexDocumentGenerator(BuilderMixin):
         # XXX: By default, we skip any preamble and start directly in the
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
-            tex_doc = TeXDocument()
-        if 'idgen' not in tex_doc.userdata['idgen']:
-            tex_doc.userdata['idgen'] = IdGen()
-        self.build_nodes(rst_document, tex_doc, ObjectProxy(tex_doc))
+            tex_doc = self.create_document()
+        self.build_nodes(rst_document, tex_doc, tex_doc)
+#         if 'idgen' not in tex_doc.userdata['idgen']:
+#             tex_doc.userdata['idgen'] = IdGen()
+#         self.build_nodes(rst_document, tex_doc, ObjectProxy(tex_doc))
         return tex_doc
