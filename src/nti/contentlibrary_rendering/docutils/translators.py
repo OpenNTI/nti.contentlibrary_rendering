@@ -126,6 +126,15 @@ class BlockQuoteToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     __name__ = 'block_quote'
 
 
+class StrongToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'strong'
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        result = tex_doc.createElement("textbf")
+        return result
+
+
 class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'paragraph'
