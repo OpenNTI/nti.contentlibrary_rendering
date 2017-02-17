@@ -196,6 +196,8 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('par')
+        # XXX: We need a title for a paragraph b/c the renderer uses it
+        # to generate and ntiid for it
         tex_node.title = to_unicode(self._get_title(rst_node, tex_doc))
         return tex_node
 
