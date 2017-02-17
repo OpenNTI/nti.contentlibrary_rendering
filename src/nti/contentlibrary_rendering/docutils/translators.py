@@ -190,7 +190,8 @@ class UnderlinedToPlastexNodeTranslator(TranslatorMixin):
     __name__ = "underlined"
 
     def translate(self, rst_node, tex_doc, tex_parent):
-        result = tex_doc.createElement("underline")
+        # uline is a style defined in the rendering pacakge
+        result = tex_doc.createElement("uline")
         return result
 
 

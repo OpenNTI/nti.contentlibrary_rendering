@@ -30,3 +30,5 @@ QUEUE_NAMES = (CONTENT_UNITS_QUEUE,)
 
 def get_factory():
     return component.getUtility(IContentQueueFactory)
+
+### from IPython.terminal.debugger import set_trace;set_trace()

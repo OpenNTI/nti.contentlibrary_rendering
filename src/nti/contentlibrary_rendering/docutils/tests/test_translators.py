@@ -47,6 +47,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         with open(name, "rb") as fp:
             source_doc = publish_doctree(fp.read())
         tex_dir =  tempfile.mkdtemp(prefix="render_")
+        print(tex_dir)
         try:
             document = render_document(source_doc, 
                                        outfile_dir=tex_dir, 
@@ -68,3 +69,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
 
     def test_ordered_list(self):
         self._generate_from_file('ordered_list.rst')
+
+    def test_roles(self):
+        self._generate_from_file('roles.rst')
+
