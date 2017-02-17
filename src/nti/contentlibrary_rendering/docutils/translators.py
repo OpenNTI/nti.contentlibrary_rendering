@@ -20,7 +20,7 @@ from nti.contentlibrary_rendering.docutils import get_translator
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
-from nti.contentlibrary_rendering.docutils.utils import ObjectProxy
+from nti.contentlibrary_rendering.docutils.utils import DocumentProxy
 from nti.contentlibrary_rendering.docutils.utils import rst_traversal_count
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
@@ -266,5 +266,5 @@ class PlastexDocumentGenerator(BuilderMixin):
             tex_doc = TeXDocument()
         if 'idgen' not in tex_doc.userdata:
             tex_doc.userdata['idgen'] = IdGen()
-        self.build_nodes(rst_document, tex_doc, ObjectProxy(tex_doc))
+        self.build_nodes(rst_document, tex_doc, DocumentProxy(tex_doc))
         return tex_doc

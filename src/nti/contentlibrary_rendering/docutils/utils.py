@@ -12,13 +12,15 @@ logger = __import__('logging').getLogger(__name__)
 from zope.proxy import ProxyBase
 
 
-class ObjectProxy(ProxyBase):
+class DocumentProxy(ProxyBase):
+
+    _v_paragraph_counter = 0
 
     def __new__(cls, *args, **kwds):
-        return super(ObjectProxy, cls).__new__(cls, *args, **kwds)
+        return super(DocumentProxy, cls).__new__(cls, *args, **kwds)
 
     def __init__(self, *args, **kwds):
-        super(ObjectProxy, self).__init__(*args, **kwds)
+        super(DocumentProxy, self).__init__(*args, **kwds)
 
     def __getattr__(self, name):
         if name.startswith('_v'):
