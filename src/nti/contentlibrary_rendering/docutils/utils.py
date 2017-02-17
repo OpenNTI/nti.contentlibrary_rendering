@@ -33,6 +33,9 @@ class DocumentProxy(ProxyBase):
         else:
             return ProxyBase.__setattr__(self, name, value)
 
+    def _inc_paragraph_counter(self):
+        self._v_paragraph_counter += 1
+        return self._v_paragraph_counter
 
 def rst_traversal_count(rst_node, tagname):
     """

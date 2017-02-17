@@ -16,6 +16,8 @@ logger = getLogger(__name__)
 
 from zope import interface
 
+from nti.base._compat import to_unicode
+
 from nti.contentlibrary_rendering.docutils import get_translator
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
@@ -187,9 +189,14 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'paragraph'
 
+    def _get_title(self, rst_node, tex_doc):
+        title = rst_node.attributes.get('title')
+        title = title or rst_node.attributes.get('id')
+        return title or 'par_%s' % tex_doc._inc_paragraph_counter()
+
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('par')
-        tex_node.title='foo' # TODO: What title?
+        tex_node.title = to_unicode(self._get_title(rst_node, tex_doc))
         return tex_node
 
 
