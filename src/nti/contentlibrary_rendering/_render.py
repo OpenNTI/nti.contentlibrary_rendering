@@ -110,7 +110,7 @@ def copy_package_data(item, target):
 
 
 def prepare_tex_document(package=None, provider='NTI', jobname=None,
-                         context=None, tex_dom=None):
+                         context=None, tex_dom=None, outfile_dir=None):
     """
     Build and prepare context for our plasTeX document.
     """
@@ -118,7 +118,9 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
     tex_dom = TeXDocument() if tex_dom is None else tex_dom
     Base.document.filenameoverride = property(lambda unused: 'index')
     # Prep our doc
-    prepare_document_settings(tex_dom, provider=provider)
+    prepare_document_settings(tex_dom,
+                              provider=provider,
+                              working_dir=outfile_dir)
     # Pull in all necessary plugins/configs/templates.
     unused_ctx, packages_path = load_packages(context=context,
                                               load_configs=False)
@@ -133,17 +135,6 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
     return tex_dom
 
 
-def process_document(tex_dom, jobname, outfile_dir=None):
-    # XXX: do we need to patch_all here?
-    current_dir = os.getcwd()
-    tex_dir = outfile_dir or tempfile.mkdtemp()
-    try:
-        os.chdir(tex_dir)
-        return nti_render.process_document(tex_dom, jobname)
-    finally:
-        os.chdir(current_dir)
-
-
 def generate_document(source_doc, tex_dom, content_type=RST_MIMETYPE):
     generator = component.getUtility(IPlastexDocumentGenerator,
                                      name=str(content_type))
@@ -156,11 +147,20 @@ def render_document(source_doc, package=None, outfile_dir=None,
     """
     Render the given source document.
     """
-    # Get a suitable tex dom
-    tex_dom = prepare_tex_document(package, provider, jobname)
-    # Generate our plasTeX DOM and render.
-    generate_document(source_doc, tex_dom, content_type)
-    return process_document(tex_dom, jobname, outfile_dir=outfile_dir)
+    current_dir = os.getcwd()
+    outfile_dir = outfile_dir or tempfile.mkdtemp()
+    try:
+        os.chdir(outfile_dir)
+        # Get a suitable tex dom
+        tex_dom = prepare_tex_document(package,
+                                       provider,
+                                       jobname,
+                                       outfile_dir=outfile_dir)
+        # Generate our plasTeX DOM and render.
+        generate_document(source_doc, tex_dom, content_type)
+        return nti_render.process_document(tex_dom, jobname)
+    finally:
+        os.chdir(current_dir)
 
 
 def transform_content(context, contentType):
