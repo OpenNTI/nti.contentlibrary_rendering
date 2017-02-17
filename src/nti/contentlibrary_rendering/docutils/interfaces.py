@@ -39,7 +39,7 @@ class IRSTToPlastexNodeTranslator(interface.Interface):
     A utility to translate an RST node into a plasTeX node.
     """
 
-    def translate(rst_node, tex_doc, tex_parent=None):
+    def translate(rst_node, tex_doc, tex_parent):
         """
         Translate the specified RST node into a plasTeX node.
 

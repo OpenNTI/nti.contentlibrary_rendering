@@ -51,7 +51,7 @@ class TranslatorMixin(object):
     def translator(self, node_name):
         return get_translator(node_name)
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         pass
 
 
@@ -65,7 +65,7 @@ class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = u''
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement(rst_node.tagname)
         return result
 
@@ -74,7 +74,7 @@ class TextToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "#text"
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createTextNode(rst_node.astext())
         return result
 
@@ -83,7 +83,7 @@ class TitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "title"
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement(rst_node.tagname)
         title_text = tex_doc.createTextNode(rst_node.astext())
         result.append(title_text)
@@ -126,7 +126,7 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
         title_node = translator.translate(title_child, tex_doc, tex_node)
         tex_node.setAttribute('title', title_node)
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         section_tag = self._get_section_tag(rst_node)
         result = tex_doc.createElement(section_tag)
         self._set_title(rst_node, tex_doc, result)
@@ -137,7 +137,7 @@ class SubtitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'subtitle'
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         # TODO: Do we want a new section here?
         result = tex_doc.createElement('section')
         names = rst_node.attributes.get('names')
@@ -154,7 +154,7 @@ class DocumentToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'document'
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement(rst_node.tagname)
         title = rst_node.attributes.get('title')
         if title:
@@ -171,7 +171,7 @@ class StrongToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'strong'
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement("textbf")
         return result
 
@@ -180,7 +180,7 @@ class EmphasisToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'emphasis'
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement("emph")
         return result
 
@@ -189,7 +189,7 @@ class UnderlinedToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "underlined"
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement("underline")
         return result
 
@@ -198,11 +198,13 @@ class BoldItalicToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "bolditalic"
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         textbf = tex_doc.createElement("textbf")
-        result = tex_doc.createElement("emph")
-        textbf.append(result)
-        return result
+        emph = tex_doc.createElement("emph")
+        textbf.append(emph)
+        # overwrite append so next nodes are added to emph
+        textbf.append = emph.append 
+        return textbf
 
 
 class ParagraphToPlastexNodeTranslator(TranslatorMixin):
@@ -214,7 +216,7 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
         title = title or rst_node.attributes.get('id')
         return title or 'par_%s' % tex_doc._inc_paragraph_counter()
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('par')
         # XXX: We need a title for a paragraph b/c the renderer uses it
         # to generate and ntiid for it
@@ -226,7 +228,7 @@ class ListItemToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'list_item'
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('list_item')
         return tex_node
 
@@ -235,7 +237,7 @@ class EnumeratedListToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'enumerated_list'
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('enumerate')
         return tex_node
 
@@ -244,7 +246,7 @@ class BulletListToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'bullet_list'
 
-    def translate(self, rst_node, tex_doc, tex_parent=None):
+    def translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('itemize')
         return tex_node
 
