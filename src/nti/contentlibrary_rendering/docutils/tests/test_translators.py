@@ -47,7 +47,6 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         with open(name, "rb") as fp:
             source_doc = publish_doctree(fp.read())
         tex_dir =  tempfile.mkdtemp(prefix="render_")
-        print(tex_dir)
         try:
             document = render_document(source_doc, 
                                        outfile_dir=tex_dir, 
@@ -61,9 +60,6 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
             shutil.rmtree(tex_dir)
         return document
 
-    def xtest_basic(self):
-        self._generate_from_file('basic.rst')
-        
     def test_bullet_list(self):
         self._generate_from_file('bullet_list.rst')
 
