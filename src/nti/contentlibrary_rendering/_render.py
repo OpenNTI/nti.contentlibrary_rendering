@@ -91,7 +91,7 @@ def copy_package_data(item, target):
     copy_attributes(package, target, ('PlatformPresentationResources',))
 
     # 5. make sure we copy the new ntiid
-    if is_ntiid_of_type(target.ntiid, TYPE_OID):
+    if not target.ntiid or is_ntiid_of_type(target.ntiid, TYPE_OID):
         target.ntiid = package.ntiid
 
     # 6. unregister from the intid facility the target old children
