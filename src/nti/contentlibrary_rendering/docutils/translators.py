@@ -78,44 +78,6 @@ class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     __name__ = "math"
 
 
-# Sections
-
-
-class SectionToPlastexNodeTranslator(TranslatorMixin):
-
-    __name__ = 'section'
-
-    SECTION_DEPTH_MAX = 3
-    SECTION_MAP = {1: 'section',
-                   2: 'subsection',
-                   3: 'subsubsection'}
-
-    def _get_section_tag(self, rst_node):
-        parent_section_count = rst_traversal_count(rst_node, 'section')
-        if parent_section_count >= self.SECTION_DEPTH_MAX:
-            raise ValueError('Only three levels of sections are allowed.')
-        section_level = parent_section_count + 1
-        section_val = self.SECTION_MAP[section_level]
-        return section_val
-
-    def _set_title(self, rst_node, tex_doc, tex_node):
-        """
-        Titles are required by sections.
-        """
-        assert rst_node.children
-        title_child = rst_node.children[0]
-        assert title_child.tagname == 'title'
-        translator = self.translator('title')
-        title_node = translator.translate(title_child, tex_doc, tex_node)
-        tex_node.setAttribute('title', title_node)
-
-    def translate(self, rst_node, tex_doc, tex_parent):
-        section_tag = self._get_section_tag(rst_node)
-        result = tex_doc.createElement(section_tag)
-        self._set_title(rst_node, tex_doc, result)
-        return result
-
-
 # Titles
 
 
@@ -204,6 +166,15 @@ class BoldUnderlinedToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
+class ItalicUnderlinedToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "italicunderlined"
+
+    def translate(self, rst_node, tex_doc, tex_parent):
+        result = tex_doc.createElement("italicunderlined")
+        return result
+
+
 class BoldItalicUnderlinedToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "bolditalicunderlined"
@@ -265,6 +236,44 @@ class BulletListToPlastexNodeTranslator(TranslatorMixin):
     def translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('itemize')
         return tex_node
+
+
+# Sections
+
+
+class SectionToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'section'
+
+    SECTION_DEPTH_MAX = 3
+    SECTION_MAP = {1: 'section',
+                   2: 'subsection',
+                   3: 'subsubsection'}
+
+    def _get_section_tag(self, rst_node):
+        parent_section_count = rst_traversal_count(rst_node, 'section')
+        if parent_section_count >= self.SECTION_DEPTH_MAX:
+            raise ValueError('Only three levels of sections are allowed.')
+        section_level = parent_section_count + 1
+        section_val = self.SECTION_MAP[section_level]
+        return section_val
+
+    def _set_title(self, rst_node, tex_doc, tex_node):
+        """
+        Titles are required by sections.
+        """
+        assert rst_node.children
+        title_child = rst_node.children[0]
+        assert title_child.tagname == 'title'
+        translator = self.translator('title')
+        title_node = translator.translate(title_child, tex_doc, tex_node)
+        tex_node.setAttribute('title', title_node)
+
+    def translate(self, rst_node, tex_doc, tex_parent):
+        section_tag = self._get_section_tag(rst_node)
+        result = tex_doc.createElement(section_tag)
+        self._set_title(rst_node, tex_doc, result)
+        return result
 
 
 # Document

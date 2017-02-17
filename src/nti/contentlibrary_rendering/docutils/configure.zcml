@@ -22,14 +22,17 @@
 	<!-- Plastex Translators -->
 	<utility factory=".translators.DefaultNodeToPlastexNodeTranslator" />
 	<utility factory=".translators.MathToPlastexNodeTranslator" name="math" />
-	<utility factory=".translators.TextToPlastexNodeTranslator" name="#text" />
 	<utility factory=".translators.ImageToPlastexNodeTranslator" name="image" />
+
+	<utility factory=".translators.TextToPlastexNodeTranslator" name="#text" />
 	<utility factory=".translators.StrongToPlastexNodeTranslator" name="strong" />
 	<utility factory=".translators.EmphasisToPlastexNodeTranslator" name="emphasis" />
 	
 	<utility factory=".translators.BoldItalicToPlastexNodeTranslator" name="bolditalic" />
 	<utility factory=".translators.UnderlinedToPlastexNodeTranslator" name="underlined" />
-	<utility factory=".translators.UnderlinedToPlastexNodeTranslator" name="boldunderlined" />
+	<utility factory=".translators.BoldUnderlinedToPlastexNodeTranslator" name="boldunderlined" />
+	<utility factory=".translators.ItalicUnderlinedToPlastexNodeTranslator" name="italicunderlined" />
+	<utility factory=".translators.BoldItalicUnderlinedToPlastexNodeTranslator" name="bolditalicunderlined" />
 
 	<utility factory=".translators.TitleToPlastexNodeTranslator" name="title" />
 	<utility factory=".translators.SubtitleToPlastexNodeTranslator" name="subtitle" />
