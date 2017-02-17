@@ -189,6 +189,7 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     def translate(self, rst_node, tex_doc, tex_parent=None):
         tex_node = tex_doc.createElement('par')
+        tex_node.title='foo' # TODO: What title?
         return tex_node
 
 
