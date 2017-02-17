@@ -185,6 +185,26 @@ class EmphasisToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
+class UnderlinedToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "underlined"
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        result = tex_doc.createElement("underline")
+        return result
+
+
+class BoldItalicToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "bolditalic"
+
+    def translate(self, rst_node, tex_doc, tex_parent=None):
+        textbf = tex_doc.createElement("textbf")
+        result = tex_doc.createElement("emph")
+        textbf.append(result)
+        return result
+
+
 class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'paragraph'
