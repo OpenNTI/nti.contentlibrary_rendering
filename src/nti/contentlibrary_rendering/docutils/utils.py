@@ -14,14 +14,13 @@ from zope.proxy import ProxyBase
 
 class DocumentProxy(ProxyBase):
 
-    _v_paragraph_counter = 0
-
     def __new__(cls, *args, **kwds):
         return super(DocumentProxy, cls).__new__(cls, *args, **kwds)
 
     def __init__(self, *args, **kwds):
         super(DocumentProxy, self).__init__(*args, **kwds)
-
+        self._v_paragraph_counter = 0
+            
     def __getattr__(self, name):
         if name.startswith('_v'):
             return self.__dict__[name]
@@ -36,6 +35,7 @@ class DocumentProxy(ProxyBase):
     def _inc_paragraph_counter(self):
         self._v_paragraph_counter += 1
         return self._v_paragraph_counter
+
 
 def rst_traversal_count(rst_node, tagname):
     """
