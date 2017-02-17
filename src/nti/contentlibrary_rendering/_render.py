@@ -160,7 +160,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
     tex_dom = prepare_tex_document(package, provider, jobname)
     # Generate our plasTeX DOM and render.
     generate_document(source_doc, tex_dom, content_type)
-    return process_document(tex_dom, jobname)
+    return process_document(tex_dom, jobname, outfile_dir=outfile_dir)
 
 
 def transform_content(context, contentType):
