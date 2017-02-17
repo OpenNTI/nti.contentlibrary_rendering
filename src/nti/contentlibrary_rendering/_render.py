@@ -109,12 +109,13 @@ def copy_package_data(item, target):
     return target
 
 
-def _get_and_prepare_doc(context, provider='NTI', jobname=None):
+def prepare_tex_document(package=None, provider='NTI', jobname=None,
+                         context=None, tex_dom=None):
     """
     Build and prepare context for our plasTeX document.
     """
     # XXX: Do we need to read in render_conf? How about cross-document refs?
-    tex_dom = TeXDocument()
+    tex_dom = TeXDocument() if tex_dom is None else tex_dom
     Base.document.filenameoverride = property(lambda unused: 'index')
     # Prep our doc
     prepare_document_settings(tex_dom, provider=provider)
@@ -122,31 +123,44 @@ def _get_and_prepare_doc(context, provider='NTI', jobname=None):
     unused_ctx, packages_path = load_packages(context=context,
                                               load_configs=False)
     setup_environ(tex_dom, jobname, packages_path)
-    if jobname is None:
-        intids = component.getUtility(IIntIds)
-        jobname = intids.getId(context)
+    if not jobname:
+        if package is not None:
+            intids = component.getUtility(IIntIds)
+            jobname = intids.getId(package)
+        else:
+            jobname = str(id(tex_dom))
     tex_dom.userdata['jobname'] = jobname
     return tex_dom
 
 
-def render_document(source_doc, context=None, outfile_dir=None,
-                    provider='NTI', jobname=None, content_type=RST_MIMETYPE):
-    """
-    Render the given source document.
-    """
+def process_document(tex_dom, jobname, outfile_dir=None):
     # XXX: do we need to patch_all here?
     current_dir = os.getcwd()
     tex_dir = outfile_dir or tempfile.mkdtemp()
     try:
         os.chdir(tex_dir)
-        tex_dom = _get_and_prepare_doc(context, provider, jobname)
-        # Generate our plasTeX DOM and render.
-        generator = component.getUtility(IPlastexDocumentGenerator,
-                                         name=str(content_type))
-        generator.generate(source_doc, tex_dom)
         return nti_render.process_document(tex_dom, jobname)
     finally:
         os.chdir(current_dir)
+
+
+def generate_document(source_doc, tex_dom, content_type=RST_MIMETYPE):
+    generator = component.getUtility(IPlastexDocumentGenerator,
+                                     name=str(content_type))
+    generator.generate(source_doc, tex_dom)
+    return tex_dom
+
+
+def render_document(source_doc, package=None, outfile_dir=None,
+                    provider='NTI', jobname=None, content_type=RST_MIMETYPE):
+    """
+    Render the given source document.
+    """
+    # Get a suitable tex dom
+    tex_dom = prepare_tex_document(package, provider, jobname)
+    # Generate our plasTeX DOM and render.
+    generate_document(source_doc, tex_dom, content_type)
+    return process_document(tex_dom, jobname)
 
 
 def transform_content(context, contentType):
@@ -164,7 +178,7 @@ def locate_rendered_content(tex_dom, context):
     return locator.locate(path, context)
 
 
-def _do_render_package(render_job):
+def process_render_jo(render_job):
     ntiid = render_job.PackageNTIID
     provider = render_job.Provider
     package = find_object_with_ntiid(ntiid)
@@ -205,7 +219,7 @@ def render_package_job(render_job):
                 render_job.job_id)
     job_id = render_job.job_id
     try:
-        _do_render_package(render_job)
+        return process_render_jo(render_job)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))
