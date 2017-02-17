@@ -229,7 +229,11 @@ class BulletListToPlastexNodeTranslator(TranslatorMixin):
         return tex_node
 
 
-class BuilderMixin(object):
+@interface.implementer(IPlastexDocumentGenerator)
+class PlastexDocumentGenerator(object):
+    """
+    Transforms an RST document into a plasTeX document.
+    """
 
     def translator(self, node_name):
         return get_translator(node_name)
@@ -260,13 +264,6 @@ class BuilderMixin(object):
         tex_node = self.handle_node(rst_node, tex_parent, tex_doc)
         self.process_children(rst_node, tex_node, tex_doc)
         return tex_node
-
-
-@interface.implementer(IPlastexDocumentGenerator)
-class PlastexDocumentGenerator(BuilderMixin):
-    """
-    Transforms an RST document into a plasTeX document.
-    """
 
     def generate(self, rst_document=None, tex_doc=None):
         # XXX: By default, we skip any preamble and start directly in the
