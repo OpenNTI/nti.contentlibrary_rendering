@@ -15,14 +15,16 @@ from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
 
 import os
+import shutil
+import tempfile
 
 from zope import component
+
+from nti.contentlibrary_rendering._render import render_document
 
 from nti.contentlibrary_rendering.docutils import publish_doctree
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
-
-from nti.contentlibrary_rendering.docutils.translators import PlastexDocumentGenerator
 
 from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
@@ -43,11 +45,20 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
     def _generate_from_file(self, source):
         name = os.path.join(os.path.dirname(__file__), 'data/%s' % source)
         with open(name, "rb") as fp:
-            tree = publish_doctree(fp.read())
-        generator = PlastexDocumentGenerator()
-        tex_doc = generator.generate(tree)
-        tex_doc.toXML()
-        return tex_doc
+            source_doc = publish_doctree(fp.read())
+        tex_dir =  tempfile.mkdtemp(prefix="render_")
+        try:
+            document = render_document(source_doc, 
+                                       outfile_dir=tex_dir, 
+                                       jobname="sample")
+            index = os.path.join(tex_dir, 'index.html')
+            assert_that(os.path.exists(index), is_(True))
+        except Exception:
+            print('Exception %s, %s' % (source, tex_dir))
+            raise
+        else:
+            shutil.rmtree(tex_dir)
+        return document
 
     def xtest_basic(self):
         self._generate_from_file('basic.rst')
