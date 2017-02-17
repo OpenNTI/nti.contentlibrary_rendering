@@ -142,7 +142,7 @@ def render_document(source_doc, context=None, outfile_dir=None,
         tex_dom = _get_and_prepare_doc(context, provider, jobname)
         # Generate our plasTeX DOM and render.
         generator = component.getUtility(IPlastexDocumentGenerator,
-                                           name=str(content_type))
+                                         name=str(content_type))
         generator.generate(source_doc, tex_dom)
         return nti_render.process_document(tex_dom, jobname)
     finally:
