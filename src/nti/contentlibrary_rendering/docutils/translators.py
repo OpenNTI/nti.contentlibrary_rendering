@@ -70,32 +70,15 @@ class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class TextToPlastexNodeTranslator(TranslatorMixin):
-
-    __name__ = "#text"
-
-    def translate(self, rst_node, tex_doc, tex_parent):
-        result = tex_doc.createTextNode(rst_node.astext())
-        return result
-
-
-class TitleToPlastexNodeTranslator(TranslatorMixin):
-
-    __name__ = "title"
-
-    def translate(self, rst_node, tex_doc, tex_parent):
-        result = tex_doc.createElement(rst_node.tagname)
-        title_text = tex_doc.createTextNode(rst_node.astext())
-        result.append(title_text)
-        return result
-
-
 class ImageToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     __name__ = "image"
 
 
 class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     __name__ = "math"
+
+
+# Sections
 
 
 class SectionToPlastexNodeTranslator(TranslatorMixin):
@@ -133,6 +116,20 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
+# Titles
+
+
+class TitleToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "title"
+
+    def translate(self, rst_node, tex_doc, tex_parent):
+        result = tex_doc.createElement(rst_node.tagname)
+        title_text = tex_doc.createTextNode(rst_node.astext())
+        result.append(title_text)
+        return result
+
+
 class SubtitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'subtitle'
@@ -150,21 +147,16 @@ class SubtitleToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class DocumentToPlastexNodeTranslator(TranslatorMixin):
+# Text
 
-    __name__ = 'document'
+
+class TextToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "#text"
 
     def translate(self, rst_node, tex_doc, tex_parent):
-        result = tex_doc.createElement(rst_node.tagname)
-        title = rst_node.attributes.get('title')
-        if title:
-            title = tex_doc.createTextNode(title)
-            result.setAttribute('title', title)
+        result = tex_doc.createTextNode(rst_node.astext())
         return result
-
-
-class BlockQuoteToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
-    __name__ = 'block_quote'
 
 
 class StrongToPlastexNodeTranslator(TranslatorMixin):
@@ -190,7 +182,6 @@ class UnderlinedToPlastexNodeTranslator(TranslatorMixin):
     __name__ = "underlined"
 
     def translate(self, rst_node, tex_doc, tex_parent):
-        # uline is a style defined in the rendering pacakge
         result = tex_doc.createElement("uline")
         return result
 
@@ -200,12 +191,33 @@ class BoldItalicToPlastexNodeTranslator(TranslatorMixin):
     __name__ = "bolditalic"
 
     def translate(self, rst_node, tex_doc, tex_parent):
-        textbf = tex_doc.createElement("textbf")
-        emph = tex_doc.createElement("emph")
-        textbf.append(emph)
-        # overwrite append so next nodes are added to emph
-        textbf.append = emph.append 
-        return textbf
+        result = tex_doc.createElement("bolditalic")
+        return result
+
+
+class BoldUnderlinedToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "boldunderlined"
+
+    def translate(self, rst_node, tex_doc, tex_parent):
+        result = tex_doc.createElement("boldunderlined")
+        return result
+
+
+class BoldItalicUnderlinedToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "bolditalicunderlined"
+
+    def translate(self, rst_node, tex_doc, tex_parent):
+        result = tex_doc.createElement("bolditalicunderlined")
+        return result
+
+
+# Paragraph
+
+
+class BlockQuoteToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
+    __name__ = 'block_quote'
 
 
 class ParagraphToPlastexNodeTranslator(TranslatorMixin):
@@ -223,6 +235,9 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
         # to generate and ntiid for it
         tex_node.title = to_unicode(self._get_title(rst_node, tex_doc))
         return tex_node
+
+
+# Lists
 
 
 class ListItemToPlastexNodeTranslator(TranslatorMixin):
@@ -250,6 +265,22 @@ class BulletListToPlastexNodeTranslator(TranslatorMixin):
     def translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('itemize')
         return tex_node
+
+
+# Document
+
+
+class DocumentToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'document'
+
+    def translate(self, rst_node, tex_doc, tex_parent):
+        result = tex_doc.createElement(rst_node.tagname)
+        title = rst_node.attributes.get('title')
+        if title:
+            title = tex_doc.createTextNode(title)
+            result.setAttribute('title', title)
+        return result
 
 
 @interface.implementer(IPlastexDocumentGenerator)
