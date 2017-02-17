@@ -1,6 +1,7 @@
 <!-- -*- mode: nxml -*- -->
 <configure	xmlns="http://namespaces.zope.org/zope"
 			xmlns:i18n="http://namespaces.zope.org/i18n"
+			xmlns:ext="http://nextthought.com/ntp/ext"
 			xmlns:zcml="http://namespaces.zope.org/zcml">
 
 	<include package="zope.component" file="meta.zcml" />
@@ -15,10 +16,18 @@
 		<allow interface=".interfaces.IDirectivesModule" />
 	</module>
 
+	<!-- Externalization -->
+	<include package="nti.externalization" file="meta.zcml" />
+	<include package="nti.externalization" />
+
+	<ext:registerAutoPackageIO
+		root_interfaces=".interfaces.IRSTValidationError"
+		modules=".validators" />
+
 	<!-- PlasTeX Generators -->
 	<utility factory=".translators.PlastexDocumentGenerator" name="rst" />
 	<utility factory=".translators.PlastexDocumentGenerator" name="text/x-rst" />
-
+	
 	<!-- Plastex Translators -->
 	<utility factory=".translators.DefaultNodeToPlastexNodeTranslator" />
 	<utility factory=".translators.MathToPlastexNodeTranslator" name="math" />
@@ -27,7 +36,7 @@
 	<utility factory=".translators.TextToPlastexNodeTranslator" name="#text" />
 	<utility factory=".translators.StrongToPlastexNodeTranslator" name="strong" />
 	<utility factory=".translators.EmphasisToPlastexNodeTranslator" name="emphasis" />
-	
+
 	<utility factory=".translators.BoldItalicToPlastexNodeTranslator" name="bolditalic" />
 	<utility factory=".translators.UnderlinedToPlastexNodeTranslator" name="underlined" />
 	<utility factory=".translators.BoldUnderlinedToPlastexNodeTranslator" name="boldunderlined" />

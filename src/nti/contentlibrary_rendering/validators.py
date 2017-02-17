@@ -13,13 +13,27 @@ from zope import interface
 
 from nti.contentlibrary.interfaces import IContentValidator
 
+from nti.contentlibrary_rendering import MessageFactory as _
 
+from nti.contentlibrary_rendering.interfaces import IValidationError
+
+from nti.property.property import alias
+
+
+@interface.implementer(IValidationError)
 class ValidationError(Exception):
-    exc_info = None
+
+    message = alias('error')
+
+    def __init__(self, message, *args, **kwargs):
+        self.error = message
+        ValidationError.__init__(self, *args, **kwargs)
 
 
 class EmptyContentError(ValidationError):
-    exc_info = None
+
+    def __init__(self):
+        ValidationError.__init__(self, _("Empty content"))
 
 
 @interface.implementer(IContentValidator)

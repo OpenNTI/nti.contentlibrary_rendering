@@ -16,8 +16,9 @@ from docutils.core import publish_doctree
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
 
-def get_rst_dom(source):
-    rst_dom = publish_doctree(source=source)
+def get_rst_dom(source, settings=None):
+    rst_dom = publish_doctree(source=source,
+                              settings=settings)
     return rst_dom
 
 

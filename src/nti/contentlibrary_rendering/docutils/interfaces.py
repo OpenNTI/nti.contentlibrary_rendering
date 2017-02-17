@@ -11,6 +11,10 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
+from nti.contentlibrary_rendering.interfaces import IValidationError
+
+from nti.schema.field import Text as ValidText
+
 
 class IRolesModule(interface.Interface):
     """
@@ -48,3 +52,9 @@ class IRSTToPlastexNodeTranslator(interface.Interface):
         :param tex_parent The [optional] plastTeX parent node
         :return the new plasTeX node
         """
+
+
+class IRSTValidationError(IValidationError):
+
+    warnings = ValidText(title="The warning messages",
+                         required=False)

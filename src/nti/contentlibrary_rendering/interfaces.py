@@ -148,6 +148,7 @@ class IPlastexDocumentGenerator(interface.Interface):
         :return a plasTeX document
         """
 
+
 class IRenderedContentLocator(interface.Interface):
     """
     Utility to manipulate the files associated with a rendered content
@@ -166,3 +167,7 @@ class IRenderedContentLocator(interface.Interface):
         """
         [re]remove the rendered content
         """
+
+
+class IValidationError(interface.Interface):
+    error = ValidTextLine(title="The error message.")
