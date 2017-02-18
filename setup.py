@@ -65,7 +65,6 @@ setup(
         'zope.cachedescriptors',
         'zope.component',
         'zope.interface',
-        'zope.i18nmessageid',
         'zope.location',
         'zope.security',
     ],

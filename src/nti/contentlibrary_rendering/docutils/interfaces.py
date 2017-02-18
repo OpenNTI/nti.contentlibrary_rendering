@@ -11,7 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
-from nti.contentlibrary_rendering.interfaces import IValidationError
+from nti.contentlibrary.interfaces import IContentValidationError
 
 from nti.schema.field import Text as ValidText
 
@@ -54,7 +54,7 @@ class IRSTToPlastexNodeTranslator(interface.Interface):
         """
 
 
-class IRSTValidationError(IValidationError):
+class IRSTContentValidationError(IContentValidationError):
 
-    warnings = ValidText(title="The warning messages",
+    Warnings = ValidText(title="The warning messages",
                          required=False)

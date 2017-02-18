@@ -11,14 +11,22 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
-from nti.contentlibrary_rendering.docutils.interfaces import IRSTValidationError
+from nti.contentlibrary.validators import ContentValidationError
 
-from nti.contentlibrary_rendering.validators import ValidationError
+from nti.contentlibrary_rendering.docutils.interfaces import IRSTContentValidationError
+
+from nti.property.property import alias
 
 
-@interface.implementer(IRSTValidationError)
-class RSTValidationError(ValidationError):
+@interface.implementer(IRSTContentValidationError)
+class RSTValidationError(ContentValidationError):
+
+    __external_class_name__ = u"ContentValidationError"
+
+    mime_type = mimeType = u'application/vnd.nextthought.content.rstvalidationerror'
+
+    warnings = alias('Warnings')
 
     def __init__(self, message, warnings=None, *args, **kwargs):
-        ValidationError.__init__(self, message, *args, **kwargs)
-        self.warnings = warnings
+        ContentValidationError.__init__(self, message, *args, **kwargs)
+        self.Warnings = warnings

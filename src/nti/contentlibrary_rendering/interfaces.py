@@ -167,7 +167,3 @@ class IRenderedContentLocator(interface.Interface):
         """
         [re]remove the rendered content
         """
-
-
-class IValidationError(interface.Interface):
-    error = ValidTextLine(title="The error message.")

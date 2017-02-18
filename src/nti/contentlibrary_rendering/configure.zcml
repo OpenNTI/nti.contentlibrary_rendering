@@ -26,10 +26,9 @@
     <include package="nti.externalization" />
 
     <ext:registerAutoPackageIO
-        root_interfaces=".interfaces.IValidationError
-        				 .interfaces.IContentPackageRenderJob
+        root_interfaces=".interfaces.IContentPackageRenderJob
                          .interfaces.IContentPackageRenderMetadata"
-        modules=".adapters .model .validators" />
+        modules=".adapters .model" />
 
 	<!-- Transformers -->
 	<utility factory=".transformers.TextTransformer" name="text" />

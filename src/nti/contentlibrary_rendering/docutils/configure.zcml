@@ -21,7 +21,7 @@
 	<include package="nti.externalization" />
 
 	<ext:registerAutoPackageIO
-		root_interfaces=".interfaces.IRSTValidationError"
+		root_interfaces=".interfaces.IRSTContentValidationError"
 		modules=".validators" />
 
 	<!-- PlasTeX Generators -->
