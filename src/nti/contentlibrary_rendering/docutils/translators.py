@@ -196,9 +196,10 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
     __name__ = 'paragraph'
 
     def _get_title(self, rst_node, tex_doc):
-        title = rst_node.attributes.get('title')
-        title = title or rst_node.attributes.get('id')
-        return title or 'par_%s' % tex_doc._inc_paragraph_counter()
+        result = rst_node.attributes.get('title') \
+              or rst_node.attributes.get('id') \
+              or 'par_%s' % tex_doc._inc_paragraph_counter()
+        return result
 
     def translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('par')
