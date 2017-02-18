@@ -143,8 +143,9 @@ class S3Locator(LocatorMixin):
                 key = bucket.new_key(key_name)
                 file_headers = s3_upload_file(key,
                                               fullpath,
-                                              policy=self.grant,
-                                              headers=headers)
+                                              gzip_types=(),
+                                              headers=headers,
+                                              policy=self.grant)
 
                 if debug:
                     logger.info('Copied %s to %s/%s as type %s encoding %s',
