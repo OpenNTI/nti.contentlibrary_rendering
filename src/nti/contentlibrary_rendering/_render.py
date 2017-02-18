@@ -178,7 +178,7 @@ def locate_rendered_content(tex_dom, context):
     return locator.locate(path, context)
 
 
-def process_render_jo(render_job):
+def process_render_job(render_job):
     ntiid = render_job.PackageNTIID
     provider = render_job.Provider
     package = find_object_with_ntiid(ntiid)
@@ -219,7 +219,7 @@ def render_package_job(render_job):
                 render_job.job_id)
     job_id = render_job.job_id
     try:
-        return process_render_jo(render_job)
+        return process_render_job(render_job)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))

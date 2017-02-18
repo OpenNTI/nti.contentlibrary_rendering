@@ -40,7 +40,7 @@ class IdGen(object):
 
     def next(self):
         self.counter += 1
-        return self.counter
+        return str(self.counter)
 
 
 @interface.implementer(IRSTToPlastexNodeTranslator)
@@ -335,5 +335,7 @@ class PlastexDocumentGenerator(object):
             tex_doc = TeXDocument()
         if 'idgen' not in tex_doc.userdata:
             tex_doc.userdata['idgen'] = IdGen()
-        self.build_nodes(rst_document, tex_doc, DocumentProxy(tex_doc))
+        # Proxy allows us to set useful state fields without modified original
+        doc_proxy = DocumentProxy(tex_doc)
+        self.build_nodes(rst_document, tex_doc, doc_proxy)
         return tex_doc
