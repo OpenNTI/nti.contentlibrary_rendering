@@ -19,9 +19,7 @@ from nti.property.property import alias
 
 
 @interface.implementer(IRSTContentValidationError)
-class RSTValidationError(ContentValidationError):
-
-    __external_class_name__ = u"ContentValidationError"
+class RSTContentValidationError(ContentValidationError):
 
     mime_type = mimeType = u'application/vnd.nextthought.content.rstvalidationerror'
 
