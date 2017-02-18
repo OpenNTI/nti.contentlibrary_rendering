@@ -25,6 +25,6 @@ class RSTContentValidationError(ContentValidationError):
 
     warnings = alias('Warnings')
 
-    def __init__(self, message, warnings=None, *args, **kwargs):
-        ContentValidationError.__init__(self, message, *args, **kwargs)
+    def __init__(self, error, warnings=None, *args, **kwargs):
+        ContentValidationError.__init__(self, error, *args, **kwargs)
         self.Warnings = warnings
