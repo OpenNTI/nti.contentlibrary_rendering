@@ -15,16 +15,12 @@ from nti.contentlibrary.validators import ContentValidationError
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTContentValidationError
 
-from nti.property.property import alias
-
 
 @interface.implementer(IRSTContentValidationError)
 class RSTContentValidationError(ContentValidationError):
 
     mime_type = mimeType = u'application/vnd.nextthought.content.rstvalidationerror'
 
-    warnings = alias('Warnings')
-
-    def __init__(self, error, warnings=None, *args, **kwargs):
-        ContentValidationError.__init__(self, error, *args, **kwargs)
-        self.Warnings = warnings
+    def __init__(self, message, warnings=None, *args, **kwargs):
+        ContentValidationError.__init__(self, message, *args, **kwargs)
+        self.warnings = warnings

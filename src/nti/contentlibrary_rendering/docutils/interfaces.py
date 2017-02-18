@@ -56,5 +56,5 @@ class IRSTToPlastexNodeTranslator(interface.Interface):
 
 class IRSTContentValidationError(IContentValidationError):
 
-    Warnings = ValidText(title="The warning messages",
+    warnings = ValidText(title="The warning messages",
                          required=False)
