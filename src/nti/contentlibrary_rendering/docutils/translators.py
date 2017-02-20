@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 
 from zope import interface
 
-from nti.base._compat import to_unicode
+from nti.base._compat import unicode_
 
 from nti.contentlibrary_rendering.docutils import get_translator
 
@@ -205,7 +205,7 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
         tex_node = tex_doc.createElement('par')
         # XXX: We need a title for a paragraph b/c the renderer uses it
         # to generate and ntiid for it
-        tex_node.title = to_unicode(self._get_title(rst_node, tex_doc))
+        tex_node.title = unicode_(self._get_title(rst_node, tex_doc))
         return tex_node
 
 
