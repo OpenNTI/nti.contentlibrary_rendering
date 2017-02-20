@@ -195,7 +195,7 @@ def process_render_job(render_job):
     # 2. Render
     tex_dom = render_document(source_doc,
                               provider=provider,
-                              context=package,
+                              package=package,
                               content_type=contentType)
 
     # 3. Place in target location
