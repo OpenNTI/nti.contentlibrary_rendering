@@ -112,7 +112,8 @@ def copy_package_data(item, target):
 def prepare_tex_document(package=None, provider='NTI', jobname=None,
                          context=None, tex_dom=None, outfile_dir=None):
     """
-    Build and prepare context for our plasTeX document.
+    Build and prepare context for our plasTeX document, returning
+    the new plasTeX document and the jobname.nose2
     """
     # XXX: Do we need to read in render_conf? How about cross-document refs?
     tex_dom = TeXDocument() if tex_dom is None else tex_dom
@@ -132,7 +133,7 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
         else:
             jobname = str(id(tex_dom))
     tex_dom.userdata['jobname'] = jobname
-    return tex_dom
+    return tex_dom, jobname
 
 
 def generate_document(source_doc, tex_dom, content_type=RST_MIMETYPE):
@@ -152,10 +153,10 @@ def render_document(source_doc, package=None, outfile_dir=None,
     try:
         os.chdir(outfile_dir)
         # Get a suitable tex dom
-        tex_dom = prepare_tex_document(package,
-                                       provider,
-                                       jobname,
-                                       outfile_dir=outfile_dir)
+        tex_dom, jobname = prepare_tex_document(package,
+                                                provider,
+                                                jobname,
+                                                outfile_dir=outfile_dir)
         # Generate our plasTeX DOM and render.
         generate_document(source_doc, tex_dom, content_type)
         return nti_render.process_document(tex_dom, jobname)
@@ -196,6 +197,7 @@ def process_render_job(render_job):
     tex_dom = render_document(source_doc,
                               provider=provider,
                               package=package,
+                              jobname=render_job.job_id,
                               content_type=contentType)
 
     # 3. Place in target location
