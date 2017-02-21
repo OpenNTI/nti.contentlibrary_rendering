@@ -230,7 +230,7 @@ def render_package_job(render_job):
                 render_job.job_id)
     job_id = render_job.job_id
     try:
-        return process_render_job(render_job)
+        process_render_job(render_job)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))
