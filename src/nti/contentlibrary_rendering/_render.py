@@ -155,7 +155,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
         # Get a suitable tex dom
         tex_dom, jobname = prepare_tex_document(package,
                                                 provider,
-                                                jobname,
+                                                jobname=jobname,
                                                 outfile_dir=outfile_dir)
         # Generate our plasTeX DOM and render.
         generate_document(source_doc, tex_dom, content_type)
@@ -190,29 +190,37 @@ def process_render_job(render_job):
     elif not IRenderableContentPackage.providedBy(package):
         raise TypeError("Invalid content package", ntiid)
 
-    # 1. Transform content into dom
-    source_doc = transform_content(package, contentType)
+    current_dir = os.getcwd()
+    outfile_dir = tempfile.mkdtemp()
+    try:
+        os.chdir(outfile_dir)
 
-    # 2. Render
-    tex_dom = render_document(source_doc,
-                              provider=provider,
-                              package=package,
-                              jobname=render_job.job_id,
-                              content_type=contentType)
+        # 1. Transform content into dom
+        source_doc = transform_content(package, contentType)
 
-    # 3. Place in target location
-    key_or_bucket = locate_rendered_content(tex_dom, package)
+        # 2. Render
+        tex_dom = render_document(source_doc,
+                                  provider=provider,
+                                  package=package,
+                                  jobname=render_job.job_id,
+                                  content_type=contentType,
+                                  outfile_dir=outfile_dir)
 
-    # 4. copy from target
-    copy_package_data(key_or_bucket, package)
+        # 3. Place in target location
+        key_or_bucket = locate_rendered_content(tex_dom, package)
 
-    # 5. marked as rendered
-    if render_job.MarkRendered:
-        interface.alsoProvides(package, IContentRendered)
+        # 4. copy from target
+        copy_package_data(key_or_bucket, package)
 
-    # marked changed
-    lifecycleevent.modified(package)
-    return package
+        # 5. marked as rendered
+        if render_job.MarkRendered:
+            interface.alsoProvides(package, IContentRendered)
+
+        # marked changed
+        lifecycleevent.modified(package)
+        return package
+    finally:
+        os.chdir(current_dir)
 
 
 def render_package_job(render_job):
