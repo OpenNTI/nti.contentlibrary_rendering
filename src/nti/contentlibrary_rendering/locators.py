@@ -26,6 +26,7 @@ from zope.intid.interfaces import IIntIds
 from nti.contentlibrary.filesystem import FilesystemBucket
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
 
 from nti.contentlibrary.nti_s3put import IGNORED_DOTFILES
 
@@ -69,13 +70,15 @@ class LocatorMixin(object):
         folder = find_interface(context, IHostPolicyFolder, strict=False)
         with current_site(get_host_site(folder.__name__)):
             library = component.getUtility(IContentPackageLibrary)
-            return self._do_locate(path, library.root, context)
+            enumeration = IDelimitedHierarchyContentPackageEnumeration(library)
+            return self._do_locate(path, enumeration.root, context)
 
     def remove(self, context):
         folder = find_interface(context, IHostPolicyFolder, strict=False)
         with current_site(get_host_site(folder.__name__)):
             library = component.getUtility(IContentPackageLibrary)
-            return self._do_remove(library.root, context)
+            enumeration = IDelimitedHierarchyContentPackageEnumeration(library)
+            return self._do_remove(enumeration.root, context)
 
 
 @interface.implementer(IRenderedContentLocator)
