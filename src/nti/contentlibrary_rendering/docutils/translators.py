@@ -361,6 +361,5 @@ class PlastexDocumentGenerator(object):
             tex_doc.userdata['idgen'] = IdGen()
         # Proxy allows us to set useful state fields without modified original
         doc_proxy = DocumentProxy(tex_doc)
-        from IPython.terminal.debugger import set_trace;set_trace()
         self.build_nodes(rst_document, tex_doc, doc_proxy)
         return tex_doc
