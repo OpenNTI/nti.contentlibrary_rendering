@@ -126,12 +126,14 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
     unused_ctx, packages_path = load_packages(context=context,
                                               load_configs=False)
     setup_environ(tex_dom, jobname, packages_path)
+    # Generate a jobname, this is used in the eventual NTIID.
     if not jobname:
         if package is not None:
             intids = component.getUtility(IIntIds)
             jobname = intids.getId(package)
         else:
-            jobname = str(id(tex_dom))
+            jobname = id(tex_dom)
+    jobname = str(jobname)
     tex_dom.userdata['jobname'] = jobname
     return tex_dom, jobname
 
@@ -202,7 +204,6 @@ def process_render_job(render_job):
         tex_dom = render_document(source_doc,
                                   provider=provider,
                                   package=package,
-                                  jobname=render_job.job_id,
                                   content_type=contentType,
                                   outfile_dir=outfile_dir)
 
