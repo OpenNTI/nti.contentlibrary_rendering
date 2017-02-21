@@ -16,6 +16,8 @@ logger = getLogger(__name__)
 
 from zope import interface
 
+from docutils.nodes import figure
+
 from nti.base._compat import unicode_
 
 from nti.contentlibrary_rendering.docutils import get_translator
@@ -23,6 +25,7 @@ from nti.contentlibrary_rendering.docutils import get_translator
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
 from nti.contentlibrary_rendering.docutils.utils import DocumentProxy
+from nti.contentlibrary_rendering.docutils.utils import rst_find_interface
 from nti.contentlibrary_rendering.docutils.utils import rst_traversal_count
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
@@ -189,6 +192,38 @@ class BoldItalicUnderlinedToPlastexNodeTranslator(TranslatorMixin):
         result = tex_doc.createElement("bolditalicunderlined")
         return result
 
+
+# Figure
+
+
+class CaptionToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "caption"
+
+    def translate(self, rst_node, tex_doc, tex_parent):
+        if rst_find_interface(rst_node, figure) is not None:
+            # XXX: in rst, a figure caption is a single paragraph.
+            # We  will interpret it as a label
+            # http://docutils.sourceforge.net/docs/ref/rst/directives.html#figure
+            result = tex_doc.createElement("label")
+        else:
+            result = tex_doc.createElement("caption")
+        return result
+
+
+class LegendToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = "legend"
+
+    def translate(self, rst_node, tex_doc, tex_parent):
+        if rst_find_interface(rst_node, figure) is not None:
+            # XXX: in rst, a figure legend can be multiple paragraph
+            # We  will interpret it as a caption
+            # http://docutils.sourceforge.net/docs/ref/rst/directives.html#figure
+            result = tex_doc.createElement("caption")
+        else:
+            result = tex_doc.createElement("legend")
+        return result
 
 # Paragraph
 

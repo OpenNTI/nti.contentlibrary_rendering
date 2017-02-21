@@ -56,6 +56,9 @@
 	<utility factory=".translators.BulletListToPlastexNodeTranslator" name="bullet_list" />
 	<utility factory=".translators.EnumeratedListToPlastexNodeTranslator" name="enumerated_list" />
 
+	<utility factory=".translators.LegendToPlastexNodeTranslator" name="legend" />
+	<utility factory=".translators.CaptionToPlastexNodeTranslator" name="caption" />
+
 	<!-- Transformers -->
 	<utility factory=".transformers.RSTTransformer" name="rst" />
 	<utility factory=".transformers.RSTTransformer" name="text/x-rst" />
