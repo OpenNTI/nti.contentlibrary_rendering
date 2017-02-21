@@ -19,8 +19,10 @@ class DocumentProxy(ProxyBase):
 
     def __init__(self, *args, **kwds):
         super(DocumentProxy, self).__init__(*args, **kwds)
+        self._v_skip = False
+        self._v_store = list()
         self._v_paragraph_counter = 0
-            
+
     def __getattr__(self, name):
         if name.startswith('_v'):
             return self.__dict__[name]
@@ -32,7 +34,28 @@ class DocumentProxy(ProxyBase):
         else:
             return ProxyBase.__setattr__(self, name, value)
 
-    def _inc_paragraph_counter(self):
+    # store
+
+    def px_store(self):
+        return self._v_store
+
+    def px_push(self, data):
+        self._v_store.append(data)
+
+    def px_clear(self):
+        self._v_store = list()
+
+    # skip 
+    
+    def px_skipping(self):
+        return self._v_skip
+
+    def px_toggle_skip(self):
+        self._v_skip = not self._v_skip
+
+    # par
+
+    def px_inc_paragraph_counter(self):
         self._v_paragraph_counter += 1
         return self._v_paragraph_counter
 
