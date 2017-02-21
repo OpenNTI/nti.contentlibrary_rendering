@@ -27,6 +27,8 @@ from nti.contentlibrary_rendering.docutils.utils import rst_traversal_count
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
+from nti.contentrendering.plastexpackages.ulem import uline
+
 
 class IdGen(object):
 
@@ -139,13 +141,17 @@ class EmphasisToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class UnderlinedToPlastexNodeTranslator(TranslatorMixin):
+class UnderlineToPlastexNodeTranslator(TranslatorMixin):
 
-    __name__ = "underlined"
+    __name__ = "underline"
 
     def translate(self, rst_node, tex_doc, tex_parent):
-        result = tex_doc.createElement("underline")
+        result = uline()
         return result
+
+
+class UnderlinedToPlastexNodeTranslator(UnderlineToPlastexNodeTranslator):
+    __name__ = "underlined"
 
 
 class BoldItalicToPlastexNodeTranslator(TranslatorMixin):
@@ -197,8 +203,8 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     def _get_title(self, rst_node, tex_doc):
         result = rst_node.attributes.get('title') \
-              or rst_node.attributes.get('id') \
-              or 'par_%s' % tex_doc._inc_paragraph_counter()
+            or rst_node.attributes.get('id') \
+            or 'par_%s' % tex_doc._inc_paragraph_counter()
         return result
 
     def translate(self, rst_node, tex_doc, tex_parent):
