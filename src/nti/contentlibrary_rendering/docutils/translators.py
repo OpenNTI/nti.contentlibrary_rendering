@@ -215,8 +215,8 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     def _get_title(self, rst_node, tex_doc):
         result = rst_node.attributes.get('title') \
-             or  rst_node.attributes.get('id') \
-             or 'par_%s' % tex_doc.px_inc_paragraph_counter()
+            or  rst_node.attributes.get('id') \
+            or 'par_%s' % tex_doc.px_inc_paragraph_counter()
         return result
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
@@ -311,46 +311,53 @@ class DocumentToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
+# Transformer
+
+
+def depart_node(rst_node, tex_node, tex_doc):
+    node_translator = get_translator(rst_node.tagname)
+    return node_translator.depart(rst_node, tex_node, tex_doc)
+
+
+def handle_node(rst_node, tex_parent, tex_doc):
+    """
+    Handle our node by translating it and adding it to the doc.
+    """
+    node_translator = get_translator(rst_node.tagname)
+    result = node_translator.translate(rst_node, tex_doc, tex_parent)
+    if result is not None and tex_parent is not None:
+        tex_parent.append(result)
+    # If no-op, keep parsing but do so for our tex_parent.
+    # XXX: Is this what we want?
+    if result is None:
+        result = tex_parent
+    return result
+
+
+def process_children(rst_node, tex_node, tex_doc):
+    for rst_child in rst_node.children or ():
+        build_nodes(rst_child, tex_node, tex_doc)
+
+
+def build_nodes(rst_node, tex_parent, tex_doc):
+    """
+    Handle our node by translating it and adding it to the doc
+    and then processing the children.
+    """
+    tex_node = handle_node(rst_node, tex_parent, tex_doc)
+    process_children(rst_node, tex_node, tex_doc)
+    depart_node(rst_node, tex_node, tex_doc)
+    return tex_node
+
+
 @interface.implementer(IPlastexDocumentGenerator)
 class PlastexDocumentGenerator(object):
     """
     Transforms an RST document into a plasTeX document.
     """
 
-    def translator(self, node_name):
-        return get_translator(node_name)
-
-    def handle_node(self, rst_node, tex_parent, tex_doc):
-        """
-        Handle our node by translating it and adding it to the doc.
-        """
-        node_translator = self.translator(rst_node.tagname)
-        result = node_translator.translate(rst_node, tex_doc, tex_parent)
-        if result is not None:
-            tex_parent.append(result)
-        # If no-op, keep parsing but do so for our tex_parent.
-        # XXX: Is this what we want?
-        if result is None:
-            result = tex_parent
-        return result
-
-    def depart_node(self, rst_node, tex_node, tex_doc):
-        node_translator = self.translator(rst_node.tagname)
-        node_translator.depart(rst_node, tex_node, tex_doc)
-
-    def process_children(self, rst_node, tex_node, tex_doc):
-        for rst_child in rst_node.children or ():
-            self.build_nodes(rst_child, tex_node, tex_doc)
-
     def build_nodes(self, rst_node, tex_parent, tex_doc):
-        """
-        Handle our node by translating it and adding it to the doc
-        and then processing the children.
-        """
-        tex_node = self.handle_node(rst_node, tex_parent, tex_doc)
-        self.process_children(rst_node, tex_node, tex_doc)
-        self.depart_node(rst_node, tex_node, tex_doc)
-        return tex_node
+        build_nodes(rst_node, tex_parent, tex_doc)
 
     def generate(self, rst_document=None, tex_doc=None):
         # XXX: By default, we skip any preamble and start directly in the
