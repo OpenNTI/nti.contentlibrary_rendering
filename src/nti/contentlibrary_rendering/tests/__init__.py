@@ -34,18 +34,17 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
 
     @classmethod
     def setUp(cls):
+        cls.old_cache_dir = os.getenv('CHAMELEON_CACHE')
+        cls.new_cache_dir = tempfile.mkdtemp(prefix="cham_")
+        os.environ['CHAMELEON_CACHE'] = cls.new_cache_dir
         setHooks()  # in case something already tore this down
         cls.setUpPackages()
-        cls.old_cache = os.getenv('CHAMELEON_CACHE')
-        cls.old_data_dir = os.getenv('DATASERVER_DATA_DIR')
-        cls.new_data_dir = tempfile.mkdtemp(dir="/tmp")
-        os.environ['DATASERVER_DATA_DIR'] = cls.new_data_dir
-        os.environ['CHAMELEON_CACHE'] = cls.new_data_dir
 
     @classmethod
     def tearDown(cls):
         cls.tearDownPackages()
         zope.testing.cleanup.cleanUp()
+
 
     @classmethod
     def testSetUp(cls, test=None):
@@ -53,13 +52,11 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
         # they are tracked by NTIID and would otherwise persist
         annotations = component.getUtility(IContentUnitAnnotationUtility)
         annotations.annotations.clear()
-        shutil.rmtree(cls.new_data_dir, True)
-        os.environ['CHAMELEON_CACHE'] = cls.old_cache
-        os.environ['DATASERVER_DATA_DIR'] = cls.old_data_dir or '/tmp'
 
     @classmethod
     def testTearDown(cls):
-        pass
+        shutil.rmtree(cls.new_cache_dir, True)
+        os.environ['CHAMELEON_CACHE'] = cls.old_cache_dir
 
 import unittest
 
