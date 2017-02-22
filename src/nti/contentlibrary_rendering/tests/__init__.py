@@ -23,6 +23,17 @@ from nti.testing.layers import ZopeComponentLayer
 from nti.testing.layers import ConfiguringLayerMixin
 
 
+def setChameleonCache(cls):
+    cls.old_cache_dir = os.getenv('CHAMELEON_CACHE')
+    cls.new_cache_dir = tempfile.mkdtemp(prefix="cham_")
+    os.environ['CHAMELEON_CACHE'] = cls.new_cache_dir
+
+
+def restoreChameleonCache(cls):
+    shutil.rmtree(cls.new_cache_dir, True)
+    os.environ['CHAMELEON_CACHE'] = cls.old_cache_dir
+
+
 class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
                                        ConfiguringLayerMixin):
 
@@ -34,9 +45,7 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
 
     @classmethod
     def setUp(cls):
-        cls.old_cache_dir = os.getenv('CHAMELEON_CACHE')
-        cls.new_cache_dir = tempfile.mkdtemp(prefix="cham_")
-        os.environ['CHAMELEON_CACHE'] = cls.new_cache_dir
+        setChameleonCache(cls)
         setHooks()  # in case something already tore this down
         cls.setUpPackages()
 
@@ -44,7 +53,6 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
     def tearDown(cls):
         cls.tearDownPackages()
         zope.testing.cleanup.cleanUp()
-
 
     @classmethod
     def testSetUp(cls, test=None):
@@ -55,8 +63,7 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
 
     @classmethod
     def testTearDown(cls):
-        shutil.rmtree(cls.new_cache_dir, True)
-        os.environ['CHAMELEON_CACHE'] = cls.old_cache_dir
+        restoreChameleonCache(cls)
 
 import unittest
 
