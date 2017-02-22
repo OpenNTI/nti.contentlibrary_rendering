@@ -14,6 +14,7 @@ from zope import interface
 
 def register_directives():
     pass
+register_directives()
 
 from nti.contentlibrary_rendering.docutils.interfaces import IDirectivesModule
 interface.moduleProvides(IDirectivesModule)
