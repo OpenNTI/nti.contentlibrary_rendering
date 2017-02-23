@@ -318,7 +318,7 @@ def depart_node(rst_node, tex_node, tex_doc):
     node_translator = get_translator(rst_node.tagname)
     result = node_translator.depart(rst_node, tex_node, tex_doc)
     if hasattr(rst_node, 'attributes'):  # check for node id
-        nid = rst_node.attributes.get('id')
+        nid = rst_node.attributes.get('nodeID')
         if nid and not tex_node.getAttribute('id'): 
             tex_node.setAttribute('id', nid)
     return result
