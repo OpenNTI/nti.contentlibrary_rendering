@@ -24,11 +24,14 @@ from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeCo
 
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
+from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
 from nti.contentlibrary_rendering.model import ContentPackageRenderJob
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
+
+from nti.traversal.traversal import find_interface
 
 from nti.zodb.containers import time_to_64bit_int
 
@@ -86,3 +89,10 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
 PACKAGE_RENDER_KEY = 'nti.contentlibrary.rendering.ContentPackageRenderMetadata'
 ContentPackageRenderMetadata = an_factory(DefaultContentPackageRenderMetadata,
                                           PACKAGE_RENDER_KEY)
+
+
+@component.adapter(IContentPackageRenderJob)
+@interface.implementer(IRenderableContentPackage)
+def _job_to_package(job):
+    result = find_interface(job, IRenderableContentPackage)
+    return result
