@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 from hamcrest import is_
 from hamcrest import assert_that
 from hamcrest import has_property
+from hamcrest import contains_string
 
 from nti.testing.matchers import validly_provides
 from nti.testing.matchers import verifiably_provides
@@ -43,6 +44,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                         verifiably_provides(IRSTToPlastexNodeTranslator))
 
     def _generate_from_file(self, source):
+        index = document = None
         name = os.path.join(os.path.dirname(__file__), 'data/%s' % source)
         with open(name, "rb") as fp:
             source_doc = publish_doctree(fp.read())
@@ -53,19 +55,44 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                                        jobname="sample")
             index = os.path.join(tex_dir, 'index.html')
             assert_that(os.path.exists(index), is_(True))
+            with open(index, "r") as fp:
+                index = fp.read()
         except Exception:
             print('Exception %s, %s' % (source, tex_dir))
             raise
         else:
             shutil.rmtree(tex_dir)
-        return document
+        return (index, document)
 
     def test_bullet_list(self):
-        self._generate_from_file('bullet_list.rst')
-
+        index, _ = self._generate_from_file('bullet_list.rst')
+        assert_that(index, contains_string('Bullet List Item 1</p> <ul class="itemize">'))
+        assert_that(index, contains_string('Nested Bullet List Item 1-1</p> </li>'))
+        assert_that(index, contains_string('Double Nested Bullet List Item 1-2-1</p> </li>'))
+        assert_that(index, contains_string('Double Nested Bullet List Item 1-2-2</p> </li>'))
+        assert_that(index, contains_string('Nested Bullet List Item 1-3</p> </li> <li>'))
+        assert_that(index, contains_string('Nested Bullet List Item 1-4</p> </li> </ul>'))
+        assert_that(index, contains_string('Bullet List Item 2</p> <ul class="itemize">'))
+        assert_that(index, contains_string('Nested Bullet List Item 2-1</p> </li>'))
+        assert_that(index, contains_string('Nested Bullet List Item 2-2</p> </li>'))
+        assert_that(index, contains_string('Nested Bullet List Item 2-3</p> </li>'))
+        assert_that(index, contains_string('Bullet List Item 3</p> </li>'))
+        assert_that(index, contains_string('Bullet List Item 4</p> </li>'))
+        
     def test_ordered_list(self):
-        self._generate_from_file('ordered_list.rst')
+        index, _ = self._generate_from_file('ordered_list.rst')
+        assert_that(index, contains_string('Ordered List Item 1</p> <ol class="enumerate" start="1">'))
+        assert_that(index, contains_string('Nested Ordered List Item 1-1</p> </li>'))
+        assert_that(index, contains_string('Nested Ordered List Item 1-2</p> <ol class="enumerate"'))
+        assert_that(index, contains_string('Double Nested Ordered List Item 1-2-1</p> </li>'))
+        assert_that(index, contains_string('Double Nested Ordered List Item 1-2-2</p> </li>'))
+        assert_that(index, contains_string('Nested Ordered List Item 1-3</p> </li>'))
+        assert_that(index, contains_string('Nested Ordered List Item 1-4</p> </li>'))
 
     def test_roles(self):
-        self._generate_from_file('roles.rst')
-
+        index, _ = self._generate_from_file('roles.rst')
+        assert_that(index, contains_string('<b class="bfseries"><em>ichigo</em></b> kurosaki</p>'))
+        assert_that(index, contains_string('<span class="underline">aizen</span> sosuke</p>'))
+        assert_that(index, contains_string('<b class="bfseries"><span class="underline">rukia</span></b> kuchiki</p>'))
+        assert_that(index, contains_string('<em><span class="underline">Byakuya</span></em> kuchiki</p>'))
+        assert_that(index, contains_string('<b class="bfseries"><em><span class="underline">Genryusai</span></em></b> Yamamoto</p>'))
