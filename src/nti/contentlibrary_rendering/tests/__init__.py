@@ -7,10 +7,6 @@ __docformat__ = "restructuredtext en"
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
 
-import os
-import shutil
-import tempfile
-
 from zope.component.hooks import setHooks
 
 from zope import component
@@ -21,17 +17,6 @@ from nti.contentlibrary.interfaces import IContentUnitAnnotationUtility
 
 from nti.testing.layers import ZopeComponentLayer
 from nti.testing.layers import ConfiguringLayerMixin
-
-
-def setChameleonCache(cls):
-    cls.old_cache_dir = os.getenv('CHAMELEON_CACHE')
-    cls.new_cache_dir = tempfile.mkdtemp(prefix="cham_")
-    os.environ['CHAMELEON_CACHE'] = cls.new_cache_dir
-
-
-def restoreChameleonCache(cls):
-    shutil.rmtree(cls.new_cache_dir, True)
-    os.environ['CHAMELEON_CACHE'] = cls.old_cache_dir
 
 
 class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
@@ -45,7 +30,6 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
 
     @classmethod
     def setUp(cls):
-        setChameleonCache(cls)
         setHooks()  # in case something already tore this down
         cls.setUpPackages()
 
@@ -63,7 +47,7 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
 
     @classmethod
     def testTearDown(cls):
-        restoreChameleonCache(cls)
+        pass
 
 import unittest
 
