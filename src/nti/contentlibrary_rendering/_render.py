@@ -145,9 +145,10 @@ def generate_document(source_doc, tex_dom, content_type=RST_MIMETYPE):
     return tex_dom
 
 
-def _apply_config_overrides(tex_dom):
+def apply_config_overrides(tex_dom):
     # We want a single file, 'index.html'
     tex_dom.config['files']['split-level'] = 0
+
 
 def render_document(source_doc, package=None, outfile_dir=None,
                     provider='NTI', jobname=None, content_type=RST_MIMETYPE):
@@ -163,7 +164,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
                                                 provider,
                                                 jobname=jobname,
                                                 outfile_dir=outfile_dir)
-        _apply_config_overrides(tex_dom)
+        apply_config_overrides(tex_dom)
         # Generate our plasTeX DOM and render.
         generate_document(source_doc, tex_dom, content_type)
         return nti_render.process_document(tex_dom, jobname)
