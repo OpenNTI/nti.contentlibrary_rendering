@@ -316,7 +316,12 @@ class DocumentToPlastexNodeTranslator(TranslatorMixin):
 
 def depart_node(rst_node, tex_node, tex_doc):
     node_translator = get_translator(rst_node.tagname)
-    return node_translator.depart(rst_node, tex_node, tex_doc)
+    result = node_translator.depart(rst_node, tex_node, tex_doc)
+    if hasattr(rst_node, 'attributes'):  # check for node id
+        nid = rst_node.attributes.get('id')
+        if nid and not tex_node.getAttribute('id'): 
+            tex_node.setAttribute('id', nid)
+    return result
 
 
 def handle_node(rst_node, tex_parent, tex_doc):
