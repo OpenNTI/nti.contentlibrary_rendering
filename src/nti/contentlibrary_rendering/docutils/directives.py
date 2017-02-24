@@ -62,7 +62,7 @@ class UID(Directive):
 
     def run(self):
         try:
-            nodeID = directives.unicode_code(self.arguments[0])
+            uid = directives.unicode_code(self.arguments[0])
         except ValueError:
             raise self.error(
                 'Invalid doc id attribute value for "%s" directive: "%s".'
@@ -74,12 +74,12 @@ class UID(Directive):
                                     self.content_offset,
                                     container)
             for node in container:
-                node['uid'] = nodeID
+                node['uid'] = uid
             node_list.extend(container.children)
         else:
             pending = nodes.pending(
                 UIDAttribute,
-                {'uid': nodeID, 'directive': self.name},
+                {'uid': uid, 'directive': self.name},
                 self.block_text)
             self.state_machine.document.note_pending(pending)
             node_list.append(pending)
