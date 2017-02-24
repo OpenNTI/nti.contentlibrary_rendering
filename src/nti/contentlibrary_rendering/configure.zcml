@@ -32,9 +32,7 @@
         modules=".adapters .model" />
 
     <!-- Locating -->
-    <configure zcml:condition="have testmode">
-        <utility factory=".locators.FilesystemLocator" />
-    </configure>
+    <utility factory=".locators.FilesystemLocator" />
 
 	<!-- Transformers -->
 	<utility factory=".transformers.TextTransformer" name="text" />
