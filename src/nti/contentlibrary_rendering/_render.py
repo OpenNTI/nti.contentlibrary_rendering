@@ -83,9 +83,13 @@ def copy_package_data(item, target):
     # 2. copy all new content package attributes
     copy_attributes(package, target, IContentPackage.names())
 
-    # 3. copy unit attributes
-    attributes = set(IContentUnit.names()) - {'children', 'ntiid'}
+    # 3a. copy unit attributes
+    attributes = set(IContentUnit.names()) - {'children', 'ntiid', 'icon'}
     copy_attributes(package, target, attributes)
+
+    # 3b. copy icon
+    if not target.icon and package.icon:
+        target.icon = package.icon
 
     # 4. copy displayable content attributes
     copy_attributes(package, target, ('PlatformPresentationResources',))
