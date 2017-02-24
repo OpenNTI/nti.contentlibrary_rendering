@@ -110,6 +110,8 @@ class FilesystemLocator(LocatorMixin):
 @interface.implementer(IRenderedContentLocator)
 class S3Locator(LocatorMixin):
 
+    prefix = '/'
+    headers = {}
     grant = 'public-read-write'
 
     @property
@@ -124,20 +126,18 @@ class S3Locator(LocatorMixin):
     def aws_secret_access_key(self):
         return self.settings.get('AWS_SECRET_ACCESS_KEY')
 
-    def _do_locate(self, path, root, context, debug=True):
-        prefix = '/'
-        headers = {}
-        bucket_name = str(self._intids.getId(context))
+    def _transfer(self, path, bucket_name, prefix='/', headers=None, debug=True):
+        headers = dict() if headers is None else headers
         connection = boto.connect_s3(aws_access_key_id=self.aws_access_key_id,
                                      aws_secret_access_key=self.aws_secret_access_key)
         connection.debug = debug
         bucket = connection.get_bucket(bucket_name)
-        for root, _, files in os.walk(path):
+        for dirpath, _, files in os.walk(path):
             for filename in files:
                 if filename in IGNORED_DOTFILES:
                     continue
 
-                fullpath = os.path.join(root, filename)
+                fullpath = os.path.join(dirpath, filename)
                 key_name = get_key_name(fullpath, prefix)
                 if debug:
                     logger.info('Copying %s to %s/%s',
@@ -158,6 +158,13 @@ class S3Locator(LocatorMixin):
                                     'application/octet-stream'),
                                 file_headers.get('Content-Encoding', 'identity'))
         return bucket
+
+    def _do_locate(self, path, root, context, debug=True):
+        bucket_name = str(self._intids.getId(context))
+        return self._transfer(path, bucket_name, 
+                              self.prefix, 
+                              self.headers, 
+                              debug=debug)
 
     def _do_remove(self, root, context, debug=True):
         bucket_name = str(self._intids.getId(context))
