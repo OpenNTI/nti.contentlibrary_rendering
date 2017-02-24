@@ -19,9 +19,9 @@ from docutils.parsers.rst import directives
 from docutils.transforms import Transform
 
 
-class DocIDAttribute(Transform):
+class UIDAttribute(Transform):
     """
-    Move the "docid" attribute specified in the "pending" node into the
+    Move the "uid" attribute specified in the "pending" node into the
     immediately following non-comment element.
     """
 
@@ -38,7 +38,7 @@ class DocIDAttribute(Transform):
                 if    isinstance(element, nodes.Invisible) \
                    or isinstance(element, nodes.system_message):
                     continue
-                element['docid'] = pending.details['docid']
+                element['uid'] = pending.details['uid']
                 pending.parent.remove(pending)
                 return
             else:
@@ -53,7 +53,7 @@ class DocIDAttribute(Transform):
         pending.replace_self(error)
 
 
-class DocID(Directive):
+class UID(Directive):
 
     has_content = True
     required_arguments = 1
@@ -74,12 +74,12 @@ class DocID(Directive):
                                     self.content_offset,
                                     container)
             for node in container:
-                node['docid'] = nodeID
+                node['uid'] = nodeID
             node_list.extend(container.children)
         else:
             pending = nodes.pending(
-                DocIDAttribute,
-                {'docid': nodeID, 'directive': self.name},
+                UIDAttribute,
+                {'uid': nodeID, 'directive': self.name},
                 self.block_text)
             self.state_machine.document.note_pending(pending)
             node_list.append(pending)
@@ -88,7 +88,7 @@ class DocID(Directive):
 
 
 def register_directives():
-    directives.register_directive("docid", DocID)
+    directives.register_directive("uid", UID)
 register_directives()
 
 

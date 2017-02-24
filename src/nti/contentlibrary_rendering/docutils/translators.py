@@ -318,9 +318,9 @@ def depart_node(rst_node, tex_node, tex_doc):
     node_translator = get_translator(rst_node.tagname)
     result = node_translator.depart(rst_node, tex_node, tex_doc)
     if hasattr(rst_node, 'attributes'): # check for docid
-        docid = rst_node.attributes.get('docid')
-        if docid and not tex_node.getAttribute('id'): 
-            tex_node.id = unicode_(docid)
+        uid = rst_node.attributes.get('uid')
+        if uid and not tex_node.getAttribute('id'): 
+            tex_node.id = unicode_(uid)
             tex_node.setAttribute('id', tex_node.id)
     return result
 

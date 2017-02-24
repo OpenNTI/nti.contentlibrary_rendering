@@ -26,4 +26,4 @@ class TestDirectives(ContentlibraryRenderingLayerTest):
     def test_directives(self):
         from nti.contentlibrary_rendering.docutils import directives
         assert_that(directives, validly_provides(IDirectivesModule))
-        assert_that(docutils_directive('docid', None, None), is_(not_none()))
+        assert_that(docutils_directive('uid', None, None), is_(not_none()))

@@ -1,12 +1,12 @@
 =============
-DocID File
+UID File
 =============
 
-.. docid:: ichigo
+.. uid:: ichigo
 
    Ichigo has been noted on several occasions to have tremendously vast levels of spiritual energy
 
-.. docid:: exceptional
+.. uid:: exceptional
 
 An Exceptional Section
 ======================

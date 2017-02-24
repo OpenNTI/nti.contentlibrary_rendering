@@ -97,7 +97,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         assert_that(index, contains_string('<em><span class="underline">Byakuya</span></em> kuchiki</p>'))
         assert_that(index, contains_string('<b class="bfseries"><em><span class="underline">Genryusai</span></em></b> Yamamoto</p>'))
         
-    def test_docid(self):
-        index = self._generate_from_file('docid.rst')
+    def test_uid(self):
+        index = self._generate_from_file('uid.rst')
         assert_that(index, contains_string('id="exceptional" ntiid="t'))
         assert_that(index, contains_string('<p class="par" id="ichigo">Ichigo has been'))
