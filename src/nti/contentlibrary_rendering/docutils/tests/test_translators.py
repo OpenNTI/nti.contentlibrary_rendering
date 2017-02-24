@@ -44,15 +44,15 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                         verifiably_provides(IRSTToPlastexNodeTranslator))
 
     def _generate_from_file(self, source):
-        index = document = None
+        index = None
         name = os.path.join(os.path.dirname(__file__), 'data/%s' % source)
         with open(name, "rb") as fp:
             source_doc = publish_doctree(fp.read())
         tex_dir =  tempfile.mkdtemp(prefix="render_")
         try:
-            document = render_document(source_doc, 
-                                       outfile_dir=tex_dir, 
-                                       jobname="sample")
+            render_document(source_doc, 
+                            outfile_dir=tex_dir, 
+                            jobname="sample")
             index = os.path.join(tex_dir, 'index.html')
             assert_that(os.path.exists(index), is_(True))
             with open(index, "r") as fp:
@@ -62,10 +62,10 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
             raise
         else:
             shutil.rmtree(tex_dir)
-        return (index, document)
+        return index
 
     def test_bullet_list(self):
-        index, _ = self._generate_from_file('bullet_list.rst')
+        index = self._generate_from_file('bullet_list.rst')
         assert_that(index, contains_string('Bullet List Item 1</p> <ul class="itemize">'))
         assert_that(index, contains_string('Nested Bullet List Item 1-1</p> </li>'))
         assert_that(index, contains_string('Double Nested Bullet List Item 1-2-1</p> </li>'))
@@ -80,7 +80,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         assert_that(index, contains_string('Bullet List Item 4</p> </li>'))
         
     def test_ordered_list(self):
-        index, _ = self._generate_from_file('ordered_list.rst')
+        index = self._generate_from_file('ordered_list.rst')
         assert_that(index, contains_string('Ordered List Item 1</p> <ol class="enumerate" start="1">'))
         assert_that(index, contains_string('Nested Ordered List Item 1-1</p> </li>'))
         assert_that(index, contains_string('Nested Ordered List Item 1-2</p> <ol class="enumerate"'))
@@ -90,9 +90,14 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         assert_that(index, contains_string('Nested Ordered List Item 1-4</p> </li>'))
 
     def test_roles(self):
-        index, _ = self._generate_from_file('roles.rst')
+        index = self._generate_from_file('roles.rst')
         assert_that(index, contains_string('<b class="bfseries"><em>ichigo</em></b> kurosaki</p>'))
         assert_that(index, contains_string('<span class="underline">aizen</span> sosuke</p>'))
         assert_that(index, contains_string('<b class="bfseries"><span class="underline">rukia</span></b> kuchiki</p>'))
         assert_that(index, contains_string('<em><span class="underline">Byakuya</span></em> kuchiki</p>'))
         assert_that(index, contains_string('<b class="bfseries"><em><span class="underline">Genryusai</span></em></b> Yamamoto</p>'))
+        
+    def test_docid(self):
+        index = self._generate_from_file('docid.rst')
+        assert_that(index, contains_string('id="exceptional" ntiid="t'))
+        assert_that(index, contains_string('<p class="par" id="ichigo">Ichigo has been'))

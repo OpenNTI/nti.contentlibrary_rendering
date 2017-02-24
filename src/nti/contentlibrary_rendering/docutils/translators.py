@@ -317,10 +317,11 @@ class DocumentToPlastexNodeTranslator(TranslatorMixin):
 def depart_node(rst_node, tex_node, tex_doc):
     node_translator = get_translator(rst_node.tagname)
     result = node_translator.depart(rst_node, tex_node, tex_doc)
-    if hasattr(rst_node, 'attributes'):  # check for node id
-        nid = rst_node.attributes.get('nodeID')
-        if nid and not tex_node.getAttribute('id'): 
-            tex_node.setAttribute('id', nid)
+    if hasattr(rst_node, 'attributes'): # check for docid
+        docid = rst_node.attributes.get('docid')
+        if docid and not tex_node.getAttribute('id'): 
+            tex_node.id = unicode_(docid)
+            tex_node.setAttribute('id', tex_node.id)
     return result
 
 

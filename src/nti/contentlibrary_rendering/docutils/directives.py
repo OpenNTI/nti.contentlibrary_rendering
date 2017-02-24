@@ -16,8 +16,44 @@ from docutils import nodes
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 
+from docutils.transforms import Transform
 
-class NodeID(Directive):
+
+class DocIDAttribute(Transform):
+    """
+    Move the "docid" attribute specified in the "pending" node into the
+    immediately following non-comment element.
+    """
+
+    default_priority = 210  # same as Class
+
+    def apply(self):
+        pending = self.startnode
+        child = pending
+        parent = pending.parent
+        while parent:
+            # Check for appropriate following siblings:
+            for index in range(parent.index(child) + 1, len(parent)):
+                element = parent[index]
+                if    isinstance(element, nodes.Invisible) \
+                   or isinstance(element, nodes.system_message):
+                    continue
+                element['docid'] = pending.details['docid']
+                pending.parent.remove(pending)
+                return
+            else:
+                # At end of section or container; apply to sibling
+                child = parent
+                parent = parent.parent
+        error = self.document.reporter.error(
+            'No suitable element following "%s" directive'
+            % pending.details['directive'],
+            nodes.literal_block(pending.rawsource, pending.rawsource),
+            line=pending.line)
+        pending.replace_self(error)
+
+
+class DocID(Directive):
 
     has_content = True
     required_arguments = 1
@@ -26,29 +62,33 @@ class NodeID(Directive):
 
     def run(self):
         try:
-            nodeID_value = directives.unicode_code(self.arguments[0])
+            nodeID = directives.unicode_code(self.arguments[0])
         except ValueError:
             raise self.error(
-                'Invalid nodeID attribute value for "%s" directive: "%s".'
+                'Invalid doc id attribute value for "%s" directive: "%s".'
                 % (self.name, self.arguments[0]))
         node_list = []
         if self.content:
             container = nodes.Element()
-            self.state.nested_parse(self.content, 
+            self.state.nested_parse(self.content,
                                     self.content_offset,
                                     container)
             for node in container:
-                node['nodeID'] = nodeID_value
+                node['docid'] = nodeID
             node_list.extend(container.children)
         else:
-            raise self.error(
-                'Content is expected for directive: "%s".' %
-                self.name)
+            pending = nodes.pending(
+                DocIDAttribute,
+                {'docid': nodeID, 'directive': self.name},
+                self.block_text)
+            self.state_machine.document.note_pending(pending)
+            node_list.append(pending)
+
         return node_list
 
 
 def register_directives():
-    directives.register_directive("nodeID", NodeID)
+    directives.register_directive("docid", DocID)
 register_directives()
 
 
