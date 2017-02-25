@@ -19,6 +19,7 @@ from zope import interface
 
 from zope.cachedescriptors.property import readproperty
 
+from zope.component.hooks import site as getSite
 from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
@@ -125,6 +126,10 @@ class S3Locator(LocatorMixin):
     @readproperty
     def aws_secret_access_key(self):
         return self.settings.get('AWS_SECRET_ACCESS_KEY')
+    
+    @readproperty
+    def bucket_name(self): 
+        return getSite().__name__
 
     def _transfer(self, path, bucket_name, prefix='/', headers=None, debug=True):
         headers = dict() if headers is None else headers
@@ -160,11 +165,14 @@ class S3Locator(LocatorMixin):
         return bucket
 
     def _do_locate(self, path, root, context, debug=True):
-        bucket_name = str(self._intids.getId(context))
-        return self._transfer(path, bucket_name, 
-                              self.prefix, 
-                              self.headers, 
-                              debug=debug)
+        prefix = self.prefix
+        jobname = str(self._intids.getId(context))
+        if path.endswith(jobname):
+            prefix = os.path.split(path)[0]
+        return self._transfer(path, self.bucket_name, 
+                              debug=debug,
+                              prefix=prefix, 
+                              headers=self.headers)
 
     def _do_remove(self, root, context, debug=True):
         bucket_name = str(self._intids.getId(context))
