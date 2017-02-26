@@ -24,6 +24,8 @@ from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeCo
 
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
+from nti.contentlibrary_rendering.common import get_creator
+
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
@@ -68,7 +70,7 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
         result.MarkRendered = mark_rendered
         result.Provider = provider
-        result.creator = self._creator(creator)
+        result.creator = get_creator(creator) or get_creator(package)
         result.JobId = self._create_unique_job_key(result)
         self[result.JobId] = result
         return result

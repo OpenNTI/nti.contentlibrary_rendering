@@ -21,6 +21,13 @@ from zope import lifecycleevent
 
 from zope.intid.interfaces import IIntIds
 
+from zope.security.interfaces import IPrincipal
+from zope.security.interfaces import IParticipation
+
+from zope.security.management import endInteraction
+from zope.security.management import newInteraction
+from zope.security.management import restoreInteraction
+
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
@@ -234,12 +241,25 @@ def process_render_job(render_job):
         os.chdir(current_dir)
 
 
+@interface.implementer(IParticipation)
+class _Participation(object):
+
+    __slots__ = (b'interaction', b'principal')
+
+    def __init__(self, principal):
+        self.interaction = None
+        self.principal = principal
+
+
 def render_package_job(render_job):
     logger.info('Rendering content (%s) (%s)',
                 render_job.PackageNTIID,
                 render_job.job_id)
     job_id = render_job.job_id
+    creator = render_job.creator
+    endInteraction()
     try:
+        newInteraction(_Participation(IPrincipal(creator)))
         process_render_job(render_job)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
@@ -249,3 +269,5 @@ def render_package_job(render_job):
                     render_job.PackageNTIID,
                     render_job.job_id)
         render_job.update_to_success_state()
+    finally:
+        restoreInteraction()

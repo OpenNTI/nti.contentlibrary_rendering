@@ -54,3 +54,10 @@ def get_render_job(package_ntiid, job_id):
     except (KeyError, TypeError, AttributeError):
         result = None
     return result
+
+
+def get_creator(context):
+    result = getattr(context, 'creator', context)
+    result = getattr(result, 'username', result)
+    result = getattr(result, 'id', result)  # check 4 principal
+    return result

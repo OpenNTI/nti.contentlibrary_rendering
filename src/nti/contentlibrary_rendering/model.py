@@ -13,9 +13,15 @@ from functools import total_ordering
 
 from zope import interface
 
+from zope.cachedescriptors.property import readproperty
+
 from zope.container.contained import Contained
 
 from nti.base._compat import to_unicode
+
+from nti.contentlibrary.interfaces import IContentPackage
+
+from nti.contentlibrary_rendering.common import get_creator
 
 from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
@@ -27,13 +33,15 @@ from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
+from nti.property.property import alias
+
 from nti.schema.eqhash import EqHash
 
 from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from nti.property.property import alias
+from nti.traversal.traversal import find_interface
 
 
 @EqHash('JobId')
@@ -46,8 +54,6 @@ class ContentPackageRenderJob(SchemaConfigured,
 
     __external_class_name__ = u"ContentPackageRenderJob"
     mime_type = mimeType = u'application/vnd.nextthought.content.packagerenderjob'
-
-    creator = SYSTEM_USER_ID
 
     state = alias('State')
     provider = alias('Provider')
@@ -73,6 +79,11 @@ class ContentPackageRenderJob(SchemaConfigured,
             return self.lastModified > other.lastModified
         except AttributeError:
             return NotImplemented
+
+    @readproperty
+    def creator(self):
+        package = find_interface(self, IContentPackage, strict=False)
+        return get_creator(package) or SYSTEM_USER_ID
 
     def is_finished(self):
         """
