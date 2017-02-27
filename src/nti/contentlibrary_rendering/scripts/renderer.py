@@ -9,15 +9,23 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import os
+import tempfile
+
+from zope import component
 from zope import interface
 
 from zope.location.interfaces import IContained
 
 from z3c.autoinclude.zcml import includePluginsDirective
 
+from nti.async.interfaces import IReactorStarted
+
 from nti.async.utils.processor import Processor
 
 from nti.contentlibrary_rendering import QUEUE_NAMES
+
+from nti.contentrendering.utils.chameleon import setupChameleonCache
 
 from nti.dataserver.utils.base_script import create_context
 
@@ -33,6 +41,13 @@ class PluginPoint(object):
 PP_CONTENT_RENDERING = PluginPoint('nti.contentrendering')
 
 
+@component.adapter(IReactorStarted)
+def reactor_started(context):
+    cache_dir = tempfile.mkdtemp(prefix="chameleon_cache_")
+    context.cache_dir = os.environ['CHAMELEON_CACHE'] = cache_dir
+    setupChameleonCache(True, cache_dir)
+
+
 class Constructor(Processor):
 
     def set_log_formatter(self, args):
@@ -42,7 +57,7 @@ class Constructor(Processor):
         includePluginsDirective(context, PP_CONTENT_RENDERING)
 
     def create_context(self, env_dir):
-        context = create_context(env_dir, 
+        context = create_context(env_dir,
                                  with_library=True,
                                  plugins=True,
                                  slugs=True,
@@ -57,7 +72,8 @@ class Constructor(Processor):
         setattr(args, 'redis', True)
         setattr(args, 'library', True)
         setattr(args, 'queue_names', QUEUE_NAMES)
-        super(Constructor, self).process_args(args)
+        component.getGlobalSiteManager().registerHandler(reactor_started)
+        Processor.process_args(self, args)
 
 
 def main():
