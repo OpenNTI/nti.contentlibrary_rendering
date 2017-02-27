@@ -21,6 +21,8 @@ from zope import lifecycleevent
 
 from zope.annotation.interfaces import IAnnotations
 
+from zope.event import notify as event_notify
+
 from zope.intid.interfaces import IIntIds
 
 from zope.security.interfaces import IPrincipal
@@ -59,9 +61,12 @@ from nti.contentrendering.render_document import prepare_document_settings
 
 from nti.externalization.proxy import removeAllProxies
 
+from nti.ntiids.interfaces import WillUpdateNTIIDEvent
+
 from nti.ntiids.ntiids import TYPE_OID
 from nti.ntiids.ntiids import is_ntiid_of_type
 from nti.ntiids.ntiids import find_object_with_ntiid
+
 
 # Patch our plastex early.
 patch_all()
@@ -84,6 +89,18 @@ def _copy_annotations(package, old_annotations):
         return
     for key, value in old_annotations.items():
         new_annotations[key] = value
+
+
+def _update_package_ntiid(target, source_package):
+    """
+    Update our package with the now-rendered ntiid, making sure we copy
+    our annotations over (since we store by ntiid).
+    """
+    old_ntiid = target.ntiid
+    event_notify(WillUpdateNTIIDEvent(target, old_ntiid, source_package.ntiid))
+    annotes = IAnnotations(target)
+    target.ntiid = source_package.ntiid
+    _copy_annotations(target, annotes)
 
 
 def copy_package_data(item, target):
@@ -117,10 +134,7 @@ def copy_package_data(item, target):
 
     # 5. make sure we copy the new ntiid
     if not target.ntiid or is_ntiid_of_type(target.ntiid, TYPE_OID):
-        annotes = IAnnotations(target)
-        target.ntiid = package.ntiid
-        # Only update our annotations if our ntiid changed
-        _copy_annotations(target, annotes)
+        _update_package_ntiid(target, package)
 
     # 6. unregister from the intid facility the target old children
     for unit in target.children or ():
