@@ -52,6 +52,7 @@ class TestRender(ContentlibraryRenderingLayerTest):
             bucket = FilesystemBucket(name="sample")
             bucket.absolute_path = tmp_dir
             target = RenderableContentPackage()
+            target.ntiid = 'tag:nextthought.com,2011-10:NTI-OID-placeholder'
             copy_package_data(bucket, target)
             # check
             assert_that(target,

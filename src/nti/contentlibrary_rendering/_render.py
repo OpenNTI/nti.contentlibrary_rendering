@@ -19,6 +19,8 @@ from zope import component
 from zope import interface
 from zope import lifecycleevent
 
+from zope.annotation.interfaces import IAnnotations
+
 from zope.intid.interfaces import IIntIds
 
 from zope.security.interfaces import IPrincipal
@@ -72,6 +74,18 @@ def copy_attributes(source, target, names):
             setattr(target, name, value)
 
 
+def _copy_annotations(package, old_annotations):
+    """
+    Copy our old annotations into our new package (with new ntiid).
+    """
+    # This means we have a staled/orphaned annotation object now
+    new_annotations = IAnnotations(package)
+    if old_annotations is None or old_annotations is new_annotations:
+        return
+    for key, value in old_annotations.items():
+        new_annotations[key] = value
+
+
 def copy_package_data(item, target):
     """
     copy rendered data to target
@@ -82,10 +96,10 @@ def copy_package_data(item, target):
                                    RenderableContentUnit)
     assert package is not None, "Invalid rendered content directory"
 
-    # 1. remove package to clear internal structures
+    # 1. remove target package to clear internal structures
     library = component.queryUtility(IContentPackageLibrary)
     if library is not None:
-        library.remove(package, event=False, unregister=False)
+        library.remove(target, event=False, unregister=False)
 
     # 2. copy all new content package attributes
     copy_attributes(package, target, IContentPackage.names())
@@ -103,7 +117,10 @@ def copy_package_data(item, target):
 
     # 5. make sure we copy the new ntiid
     if not target.ntiid or is_ntiid_of_type(target.ntiid, TYPE_OID):
+        annotes = IAnnotations(target)
         target.ntiid = package.ntiid
+        # Only update our annotations if our ntiid changed
+        _copy_annotations(target, annotes)
 
     # 6. unregister from the intid facility the target old children
     for unit in target.children or ():
@@ -113,9 +130,9 @@ def copy_package_data(item, target):
     target.children = target.children_iterable_factory(package.children or ())
     register_content_units(target, target)
 
-    # 8. [re]register in the library to populate internal structures
+    # 8. [re]register target package in the library to populate internal structures
     if library is not None:
-        library.add(package, event=False)
+        library.add(target, event=False)
 
     return target
 
