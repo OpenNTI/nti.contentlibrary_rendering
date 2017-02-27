@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
+import shutil
 import tempfile
 
 from zope import component
@@ -20,6 +21,7 @@ from zope.location.interfaces import IContained
 from z3c.autoinclude.zcml import includePluginsDirective
 
 from nti.async.interfaces import IReactorStarted
+from nti.async.interfaces import IReactorStopped
 
 from nti.async.utils.processor import Processor
 
@@ -48,6 +50,14 @@ def reactor_started(context):
     setupChameleonCache(True, cache_dir)
 
 
+@component.adapter(IReactorStopped)
+def reactor_stopped(context):
+    try:
+        shutil.rmtree(context.cache_dir, ignore_errors=True)
+    except AttributeError:
+        pass
+
+
 class Constructor(Processor):
 
     def set_log_formatter(self, args):
@@ -73,6 +83,7 @@ class Constructor(Processor):
         setattr(args, 'library', True)
         setattr(args, 'queue_names', QUEUE_NAMES)
         component.getGlobalSiteManager().registerHandler(reactor_started)
+        component.getGlobalSiteManager().registerHandler(reactor_stopped)
         Processor.process_args(self, args)
 
 
