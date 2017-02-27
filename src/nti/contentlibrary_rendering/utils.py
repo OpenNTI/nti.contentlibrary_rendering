@@ -56,8 +56,9 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
 
 def remove_renderered_package(package):
     assert IRenderableContentPackage.providedBy(package)
-    site_name = find_interface(package, IHostPolicyFolder).__name__
-    job_id="remove_renderered_content_%s" % package.ntiid
+    folder = find_interface(package, IHostPolicyFolder, strict=False)
+    site_name = folder.__name__ # fail hard if not found
+    job_id = "remove_renderered_content_%s" % package.ntiid
     put_job(CONTENT_UNITS_QUEUE,
             remove_rendered_package,
             job_id=job_id,
