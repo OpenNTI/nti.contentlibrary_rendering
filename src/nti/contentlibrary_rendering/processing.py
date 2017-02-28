@@ -122,15 +122,15 @@ def queue_add(name, func, obj, **kwargs):
 
 queue_modified = queue_add
 
-def queue_removed(queue_name, func, package_id, job_id=None, **kwargs):
+def queue_removed(queue_name, func, obj, job_id=None, **kwargs):
     """
-    Package id must be an intid.
+    Queue up a job to remove package data.
     """
     site = get_site()
     queue = get_job_queue(queue_name)
     job = create_job(_execute_generic_job,
                      func,
-                     package_id,
+                     obj,
                      site_name=site,
                      **kwargs)
     job.id = job_id

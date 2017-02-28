@@ -9,10 +9,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zope import component
-
-from zope.intid.interfaces import IIntIds
-
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
@@ -59,11 +55,8 @@ def remove_renderered_package(package):
     # Have to pass a package id to the package remove function since
     # the package will no longer be resolvable outside this transaction.
     # This must be enough info to cleanup whatever needs to be cleaned up.
-    intids = component.getUtility(IIntIds)
-    package_id = intids.getId(package)
     job_id = "remove_renderered_content_%s" % package.ntiid
     queue_removed(CONTENT_UNITS_QUEUE,
                   remove_rendered_package,
-                  package_id,
-                  job_id=job_id,
-                  ntiid=package.ntiid)
+                  package.root,
+                  job_id=job_id)

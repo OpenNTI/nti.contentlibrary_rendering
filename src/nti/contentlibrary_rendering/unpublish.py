@@ -14,10 +14,10 @@ from zope import component
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
 
-def delete_package_data(package_id):
+def delete_package_data(bucket):
     locator = component.getUtility(IRenderedContentLocator)
-    return locator.remove(package_id)
+    return locator.remove(bucket)
 
 
-def remove_rendered_package(package_id):
-    delete_package_data(package_id)
+def remove_rendered_package(bucket):
+    delete_package_data(bucket)

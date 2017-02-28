@@ -74,12 +74,9 @@ class LocatorMixin(object):
             enumeration = IDelimitedHierarchyContentPackageEnumeration(library)
             return self._do_locate(path, enumeration.root, context)
 
-    def remove(self, context):
-        folder = find_interface(context, IHostPolicyFolder, strict=False)
-        with current_site(get_host_site(folder.__name__)):
-            library = component.getUtility(IContentPackageLibrary)
-            enumeration = IDelimitedHierarchyContentPackageEnumeration(library)
-            return self._do_remove(enumeration.root, context)
+    def remove(self, bucket):
+        logger.info("Removing bucket (%s)", bucket.absolute_path)
+        return self._do_remove(bucket)
 
 
 @interface.implementer(IRenderedContentLocator)
@@ -98,14 +95,8 @@ class FilesystemLocator(LocatorMixin):
         shutil.move(path, destination)
         return root.getChildNamed(intid)
 
-    def _do_remove(self, root, context):
-        assert isinstance(root, FilesystemBucket)
-        intid = self._get_id(context)
-        child = root.getChildNamed(intid)
-        if child is not None:
-            shutil.rmtree(child.absolute_path)
-            return True
-        return False
+    def _do_remove(self, bucket):
+        shutil.rmtree(bucket.absolute_path)
 
 
 @interface.implementer(IRenderedContentLocator)
@@ -126,9 +117,9 @@ class S3Locator(LocatorMixin):
     @readproperty
     def aws_secret_access_key(self):
         return self.settings.get('AWS_SECRET_ACCESS_KEY')
-    
+
     @readproperty
-    def bucket_name(self): 
+    def bucket_name(self):
         return getSite().__name__
 
     def _transfer(self, path, bucket_name, prefix='/', headers=None, debug=True):
@@ -169,13 +160,13 @@ class S3Locator(LocatorMixin):
         jobname = str(self._intids.getId(context))
         if path.endswith(jobname):
             prefix = os.path.split(path)[0]
-        return self._transfer(path, self.bucket_name, 
+        return self._transfer(path, self.bucket_name,
                               debug=debug,
-                              prefix=prefix, 
+                              prefix=prefix,
                               headers=self.headers)
 
-    def _do_remove(self, root, context, debug=True):
-        bucket_name = str(self._intids.getId(context))
+    def _do_remove(self, bucket, debug=True):
+        bucket_name = str(bucket.name)
         connection = boto.connect_s3(aws_access_key_id=self.aws_access_key_id,
                                      aws_secret_access_key=self.aws_secret_access_key)
         connection.debug = debug

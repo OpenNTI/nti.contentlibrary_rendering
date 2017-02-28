@@ -163,7 +163,9 @@ class IRenderedContentLocator(interface.Interface):
         :return :class:`IDelimitedHierarchyItem' with new location
         """
 
-    def remove(context):
+    def remove(bucket):
         """
         [re]remove the rendered content
+
+        :param bucket the :class:`IEnumerableDelimitedHierarchyBucket` bucket
         """
