@@ -164,6 +164,7 @@ class S3Locator(LocatorMixin):
         prefix = self.prefix
         jobname = str(self._intids.getId(context))
         if path.endswith(jobname):
+            # e.g. /tmp/render/12000 get /tmp/render
             prefix = os.path.split(path)[0]
         return self._transfer(path, self.bucket_name,
                               debug=debug,
@@ -171,12 +172,16 @@ class S3Locator(LocatorMixin):
                               headers=self.headers)
 
     def _do_remove(self, bucket, debug=True):
-        bucket_name = str(bucket.name)
+        prefix = str(bucket.name)
         connection = self._connection(debug)
         try:
-            connection.delete_bucket(bucket_name)
+            bucket = connection.get_bucket(self.bucket_name)
+            keys = [k.name for k in bucket.list(prefix=prefix)]
+            if keys:
+                bucket.delete_keys(keys)
         except Exception:
-            logger.exception("Could not remove bucket %s", bucket_name)
+            logger.exception("Could not remove '%s/*' files in bucket %s", 
+                             prefix, self.bucket_name)
             return False
         finally:
             connection.close()
