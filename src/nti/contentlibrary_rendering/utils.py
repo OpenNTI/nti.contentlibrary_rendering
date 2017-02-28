@@ -52,7 +52,7 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
 
 def remove_renderered_package(package):
     assert IRenderableContentPackage.providedBy(package)
-    # Have to pass a package id to the package remove function since
+    # Have to pass the bucket to the package remove function since
     # the package will no longer be resolvable outside this transaction.
     # This must be enough info to cleanup whatever needs to be cleaned up.
     job_id = "remove_renderered_content_%s" % package.ntiid
