@@ -35,7 +35,7 @@ def _dataserver_folder():
     return dataserver.root_folder['dataserver2']
 
 
-def _do_execute_job(*args, **kwargs):
+def _do_execute_render_job(*args, **kwargs):
     args = BList(args)
     func = args.pop(0)
     job_id = kwargs.pop('job_id')
@@ -46,6 +46,12 @@ def _do_execute_job(*args, **kwargs):
                     job_id, package_ntiid, func)
         return
     return func(render_job, *args, **kwargs)
+
+
+def _do_execute_generic_job(*args, **kwargs):
+    args = BList(args)
+    func = args.pop(0)
+    return func(*args, **kwargs)
 
 
 def _get_job_site(job_site_name=None):
@@ -62,7 +68,7 @@ def _get_job_site(job_site_name=None):
     return job_site
 
 
-def _execute_job(*args, **kwargs):
+def _execute_job(job_runner, *args, **kwargs):
     """
     Performs the actual execution of a job.  We'll attempt to do
     so in the site the event occurred in, otherwise, we'll run in
@@ -71,7 +77,15 @@ def _execute_job(*args, **kwargs):
     event_site_name = kwargs.pop('site_name', None)
     event_site = _get_job_site(event_site_name)
     with current_site(event_site):
-        return _do_execute_job(*args, **kwargs)
+        return job_runner(*args, **kwargs)
+
+
+def _execute_render_job(*args, **kwargs):
+    return _execute_job(_do_execute_render_job, *args, **kwargs)
+
+
+def _execute_generic_job(*args, **kwargs):
+    return _execute_job(_do_execute_generic_job, *args, **kwargs)
 
 
 def get_job_queue(name):
@@ -79,11 +93,13 @@ def get_job_queue(name):
     return factory.get_queue(name)
 
 
-def put_job(queue_name, func, job_id=None, *args, **kwargs):
+def put_render_job(queue_name, func, job_id=None, *args, **kwargs):
+    site = get_site()
     queue = get_job_queue(queue_name)
-    job = create_job(_execute_job,
+    job = create_job(_execute_render_job,
                      func,
                      job_id=job_id,
+                     site_name=site,
                      *args, **kwargs)
     job.id = job_id
     queue.put(job)
@@ -91,13 +107,11 @@ def put_job(queue_name, func, job_id=None, *args, **kwargs):
 
 
 def add_to_queue(queue_name, func, obj, **kwargs):
-    site = get_site()
-    return put_job(queue_name,
-                   func,
-                   site_name=site,
-                   job_id=obj.JobId,
-                   package_ntiid=obj.PackageNTIID,
-                   **kwargs)
+    return put_render_job(queue_name,
+                          func,
+                          job_id=obj.JobId,
+                          package_ntiid=obj.PackageNTIID,
+                          **kwargs)
 
 
 def queue_add(name, func, obj, **kwargs):
@@ -106,9 +120,19 @@ def queue_add(name, func, obj, **kwargs):
     """
     return add_to_queue(name, func, obj, **kwargs)
 
+queue_modified = queue_add
 
-def queue_modified(name, func, obj, **kwargs):
+def queue_removed(queue_name, func, package_id, job_id=None, **kwargs):
     """
-    We expect a `IContentPackageRenderJob` here.
+    Package id must be an intid.
     """
-    return add_to_queue(name, func, obj, **kwargs)
+    site = get_site()
+    queue = get_job_queue(queue_name)
+    job = create_job(_execute_generic_job,
+                     func,
+                     package_id,
+                     site_name=site,
+                     **kwargs)
+    job.id = job_id
+    queue.put(job)
+    return job

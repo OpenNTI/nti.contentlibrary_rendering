@@ -9,6 +9,10 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+from zope import component
+
+from zope.intid.interfaces import IIntIds
+
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
@@ -21,13 +25,9 @@ from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadat
 
 from nti.contentlibrary_rendering.unpublish import remove_rendered_package
 
-from nti.contentlibrary_rendering.processing import put_job
 from nti.contentlibrary_rendering.processing import queue_add
+from nti.contentlibrary_rendering.processing import queue_removed
 from nti.contentlibrary_rendering.processing import queue_modified
-
-from nti.site.interfaces import IHostPolicyFolder
-
-from nti.traversal.traversal import find_interface
 
 
 def _create_render_job(package, user, provider='NTI', mark_rendered=True):
@@ -56,11 +56,14 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
 
 def remove_renderered_package(package):
     assert IRenderableContentPackage.providedBy(package)
-    folder = find_interface(package, IHostPolicyFolder, strict=False)
-    site_name = folder.__name__ # fail hard if not found
+    # Have to pass a package id to the package remove function since
+    # the package will no longer be resolvable outside this transaction.
+    # This must be enough info to cleanup whatever needs to be cleaned up.
+    intids = component.getUtility(IIntIds)
+    package_id = intids.getId(package)
     job_id = "remove_renderered_content_%s" % package.ntiid
-    put_job(CONTENT_UNITS_QUEUE,
-            remove_rendered_package,
-            job_id=job_id,
-            ntiid=package.ntiid,
-            site_name=site_name)
+    queue_removed(CONTENT_UNITS_QUEUE,
+                  remove_rendered_package,
+                  package_id,
+                  job_id=job_id,
+                  ntiid=package.ntiid)
