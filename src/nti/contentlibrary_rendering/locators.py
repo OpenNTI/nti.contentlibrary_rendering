@@ -106,9 +106,9 @@ class S3Locator(LocatorMixin):
     headers = {}
     grant = 'public-read-write'
 
-    @property
+    @readproperty
     def settings(self):
-        return {}
+        return os.environ
 
     @readproperty
     def aws_access_key_id(self):
@@ -122,11 +122,15 @@ class S3Locator(LocatorMixin):
     def bucket_name(self):
         return getSite().__name__
 
-    def _transfer(self, path, bucket_name, prefix='/', headers=None, debug=True):
-        headers = dict() if headers is None else headers
+    def _connection(self, debug=True):
         connection = boto.connect_s3(aws_access_key_id=self.aws_access_key_id,
                                      aws_secret_access_key=self.aws_secret_access_key)
         connection.debug = debug
+        return connection
+
+    def _transfer(self, path, bucket_name, prefix='/', headers=None, debug=True):
+        headers = dict() if headers is None else headers
+        connection = self._connection(debug)
         bucket = connection.get_bucket(bucket_name)
         for dirpath, _, files in os.walk(path):
             for filename in files:
@@ -153,6 +157,7 @@ class S3Locator(LocatorMixin):
                                     'Content-Type',
                                     'application/octet-stream'),
                                 file_headers.get('Content-Encoding', 'identity'))
+        connection.close()
         return bucket
 
     def _do_locate(self, path, root, context, debug=True):
@@ -167,12 +172,12 @@ class S3Locator(LocatorMixin):
 
     def _do_remove(self, bucket, debug=True):
         bucket_name = str(bucket.name)
-        connection = boto.connect_s3(aws_access_key_id=self.aws_access_key_id,
-                                     aws_secret_access_key=self.aws_secret_access_key)
-        connection.debug = debug
+        connection = self._connection(debug)
         try:
             connection.delete_bucket(bucket_name)
         except Exception:
             logger.exception("Could not remove bucket %s", bucket_name)
             return False
+        finally:
+            connection.close()
         return True
