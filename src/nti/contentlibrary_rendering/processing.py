@@ -119,8 +119,8 @@ def queue_add(name, func, obj, **kwargs):
     We expect a `IContentPackageRenderJob` here.
     """
     return add_to_queue(name, func, obj, **kwargs)
-
 queue_modified = queue_add
+
 
 def queue_removed(queue_name, func, obj, job_id=None, **kwargs):
     """
