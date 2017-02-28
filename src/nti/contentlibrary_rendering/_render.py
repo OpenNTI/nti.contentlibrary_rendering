@@ -39,6 +39,8 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
+from nti.contentlibrary.interfaces import ContentPackageRenderedEvent
+
 from nti.contentlibrary.library import register_content_units
 from nti.contentlibrary.library import unregister_content_units
 
@@ -270,6 +272,7 @@ def process_render_job(render_job):
         # 5. marked as rendered
         if render_job.MarkRendered:
             interface.alsoProvides(package, IContentRendered)
+            event_notify(ContentPackageRenderedEvent(package))
 
         # marked changed
         lifecycleevent.modified(package)
