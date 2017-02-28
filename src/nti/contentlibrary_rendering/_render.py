@@ -61,6 +61,7 @@ from nti.contentrendering.render_document import prepare_document_settings
 
 from nti.externalization.proxy import removeAllProxies
 
+from nti.ntiids.interfaces import UpdatedNTIIDEvent
 from nti.ntiids.interfaces import WillUpdateNTIIDEvent
 
 from nti.ntiids.ntiids import TYPE_OID
@@ -133,6 +134,7 @@ def copy_package_data(item, target):
     copy_attributes(package, target, ('PlatformPresentationResources',))
 
     # 5. make sure we copy the new ntiid
+    old_ntiid = target.ntiid
     if not target.ntiid or is_ntiid_of_type(target.ntiid, TYPE_OID):
         _update_package_ntiid(target, package)
 
@@ -147,6 +149,10 @@ def copy_package_data(item, target):
     # 8. [re]register target package in the library to populate internal structures
     if library is not None:
         library.add(target, event=False)
+
+    # 9. Must broadcast ntiid change event after inserting into library.
+    if old_ntiid != target.ntiid:
+        event_notify(UpdatedNTIIDEvent(target, old_ntiid, target.ntiid))
 
     return target
 
