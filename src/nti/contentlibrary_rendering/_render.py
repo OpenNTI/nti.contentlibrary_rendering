@@ -168,14 +168,6 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
     # XXX: Do we need to read in render_conf? How about cross-document refs?
     tex_dom = TeXDocument() if tex_dom is None else tex_dom
     Base.document.filenameoverride = property(lambda unused: 'index')
-    # Prep our doc
-    prepare_document_settings(tex_dom,
-                              provider=provider,
-                              working_dir=outfile_dir)
-    # Pull in all necessary plugins/configs/templates.
-    unused_ctx, packages_path = load_packages(context=context,
-                                              load_configs=False)
-    setup_environ(tex_dom, jobname, packages_path)
     # Generate a jobname, this is used in the eventual NTIID.
     if not jobname:
         if package is not None:
@@ -185,6 +177,15 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
             jobname = id(tex_dom)
     jobname = str(jobname)
     tex_dom.userdata['jobname'] = jobname
+    # Prep our doc
+    prepare_document_settings(tex_dom,
+                              provider=provider,
+                              base_ntiid=jobname,
+                              working_dir=outfile_dir)
+    # Pull in all necessary plugins/configs/templates.
+    unused_ctx, packages_path = load_packages(context=context,
+                                              load_configs=False)
+    setup_environ(tex_dom, jobname, packages_path)
     return tex_dom, jobname
 
 
