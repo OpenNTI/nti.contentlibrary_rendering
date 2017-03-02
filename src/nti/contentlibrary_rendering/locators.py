@@ -83,21 +83,21 @@ class LocatorMixin(object):
 @interface.implementer(IRenderedContentLocator)
 class FilesystemLocator(LocatorMixin):
 
-    def _update_perms(self, file):
+    def _update_perms(self, file_):
         """
         We shouldn't have to do this, but make sure our perms for the
         output dir retain our parent group id as well as give RW access
         to both user and (copied) group.
         """
-        parent = os.path.dirname(file)
+        parent = os.path.dirname(file_)
         parent_stat = os.stat(parent)
         parent_gid = parent_stat.st_gid
         # -1 unchanged
-        os.chown( file, -1, parent_gid)
-        os.chmod( file,
-                  stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-                  stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP |
-                  stat.S_IROTH)
+        os.chown(file_, -1, parent_gid)
+        os.chmod(file_,
+                 stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+                 stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP |
+                 stat.S_IROTH)
 
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
