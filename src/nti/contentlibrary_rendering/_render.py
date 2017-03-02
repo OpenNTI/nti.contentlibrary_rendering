@@ -180,7 +180,6 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
     # Prep our doc
     prepare_document_settings(tex_dom,
                               provider=provider,
-                              base_ntiid=jobname,
                               working_dir=outfile_dir)
     # Pull in all necessary plugins/configs/templates.
     unused_ctx, packages_path = load_packages(context=context,
