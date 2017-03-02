@@ -31,9 +31,6 @@
                          .interfaces.IContentPackageRenderMetadata"
         modules=".adapters .model" />
 
-    <!-- Locating -->
-    <utility factory=".locators.FilesystemLocator" />
-
 	<!-- Transformers -->
 	<utility factory=".transformers.TextTransformer" name="text" />
 	<utility factory=".transformers.TextTransformer" name="text/plain" />
