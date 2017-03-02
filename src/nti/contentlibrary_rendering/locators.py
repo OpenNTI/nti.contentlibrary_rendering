@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
+import stat
 import shutil
 
 import boto
@@ -82,6 +83,22 @@ class LocatorMixin(object):
 @interface.implementer(IRenderedContentLocator)
 class FilesystemLocator(LocatorMixin):
 
+    def _update_perms(self, file):
+        """
+        We shouldn't have to do this, but make sure our perms for the
+        output dir retain our parent group id as well as give RW access
+        to both user and (copied) group.
+        """
+        parent = os.path.dirname(file)
+        parent_stat = os.stat(parent)
+        parent_gid = parent_stat.st_gid
+        # -1 unchanged
+        os.chown( file, -1, parent_gid)
+        os.chmod( file,
+                  stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
+                  stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP |
+                  stat.S_IROTH)
+
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
         intid = self._get_id(context)
@@ -93,6 +110,7 @@ class FilesystemLocator(LocatorMixin):
         else:
             destination = os.path.join(root.absolute_path, intid)
         shutil.move(path, destination)
+        self._update_perms(destination)
         return root.getChildNamed(intid)
 
     def _do_remove(self, bucket):
@@ -180,7 +198,7 @@ class S3Locator(LocatorMixin):
             if keys:
                 bucket.delete_keys(keys)
         except Exception:
-            logger.exception("Could not remove '%s/*' files in bucket %s", 
+            logger.exception("Could not remove '%s/*' files in bucket %s",
                              prefix, self.bucket_name)
             return False
         finally:

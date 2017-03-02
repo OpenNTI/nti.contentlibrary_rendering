@@ -319,7 +319,7 @@ def depart_node(rst_node, tex_node, tex_doc):
     result = node_translator.depart(rst_node, tex_node, tex_doc)
     if hasattr(rst_node, 'attributes'): # check for docid
         uid = rst_node.attributes.get('uid')
-        if uid and not tex_node.getAttribute('id'): 
+        if uid and not tex_node.getAttribute('id'):
             tex_node.id = unicode_(uid)
             tex_node.setAttribute('id', tex_node.id)
     return result
