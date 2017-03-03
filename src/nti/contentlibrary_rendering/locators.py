@@ -88,8 +88,10 @@ class FilesystemLocator(LocatorMixin):
             os.mkdir(destination)
 
         for child in os.listdir(source):
-            child_name = os.path.join(destination, child)
-            shutil.move(child, child_name)
+            dest_path = os.path.join(destination, child)
+            source_path = os.path.join(source, child)
+            shutil.move(source_path, dest_path)
+        shutil.rmtree(source, ignore_errors=True)
 
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
