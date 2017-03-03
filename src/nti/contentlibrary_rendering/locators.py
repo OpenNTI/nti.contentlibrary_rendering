@@ -10,7 +10,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
-import stat
 import shutil
 
 import boto
@@ -83,21 +82,14 @@ class LocatorMixin(object):
 @interface.implementer(IRenderedContentLocator)
 class FilesystemLocator(LocatorMixin):
 
-    def _update_perms(self, file_):
-        """
-        We shouldn't have to do this, but make sure our perms for the
-        output dir retain our parent group id as well as give RW access
-        to both user and (copied) group.
-        """
-        parent = os.path.dirname(file_)
-        parent_stat = os.stat(parent)
-        parent_gid = parent_stat.st_gid
-        # -1 unchanged
-        os.chown(file_, -1, parent_gid)
-        os.chmod(file_,
-                 stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR |
-                 stat.S_IRGRP | stat.S_IWGRP | stat.S_IXGRP |
-                 stat.S_IROTH | stat.S_IXOTH )
+    def _move(self, source, destination):
+        # Make the destination so perms are correct.
+        if not os.path.isdir(destination):
+            os.mkdir(destination)
+
+        for child in os.listdir(source):
+            child_name = os.path.join(destination, child)
+            shutil.move(child, child_name)
 
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
@@ -109,8 +101,7 @@ class FilesystemLocator(LocatorMixin):
             shutil.rmtree(child.absolute_path)
         else:
             destination = os.path.join(root.absolute_path, intid)
-        shutil.move(path, destination)
-        self._update_perms(destination)
+        self._move(path, destination)
         return root.getChildNamed(intid)
 
     def _do_remove(self, bucket):
