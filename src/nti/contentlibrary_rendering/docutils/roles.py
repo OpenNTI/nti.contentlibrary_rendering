@@ -20,10 +20,7 @@ from docutils.parsers.rst import languages
 
 class underline(Inline, TextElement):
     pass
-
-
-class underlined(Inline, TextElement):
-    pass
+underlined = underline
 
 
 class bolditalic(Inline, TextElement):
@@ -32,14 +29,16 @@ class bolditalic(Inline, TextElement):
 
 class boldunderlined(Inline, TextElement):
     pass
-
+boldunderline = boldunderlined
 
 class italicunderlined(Inline, TextElement):
     pass
+italicunderline = italicunderlined
 
 
 class bolditalicunderlined(Inline, TextElement):
     pass
+bolditalicunderline = bolditalicunderlined
 
 
 def register_role(name, cls):
@@ -52,8 +51,11 @@ def register_roles():
     register_role('underline', underline)
     register_role('underlined', underlined)
     register_role('bolditalic', bolditalic)
+    register_role('boldunderline', boldunderline)
     register_role('boldunderlined', boldunderlined)
+    register_role('italicunderline', italicunderline)
     register_role('italicunderlined', italicunderlined)
+    register_role('bolditalicunderline', bolditalicunderline)
     register_role('bolditalicunderlined', bolditalicunderlined)
 register_roles()
 
