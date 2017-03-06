@@ -206,7 +206,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
     Render the given source document.
     """
     current_dir = os.getcwd()
-    outfile_dir = outfile_dir or tempfile.mkdtemp()
+    outfile_dir = outfile_dir or tempfile.mkdtemp(prefix="render_document_")
     try:
         os.chdir(outfile_dir)
         # Get a suitable tex dom
@@ -249,7 +249,7 @@ def process_render_job(render_job):
         raise TypeError("Invalid content package", ntiid)
 
     current_dir = os.getcwd()
-    outfile_dir = tempfile.mkdtemp()
+    outfile_dir = tempfile.mkdtemp(prefix="render_document_")
     try:
         os.chdir(outfile_dir)
 
