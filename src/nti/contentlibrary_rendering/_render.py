@@ -102,6 +102,8 @@ def _update_package_ntiid(target, source_package):
     old_ntiid = target.ntiid
     event_notify(WillUpdateNTIIDEvent(target, old_ntiid, source_package.ntiid))
     annotes = IAnnotations(target)
+    logger.info( 'Updating ntiid (old=%s) (new=%s)',
+                 old_ntiid, source_package.ntiid)
     target.ntiid = source_package.ntiid
     _copy_annotations(target, annotes)
 
