@@ -23,7 +23,11 @@ from nti.contentlibrary_rendering import get_factory
 from nti.contentlibrary_rendering.common import get_site
 from nti.contentlibrary_rendering.common import get_render_job
 
+from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
+
 from nti.dataserver.interfaces import IDataserver
+
+from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.site.site import get_site_for_site_names
 
@@ -43,8 +47,18 @@ def _do_execute_render_job(*args, **kwargs):
     render_job = get_render_job(package_ntiid, job_id)
     if render_job is None:
         site_name = getSite().__name__
-        logger.info('[%s] Job missing (deleted?); event dropped. (%s) (%s) (%s)',
-                    site_name, job_id, package_ntiid, func)
+        package = find_object_with_ntiid( package_ntiid )
+        meta = IContentPackageRenderMetadata( package, None )
+        keys = ''
+        if meta:
+            keys = tuple(meta)
+        logger.info('[%s] Job missing (deleted?); event dropped. (%s) (%s) (%s) (%s) (jobs=%s)',
+                    site_name,
+                    job_id,
+                    package_ntiid,
+                    func,
+                    package,
+                    keys)
         return
     return func(render_job, *args, **kwargs)
 
