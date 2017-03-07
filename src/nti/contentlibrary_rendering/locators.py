@@ -85,7 +85,7 @@ class FilesystemLocator(LocatorMixin):
     def _move(self, source, destination):
         # Make the destination so perms are correct.
         if not os.path.isdir(destination):
-            os.mkdir(destination)
+            os.makedirs(destination)
 
         for child in os.listdir(source):
             dest_path = os.path.join(destination, child)
