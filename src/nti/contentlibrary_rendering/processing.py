@@ -42,8 +42,9 @@ def _do_execute_render_job(*args, **kwargs):
     package_ntiid = kwargs.pop('package_ntiid', None)
     render_job = get_render_job(package_ntiid, job_id)
     if render_job is None:
-        logger.info('Job missing (deleted?); event dropped. (%s) (%s) (%s)',
-                    job_id, package_ntiid, func)
+        site_name = getSite().__name__
+        logger.info('[%s] Job missing (deleted?); event dropped. (%s) (%s) (%s)',
+                    site_name, job_id, package_ntiid, func)
         return
     return func(render_job, *args, **kwargs)
 
