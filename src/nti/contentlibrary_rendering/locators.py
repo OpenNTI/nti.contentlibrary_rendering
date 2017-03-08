@@ -52,7 +52,7 @@ from nti.traversal.traversal import find_interface
 
 def hex_encode(raw_bytes):
     if not isinstance(raw_bytes, six.binary_type):
-        raise TypeError("argument must be raw bytes: got %r" %
+        raise TypeError("Argument must be raw bytes: got %r" %
                         type(raw_bytes).__name__)
     result = binascii.b2a_hex(raw_bytes)
     return result
@@ -62,8 +62,8 @@ def sha1_digest(*inputs):
     hash_func = hashlib.sha1()
     for i in inputs:
         if not isinstance(i, six.binary_type):
-            raise TypeError(
-                "input type must be bytes: got %r" % type(i).__name__)
+            raise TypeError("Input type must be bytes: got %r" % 
+                            type(i).__name__)
         hash_func.update(i)
     return hash_func.digest()
 
