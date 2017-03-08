@@ -50,6 +50,15 @@ class TranslatorMixin(object):
 
     __name__ = None
 
+    # helpers
+
+    def _is_titleless(self, rst_node):
+        if hasattr(rst_node, 'attributes'):
+            return bool(rst_node.attributes.get('titleless'))
+        return False
+
+    # translation
+
     def translator(self, node_name):
         return get_translator(node_name)
 
@@ -215,8 +224,8 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     def _get_title(self, rst_node, tex_doc):
         result = rst_node.attributes.get('title') \
-            or  rst_node.attributes.get('id') \
-            or 'par_%s' % tex_doc.px_inc_paragraph_counter()
+             or  rst_node.attributes.get('id') \
+             or 'par_%s' % tex_doc.px_inc_paragraph_counter()
         return result
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
@@ -275,6 +284,8 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
             raise ValueError('Only three levels of sections are allowed.')
         section_level = parent_section_count + 1
         section_val = self.SECTION_MAP[section_level]
+        if self._is_titleless(rst_node):
+            section_val = "titleless%s" % section_val
         return section_val
 
     def _set_title(self, rst_node, tex_doc, tex_node):
@@ -291,7 +302,8 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
     def do_translate(self, rst_node, tex_doc, tex_parent):
         section_tag = self._get_section_tag(rst_node)
         result = tex_doc.createElement(section_tag)
-        self._set_title(rst_node, tex_doc, result)
+        if not self._is_titleless(rst_node):
+            self._set_title(rst_node, tex_doc, result)
         return result
 
 
@@ -317,7 +329,7 @@ class DocumentToPlastexNodeTranslator(TranslatorMixin):
 def depart_node(rst_node, tex_node, tex_doc):
     node_translator = get_translator(rst_node.tagname)
     result = node_translator.depart(rst_node, tex_node, tex_doc)
-    if hasattr(rst_node, 'attributes'): # check for docid
+    if hasattr(rst_node, 'attributes'):  # check for docid
         uid = rst_node.attributes.get('uid')
         if uid and not tex_node.getAttribute('id'):
             tex_node.id = unicode_(uid)
