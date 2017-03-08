@@ -28,6 +28,7 @@ from nti.coremetadata.interfaces import IPublishable
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+TMP_MAX = 10000
 
 def hex_encode(raw_bytes):
     if not isinstance(raw_bytes, six.binary_type):
@@ -53,7 +54,7 @@ def sha1_hex_digest(*inputs):
 
 def mkdtemp(tmpdir=None):
     tmpdir = tmpdir or tempfile.gettempdir()
-    for _ in range(tempfile.TMP_MAX):
+    for _ in xrange(TMP_MAX):
         now = time.time()
         digest = sha1_hex_digest(six.binary_type(now),
                                  six.binary_type(os.getpid()),
