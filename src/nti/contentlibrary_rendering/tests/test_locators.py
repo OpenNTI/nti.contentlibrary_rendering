@@ -10,9 +10,9 @@ __docformat__ = "restructuredtext en"
 from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
-from hamcrest import ends_with
 from hamcrest import assert_that
 from hamcrest import starts_with
+from hamcrest import contains_string
 
 import fudge
 
@@ -42,7 +42,7 @@ class TestLocator(ContentlibraryRenderingLayerTest):
             root.absolute_path = target_dir
             bucket = locator._do_locate(source_dir, root=root, context=None)
             assert_that(bucket, is_not(none()))
-            assert_that(bucket.absolute_path, ends_with("1000"))
+            assert_that(bucket.absolute_path, contains_string("authored_1000"))
             assert_that(bucket.absolute_path, starts_with(target_dir))
             assert_that(os.path.exists(bucket.absolute_path), is_(True))
             assert_that(os.path.isdir(bucket.absolute_path), is_(True))

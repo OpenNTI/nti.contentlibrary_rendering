@@ -130,16 +130,16 @@ class FilesystemLocator(LocatorMixin):
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
         intid = self._get_id(context)
-        destination = "authored_%s.%s" % (intid, self._hex(intid))
-        child = root.getChildNamed(destination)
+        name = "authored_%s.%s" % (intid, self._hex(intid))
+        child = root.getChildNamed(name)
         if child is not None:
             logger.warn("Removing %s", child)
             destination = child.absolute_path
             shutil.rmtree(child.absolute_path)
         else:
-            destination = os.path.join(root.absolute_path, destination)
+            destination = os.path.join(root.absolute_path, name)
         self._move(path, destination)
-        return root.getChildNamed(intid)
+        return root.getChildNamed(name)
 
     def _do_remove(self, bucket):
         shutil.rmtree(bucket.absolute_path)
