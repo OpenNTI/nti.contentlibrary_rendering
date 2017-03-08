@@ -14,8 +14,6 @@ import six
 import time
 import shutil
 import socket
-import hashlib
-import binascii
 
 import boto
 
@@ -39,6 +37,8 @@ from nti.contentlibrary.nti_s3put import IGNORED_DOTFILES
 from nti.contentlibrary.nti_s3put import get_key_name
 from nti.contentlibrary.nti_s3put import s3_upload_file
 
+from nti.contentlibrary_rendering.common import sha1_hex_digest
+
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
 from nti.property.property import Lazy
@@ -48,28 +48,6 @@ from nti.site.hostpolicy import get_host_site
 from nti.site.interfaces import IHostPolicyFolder
 
 from nti.traversal.traversal import find_interface
-
-
-def hex_encode(raw_bytes):
-    if not isinstance(raw_bytes, six.binary_type):
-        raise TypeError("Argument must be raw bytes: got %r" %
-                        type(raw_bytes).__name__)
-    result = binascii.b2a_hex(raw_bytes)
-    return result
-
-
-def sha1_digest(*inputs):
-    hash_func = hashlib.sha1()
-    for i in inputs:
-        if not isinstance(i, six.binary_type):
-            raise TypeError("Input type must be bytes: got %r" % 
-                            type(i).__name__)
-        hash_func.update(i)
-    return hash_func.digest()
-
-
-def sha1_hex_digest(*inputs):
-    return hex_encode(sha1_digest(*inputs))
 
 
 @interface.implementer(IRenderedContentLocator)
@@ -90,10 +68,10 @@ class LocatorMixin(object):
 
     def _hex(self, intid, now=None):
         now = now or time.time()
-        digest = sha1_hex_digest(six.binary_type(intid), 
+        digest = sha1_hex_digest(six.binary_type(intid),
                                  six.binary_type(now),
                                  six.binary_type(socket.gethostname()))
-        return digest[20:].upper() # 40 char string
+        return digest[20:].upper()  # 40 char string
 
     def locate(self, path, context):
         # validate
@@ -207,11 +185,7 @@ class S3Locator(LocatorMixin):
         return bucket
 
     def _do_locate(self, path, root, context, debug=True):
-        prefix = self.prefix
-        jobname = str(self._intids.getId(context))
-        if path.endswith(jobname):
-            # e.g. /tmp/render/12000 get /tmp/render
-            prefix = os.path.split(path)[0]
+        prefix = os.path.split(path)[0]
         return self._transfer(path, self.bucket_name,
                               debug=debug,
                               prefix=prefix,

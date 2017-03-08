@@ -10,7 +10,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
-import tempfile
 
 from plasTeX import Base
 from plasTeX import TeXDocument
@@ -48,6 +47,8 @@ from nti.contentlibrary.zodb import RenderableContentUnit
 from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.contentlibrary_rendering import RST_MIMETYPE
+
+from nti.contentlibrary_rendering.common import mkdtemp
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
@@ -102,8 +103,8 @@ def _update_package_ntiid(target, source_package):
     old_ntiid = target.ntiid
     event_notify(WillUpdateNTIIDEvent(target, old_ntiid, source_package.ntiid))
     annotes = IAnnotations(target)
-    logger.info( 'Updating ntiid (old=%s) (new=%s)',
-                 old_ntiid, source_package.ntiid)
+    logger.info('Updating ntiid (old=%s) (new=%s)',
+                old_ntiid, source_package.ntiid)
     target.ntiid = source_package.ntiid
     _copy_annotations(target, annotes)
 
@@ -150,7 +151,8 @@ def copy_package_data(item, target):
     target.children = target.children_iterable_factory(package.children or ())
     register_content_units(target, target)
 
-    # 8. [re]register target package in the library to populate internal structures
+    # 8. [re]register target package in the library to populate internal
+    # structures
     if library is not None:
         library.add(target, event=False)
 
@@ -211,7 +213,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
     Render the given source document.
     """
     current_dir = os.getcwd()
-    outfile_dir = outfile_dir or tempfile.mkdtemp(prefix="render_document_")
+    outfile_dir = outfile_dir or mkdtemp()
     try:
         os.chdir(outfile_dir)
         # Get a suitable tex dom
@@ -254,7 +256,7 @@ def process_render_job(render_job):
         raise TypeError("Invalid content package", ntiid)
 
     current_dir = os.getcwd()
-    outfile_dir = tempfile.mkdtemp(prefix="render_document_")
+    outfile_dir = mkdtemp()
     try:
         os.chdir(outfile_dir)
 

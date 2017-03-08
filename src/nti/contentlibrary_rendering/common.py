@@ -9,6 +9,13 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
+import os
+import six
+import time
+import socket
+import hashlib
+import binascii
+import tempfile
 from datetime import datetime
 
 import isodate
@@ -20,6 +27,42 @@ from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadat
 from nti.coremetadata.interfaces import IPublishable
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+
+def hex_encode(raw_bytes):
+    if not isinstance(raw_bytes, six.binary_type):
+        raise TypeError("Argument must be raw bytes: got %r" %
+                        type(raw_bytes).__name__)
+    result = binascii.b2a_hex(raw_bytes)
+    return result
+
+
+def sha1_digest(*inputs):
+    hash_func = hashlib.sha1()
+    for i in inputs:
+        if not isinstance(i, six.binary_type):
+            raise TypeError("Input type must be bytes: got %r" %
+                            type(i).__name__)
+        hash_func.update(i)
+    return hash_func.digest()
+
+
+def sha1_hex_digest(*inputs):
+    return hex_encode(sha1_digest(*inputs))
+
+
+def mkdtemp(tmpdir=None):
+    tmpdir = tmpdir or tempfile.gettempdir()
+    for _ in range(tempfile.TMP_MAX):
+        now = time.time()
+        digest = sha1_hex_digest(six.binary_type(now),
+                                 six.binary_type(os.getpid()),
+                                 six.binary_type(socket.gethostname()))
+        path = os.path.join(tmpdir, digest[20:].upper())
+        if not os.path.exists(path):
+            os.makedirs(path)
+            return path
+    raise IOError("No usable temporary directory name found")
 
 
 def is_published(obj):
