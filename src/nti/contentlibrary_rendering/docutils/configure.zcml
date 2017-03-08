@@ -9,11 +9,10 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
+	<include package=".directives" />
+	
 	<module module=".roles">
 		<allow interface=".interfaces.IRolesModule" />
-	</module>
-	<module module=".directives">
-		<allow interface=".interfaces.IDirectivesModule" />
 	</module>
 
 	<!-- Externalization -->
