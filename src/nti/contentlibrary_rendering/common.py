@@ -11,8 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 import os
 import six
-import time
-import socket
+import uuid
 import hashlib
 import binascii
 import tempfile
@@ -55,11 +54,8 @@ def sha1_hex_digest(*inputs):
 def mkdtemp(tmpdir=None):
     tmpdir = tmpdir or tempfile.gettempdir()
     for _ in xrange(TMP_MAX):
-        now = time.time()
-        digest = sha1_hex_digest(six.binary_type(now),
-                                 six.binary_type(os.getpid()),
-                                 six.binary_type(socket.gethostname()))
-        path = os.path.join(tmpdir, digest[20:].upper())
+        digest = str(uuid.uuid4())[14:].upper().replace('-','')
+        path = os.path.join(tmpdir, digest)
         if not os.path.exists(path):
             os.makedirs(path)
             return path
