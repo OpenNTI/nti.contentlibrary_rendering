@@ -39,6 +39,7 @@ from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
 from nti.contentlibrary.interfaces import ContentPackageRenderedEvent
+from nti.contentlibrary.interfaces import ContentPackageLocationChanged
 
 from nti.contentlibrary.library import register_content_units
 from nti.contentlibrary.library import unregister_content_units
@@ -95,7 +96,7 @@ def _copy_annotations(package, old_annotations):
         new_annotations[key] = value
 
 
-def _update_package_ntiid(target, source_package):
+def update_package_ntiid(target, source_package):
     """
     Update our package with the now-rendered ntiid, making sure we copy
     our annotations over (since we store by ntiid).
@@ -141,7 +142,7 @@ def copy_package_data(item, target):
     # 5. make sure we copy the new ntiid
     old_ntiid = target.ntiid
     if not target.ntiid or is_ntiid_of_type(target.ntiid, TYPE_OID):
-        _update_package_ntiid(target, package)
+        update_package_ntiid(target, package)
 
     # 6. unregister from the intid facility the target old children
     for unit in target.children or ():
@@ -235,13 +236,22 @@ def transform_content(context, contentType):
     return transformer.transform(context.contents, context=context)
 
 
-def locate_rendered_content(tex_dom, context):
+def locate_rendered_content(tex_dom, package):
+    # get path to rendered contents
     output_dir = tex_dom.userdata['working-dir']
     path, name = os.path.split(output_dir)
     name_noe, unused = os.path.splitext(name)
-    path = os.path.join(path, name_noe)  # path to rendered contents
+    path = os.path.join(path, name_noe)
+    # save old location
+    old_root = package.root
+    # locate
     locator = component.getUtility(IRenderedContentLocator)
-    return locator.locate(path, context)
+    result = locator.locate(path, package)
+    # notify location changed
+    if old_root is not None:
+        new_root = package.root
+        event_notify(ContentPackageLocationChanged(package, old_root, new_root))
+    return result
 
 
 def process_render_job(render_job):
