@@ -171,18 +171,21 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
     tex_dom = TeXDocument() if tex_dom is None else tex_dom
     Base.document.filenameoverride = property(lambda unused: 'index')
     # Generate a jobname, this is used in the eventual NTIID.
+    specific_ntiid = None
     if not jobname:
         if package is not None:
             intids = component.getUtility(IIntIds)
-            jobname = intids.getId(package)
+            specific_ntiid = jobname = intids.getId(package)
         else:
-            jobname = id(tex_dom)
+            specific_ntiid = jobname = id(tex_dom)
     jobname = str(jobname)
+    specific_ntiid = str(specific_ntiid or jobname)
     tex_dom.userdata['jobname'] = jobname
     # Prep our doc
     prepare_document_settings(tex_dom,
                               provider=provider,
-                              working_dir=outfile_dir)
+                              working_dir=outfile_dir,
+                              specific_ntiid=specific_ntiid)
     # Pull in all necessary plugins/configs/templates.
     unused_ctx, packages_path = load_packages(context=context,
                                               load_configs=False)
