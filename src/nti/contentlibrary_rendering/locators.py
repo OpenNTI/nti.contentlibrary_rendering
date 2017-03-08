@@ -10,7 +10,12 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
+import six
+import time
 import shutil
+import socket
+import hashlib
+import binascii
 
 import boto
 
@@ -45,6 +50,28 @@ from nti.site.interfaces import IHostPolicyFolder
 from nti.traversal.traversal import find_interface
 
 
+def hex_encode(raw_bytes):
+    if not isinstance(raw_bytes, six.binary_type):
+        raise TypeError("argument must be raw bytes: got %r" %
+                        type(raw_bytes).__name__)
+    result = binascii.b2a_hex(raw_bytes)
+    return result
+
+
+def sha1_digest(*inputs):
+    hash_func = hashlib.sha1()
+    for i in inputs:
+        if not isinstance(i, six.binary_type):
+            raise TypeError(
+                "input type must be bytes: got %r" % type(i).__name__)
+        hash_func.update(i)
+    return hash_func.digest()
+
+
+def sha1_hex_digest(*inputs):
+    return hex_encode(sha1_digest(*inputs))
+
+
 @interface.implementer(IRenderedContentLocator)
 class LocatorMixin(object):
 
@@ -60,6 +87,13 @@ class LocatorMixin(object):
 
     def _do_remove(self, root, context):
         pass
+
+    def _hex(self, intid, now=None):
+        now = now or time.time()
+        digest = sha1_hex_digest(six.binary_type(intid), 
+                                 six.binary_type(now),
+                                 six.binary_type(socket.gethostname()))
+        return digest[20:].upper() # 40 char string
 
     def locate(self, path, context):
         # validate
@@ -96,13 +130,14 @@ class FilesystemLocator(LocatorMixin):
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
         intid = self._get_id(context)
-        child = root.getChildNamed(intid)
+        destination = "authored_%s.%s" % (intid, self._hex(intid))
+        child = root.getChildNamed(destination)
         if child is not None:
             logger.warn("Removing %s", child)
             destination = child.absolute_path
             shutil.rmtree(child.absolute_path)
         else:
-            destination = os.path.join(root.absolute_path, intid)
+            destination = os.path.join(root.absolute_path, destination)
         self._move(path, destination)
         return root.getChildNamed(intid)
 
