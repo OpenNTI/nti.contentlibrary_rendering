@@ -35,7 +35,8 @@ from nti.site.site import get_site_for_site_names
 
 from nti.site.transient import TrivialSite
 
-MAX_RETRY_COUNT = 1
+#: The max number of times we'll retry a job that is not found.
+MAX_RETRY_COUNT = 3
 
 
 def _dataserver_folder():
@@ -55,8 +56,7 @@ def _do_execute_render_job( func, job_id=None, package_ntiid=None, retry_count=0
             keys = tuple(meta)
         if retry_count < MAX_RETRY_COUNT:
             # Re-queue; this may happen because of a race condition of when we open
-            # the db connection (tx) and then pull from the redisqueue. If we have
-            # a job now, we can be pretty sure a single retry will be successful.
+            # the db connection (tx) and then pull from the redisqueue.
             # It's hard to distinguish between this case and when an object is
             # deleted before this job runs. Unfortunately, this job goes to the end
             # of the queue, but if we hit this race condition, the queue should be
