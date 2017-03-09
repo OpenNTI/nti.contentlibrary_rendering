@@ -19,7 +19,7 @@ from docutils.parsers.rst import directives
 from docutils.transforms import Transform
 
 
-class TitlelessAttribute(Transform):
+class ImplicitAttribute(Transform):
     """
     Make titleles the immediately following non-comment element.
     """
@@ -51,7 +51,7 @@ class TitlelessAttribute(Transform):
         pending.replace_self(error)
 
 
-class Titleless(Directive):
+class Implicit(Directive):
 
     has_content = True
     required_arguments = 0
@@ -70,7 +70,7 @@ class Titleless(Directive):
             node_list.extend(container.children)
         else:
             pending = nodes.pending(
-                TitlelessAttribute,
+                ImplicitAttribute,
                 {'directive': self.name},
                 self.block_text)
             self.state_machine.document.note_pending(pending)
@@ -80,7 +80,7 @@ class Titleless(Directive):
 
 
 def register_directives():
-    directives.register_directive("titleless", Titleless)
+    directives.register_directive("implicit", Implicit)
 register_directives()
 
 

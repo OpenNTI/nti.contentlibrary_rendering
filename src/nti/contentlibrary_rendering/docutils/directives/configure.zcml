@@ -10,6 +10,6 @@
 	<include package="zope.security" />
 
 	<module module=".uid" />
-	<module module=".titleless" />
+	<module module=".implicit" />
 
 </configure>

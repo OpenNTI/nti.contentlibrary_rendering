@@ -28,6 +28,6 @@ class TestDirectives(ContentlibraryRenderingLayerTest):
         assert_that(uid, validly_provides(IDirectivesModule))
         assert_that(docutils_directive('uid', None, None), is_(not_none()))
         
-        from nti.contentlibrary_rendering.docutils.directives import titleless
-        assert_that(titleless, validly_provides(IDirectivesModule))
-        assert_that(docutils_directive('titleless', None, None), is_(not_none()))
+        from nti.contentlibrary_rendering.docutils.directives import implicit
+        assert_that(implicit, validly_provides(IDirectivesModule))
+        assert_that(docutils_directive('implicit', None, None), is_(not_none()))

@@ -97,7 +97,8 @@ class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
 
 def is_titleless(rst_node):
     if hasattr(rst_node, 'attributes'):
-        return bool(rst_node.attributes.get('titleless'))
+        return bool(   rst_node.attributes.get('titleless')
+                    or rst_node.attributes.get('implicit'))
     return False
 
 
