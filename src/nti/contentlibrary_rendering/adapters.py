@@ -98,3 +98,10 @@ ContentPackageRenderMetadata = an_factory(DefaultContentPackageRenderMetadata,
 def _job_to_package(job):
     result = find_interface(job, IRenderableContentPackage)
     return result
+
+@component.adapter(IContentPackageRenderJob)
+@interface.implementer(IContentPackageRenderMetadata)
+def _job_to_meta(job):
+    package = IRenderableContentPackage(job, None)
+    result = IContentPackageRenderMetadata(package, None)
+    return result

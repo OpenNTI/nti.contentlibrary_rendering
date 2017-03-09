@@ -19,6 +19,7 @@
 	<include package="nti.contentrendering" />
 
     <!-- Adapters -->
+    <adapter factory=".adapters._job_to_meta" />
     <adapter factory=".adapters._job_to_package" />
     <adapter factory=".adapters.ContentPackageRenderMetadata" />
 
