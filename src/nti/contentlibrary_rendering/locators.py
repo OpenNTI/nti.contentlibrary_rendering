@@ -108,7 +108,7 @@ class FilesystemLocator(LocatorMixin):
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
         intid = self._get_id(context)
-        name = "authored_%s.%s" % (intid, self._hex(intid))
+        name = "_authored_%s.%s" % (intid, self._hex(intid))
         child = root.getChildNamed(name)
         if child is not None:
             logger.warn("Removing %s", child)
