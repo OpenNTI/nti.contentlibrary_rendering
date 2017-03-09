@@ -1,10 +1,11 @@
-===============
+==============
 Titleless File
 ==============
 
+Chapter 1 Title
+===============
+
 .. titleless::
 
-An titleless section
-======================
-
-This is an paragraph.
+Section 1.1 Title
+-----------------
