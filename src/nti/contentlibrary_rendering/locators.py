@@ -120,7 +120,8 @@ class FilesystemLocator(LocatorMixin):
         return root.getChildNamed(name)
 
     def _do_remove(self, bucket):
-        shutil.rmtree(bucket.absolute_path)
+        if os.path.exists(bucket.absolute_path):
+            shutil.rmtree(bucket.absolute_path)
 
 
 @interface.implementer(IRenderedContentLocator)
