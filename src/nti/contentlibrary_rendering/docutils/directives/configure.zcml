@@ -10,6 +10,5 @@
 	<include package="zope.security" />
 
 	<module module=".uid" />
-	<module module=".implicit" />
 
 </configure>
