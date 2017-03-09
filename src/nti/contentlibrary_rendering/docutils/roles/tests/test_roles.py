@@ -22,9 +22,9 @@ from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 class TestRoles(ContentlibraryRenderingLayerTest):
 
-    def test_roles(self):
-        from nti.contentlibrary_rendering.docutils import roles
-        assert_that(roles, validly_provides(IRolesModule)) 
+    def test_formatting_roles(self):
+        from nti.contentlibrary_rendering.docutils.roles import formatting
+        assert_that(formatting, validly_provides(IRolesModule)) 
         assert_that(languages.en.roles['underlined'], is_not(none()))
         assert_that(languages.en.roles['bolditalic'], is_not(none()))
         assert_that(languages.en.roles['boldunderlined'], is_not(none()))

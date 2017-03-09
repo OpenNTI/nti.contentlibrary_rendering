@@ -9,11 +9,8 @@
 	<include package="zope.component" />
 	<include package="zope.security" />
 
+	<include package=".roles" />
 	<include package=".directives" />
-	
-	<module module=".roles">
-		<allow interface=".interfaces.IRolesModule" />
-	</module>
 
 	<!-- Externalization -->
 	<include package="nti.externalization" file="meta.zcml" />
