@@ -249,8 +249,7 @@ def locate_rendered_content(tex_dom, package):
     result = locator.locate(path, package)
     # notify location changed
     if old_root is not None:
-        new_root = package.root
-        event_notify(ContentPackageLocationChanged(package, old_root, new_root))
+        event_notify(ContentPackageLocationChanged(package, old_root, result))
     return result
 
 
