@@ -55,8 +55,9 @@ def remove_renderered_package(package, root=None):
     # Have to pass the bucket to the package remove function since
     # the package will no longer be resolvable outside this transaction.
     # This must be enough info to cleanup whatever needs to be cleaned up.
-    job_id = "remove_renderered_content_%s" % package.ntiid
     root = root or package.root
+    job_id = "remover_%s_%s" % (package.ntiid, root.name)
+    logger.info("Queuing remover job %s", root.name)
     queue_removed(CONTENT_UNITS_QUEUE,
                   remove_rendered_package,
                   root,
