@@ -325,15 +325,20 @@ class DocumentToPlastexNodeTranslator(TranslatorMixin):
 
 # Transformer
 
-
-def depart_node(rst_node, tex_node, tex_doc):
-    node_translator = get_translator(rst_node.tagname)
-    result = node_translator.depart(rst_node, tex_node, tex_doc)
+def handle_uid(rst_node, tex_node):
     if hasattr(rst_node, 'attributes'):  # check for docid
         uid = rst_node.attributes.get('uid')
         if uid and not tex_node.getAttribute('id'):
             tex_node.id = unicode_(uid)
             tex_node.setAttribute('id', tex_node.id)
+            return tex_node.id
+    return None
+
+
+def depart_node(rst_node, tex_node, tex_doc):
+    node_translator = get_translator(rst_node.tagname)
+    result = node_translator.depart(rst_node, tex_node, tex_doc)
+    handle_uid(rst_node, tex_node)
     return result
 
 
