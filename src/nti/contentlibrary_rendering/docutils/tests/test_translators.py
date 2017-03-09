@@ -101,8 +101,3 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         index = self._generate_from_file('uid.rst')
         assert_that(index, contains_string('id="exceptional" ntiid="t'))
         assert_that(index, contains_string('<p class="par" id="ichigo">Ichigo has been'))
-        
-    def test_implicit(self):
-        index = self._generate_from_file('implicit.rst')
-        assert_that(index, contains_string('<h1 id="2"></h1>'))
-
