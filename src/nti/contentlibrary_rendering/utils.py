@@ -50,13 +50,14 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
         queue_modified(CONTENT_UNITS_QUEUE, render_package_job, job)
 
 
-def remove_renderered_package(package):
+def remove_renderered_package(package, root=None):
     assert IRenderableContentPackage.providedBy(package)
     # Have to pass the bucket to the package remove function since
     # the package will no longer be resolvable outside this transaction.
     # This must be enough info to cleanup whatever needs to be cleaned up.
     job_id = "remove_renderered_content_%s" % package.ntiid
+    root = root or package.root
     queue_removed(CONTENT_UNITS_QUEUE,
                   remove_rendered_package,
-                  package.root,
+                  root,
                   job_id=job_id)
