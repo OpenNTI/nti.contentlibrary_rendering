@@ -50,15 +50,6 @@ class TranslatorMixin(object):
 
     __name__ = None
 
-    # helpers
-
-    def _is_titleless(self, rst_node):
-        if hasattr(rst_node, 'attributes'):
-            return bool(rst_node.attributes.get('titleless'))
-        return False
-
-    # translation
-
     def translator(self, node_name):
         return get_translator(node_name)
 
@@ -102,6 +93,12 @@ class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
 
 
 # Titles
+
+
+def is_titleless(rst_node):
+    if hasattr(rst_node, 'attributes'):
+        return bool(rst_node.attributes.get('titleless'))
+    return False
 
 
 class TitleToPlastexNodeTranslator(TranslatorMixin):
@@ -284,7 +281,7 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
             raise ValueError('Only three levels of sections are allowed.')
         section_level = parent_section_count + 1
         section_val = self.SECTION_MAP[section_level]
-        if self._is_titleless(rst_node):
+        if is_titleless(rst_node):
             section_val = "titleless%s" % section_val
         return section_val
 
@@ -302,7 +299,7 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
     def do_translate(self, rst_node, tex_doc, tex_parent):
         section_tag = self._get_section_tag(rst_node)
         result = tex_doc.createElement(section_tag)
-        if not self._is_titleless(rst_node):
+        if not is_titleless(rst_node):
             self._set_title(rst_node, tex_doc, result)
         return result
 
