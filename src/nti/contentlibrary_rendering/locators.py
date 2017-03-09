@@ -94,6 +94,13 @@ class LocatorMixin(object):
 @interface.implementer(IRenderedContentLocator)
 class FilesystemLocator(LocatorMixin):
 
+    AUTHORED_PREFIX = "_authored_"
+
+    def _out_name(self, context):
+        intid = self._get_id(context)
+        name = "%s%s.%s" % (self.AUTHORED_PREFIX, intid, self._hex(intid))
+        return name
+
     def _move(self, source, destination):
         # Make the destination so perms are correct.
         if not os.path.isdir(destination):
@@ -107,8 +114,7 @@ class FilesystemLocator(LocatorMixin):
 
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
-        intid = self._get_id(context)
-        name = "_authored_%s.%s" % (intid, self._hex(intid))
+        name = self._out_name(context)
         child = root.getChildNamed(name)
         if child is not None:
             logger.warn("Removing %s", child)
