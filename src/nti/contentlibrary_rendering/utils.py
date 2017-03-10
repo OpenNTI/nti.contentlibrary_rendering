@@ -56,9 +56,10 @@ def remove_renderered_package(package, root=None):
     # the package will no longer be resolvable outside this transaction.
     # This must be enough info to cleanup whatever needs to be cleaned up.
     root = root or package.root
-    job_id = "remover_%s_%s" % (package.ntiid, root.name)
-    logger.info("Queuing remover job %s", root.name)
-    queue_removed(CONTENT_UNITS_QUEUE,
-                  remove_rendered_package,
-                  root,
-                  job_id=job_id)
+    if root is not None:
+        job_id = "remover_%s_%s" % (package.ntiid, root.name)
+        logger.info("Queuing remover job %s", root.name)
+        queue_removed(CONTENT_UNITS_QUEUE,
+                      remove_rendered_package,
+                      root,
+                      job_id=job_id)
