@@ -44,44 +44,56 @@ def _dataserver_folder():
     return dataserver.root_folder['dataserver2']
 
 
+def _handle_missing_job( func, job_id, package_ntiid, retry_count, **kwargs ):
+    site_name = getSite().__name__
+    package = find_object_with_ntiid( package_ntiid )
+    meta = IContentPackageRenderMetadata( package, None )
+    keys = ''
+    if meta:
+        keys = tuple(meta)
+    if retry_count < MAX_RETRY_COUNT:
+        # Re-queue; this may happen because of a race condition of when we open
+        # the db connection (tx) and then pull from the redisqueue.
+        # It's hard to distinguish between this case and when an object is
+        # deleted before this job runs. Unfortunately, this job goes to the end
+        # of the queue, but if we hit this race condition, the queue should be
+        # nearly empty.
+        logger.info('[%s] Job missing (deleted?); will retry. (%s) (%s)',
+                    site_name,
+                    job_id,
+                    package_ntiid)
+        retry_count += 1
+        put_render_job(CONTENT_UNITS_QUEUE,
+                       func,
+                       job_id=job_id,
+                       package_ntiid=package_ntiid,
+                       retry_count=retry_count,
+                       **kwargs)
+    else:
+        logger.info('[%s] Job missing (deleted?); event dropped. (%s) (%s) (retry_count=%s) (%s) (jobs=%s)',
+                    site_name,
+                    job_id,
+                    package_ntiid,
+                    retry_count,
+                    package,
+                    keys)
+
+
 def _do_execute_render_job( func, job_id=None, package_ntiid=None, retry_count=0,
                             *args, **kwargs):
     render_job = get_render_job(package_ntiid, job_id)
     if render_job is None:
-        site_name = getSite().__name__
-        package = find_object_with_ntiid( package_ntiid )
-        meta = IContentPackageRenderMetadata( package, None )
-        keys = ''
-        if meta:
-            keys = tuple(meta)
-        if retry_count < MAX_RETRY_COUNT:
-            # Re-queue; this may happen because of a race condition of when we open
-            # the db connection (tx) and then pull from the redisqueue.
-            # It's hard to distinguish between this case and when an object is
-            # deleted before this job runs. Unfortunately, this job goes to the end
-            # of the queue, but if we hit this race condition, the queue should be
-            # nearly empty.
-            logger.info('[%s] Job missing (deleted?); will retry. (%s) (%s)',
-                        site_name,
-                        job_id,
-                        package_ntiid)
-            retry_count += 1
-            put_render_job(CONTENT_UNITS_QUEUE,
-                           func,
-                           job_id=job_id,
-                           package_ntiid=package_ntiid,
-                           retry_count=retry_count,
-                           **kwargs)
-        else:
-            logger.info('[%s] Job missing (deleted?); event dropped. (%s) (%s) (retry_count=%s) (%s) (jobs=%s)',
-                        site_name,
-                        job_id,
-                        package_ntiid,
-                        retry_count,
-                        package,
-                        keys)
-        return
-    return func(render_job, *args, **kwargs)
+        # Job missing
+        _handle_missing_job( func, job_id, package_ntiid, retry_count, **kwargs )
+    elif render_job.is_finished():
+        # Job preemptively completed.
+        logger.info('[%s] Job already completed, ignoring (%s) (%s)',
+                    getSite().__name__,
+                    job_id,
+                    package_ntiid)
+    else:
+        # Ok, we can process this one.
+        return func(render_job, *args, **kwargs)
 
 
 def _do_execute_generic_job(*args, **kwargs):
