@@ -101,3 +101,9 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         index = self._generate_from_file('uid.rst')
         assert_that(index, contains_string('id="exceptional" ntiid="t'))
         assert_that(index, contains_string('<p class="par" id="ichigo">Ichigo has been'))
+
+    def test_fakesections(self):
+        index = self._generate_from_file('fakesections.rst')
+        assert_that(index, contains_string('<h2 id="2">this is a fake subsection</h2>'))
+        assert_that(index, contains_string('<h1 id="3">this is a fake section</h1>'))
+        assert_that(index, contains_string('<h2 id="4">another fake subsection</h2>'))

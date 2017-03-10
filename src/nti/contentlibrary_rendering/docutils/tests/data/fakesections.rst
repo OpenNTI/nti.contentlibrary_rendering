@@ -5,13 +5,13 @@
 This is a title
 ***************
 
-.. fakesubsection:: this is a paragaph
+.. fakesubsection:: this is a fake subsection
 
 this is body text
 
-.. fakesection:: this is a section
+.. fakesection:: this is a fake section
 
-.. fakesubsection:: this is a paragraph
+.. fakesubsection:: another fake subsection
 
-This is a title
-***************
+Another title
+*************
