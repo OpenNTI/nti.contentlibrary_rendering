@@ -60,6 +60,8 @@ class ContentPackageRenderJob(SchemaConfigured,
     jobId = job_id = alias('JobId')
     ntiid = package = alias('PackageNTIID')
 
+    OutputRoot = None
+
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
         PersistentCreatedModDateTrackingObject.__init__(self, *args, **kwargs)

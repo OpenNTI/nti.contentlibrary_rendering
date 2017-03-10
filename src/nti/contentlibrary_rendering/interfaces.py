@@ -53,12 +53,16 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
                    required=False,
                    default=PENDING)
 
+    Error = Text(title="Rendering error.",
+                 required=False)
+
     MarkRendered = Bool(title="Mark package as rendered.",
                         required=False,
                         default=True)
+    MarkRendered.setTaggedValue('_ext_excluded_out', True)
 
-    Error = Text(title="Rendering error.",
-                 required=False)
+    OutputRoot = interface.Attribute("Render output location")
+    OutputRoot.setTaggedValue('_ext_excluded_out', True)
 
     def is_finished():
         """
