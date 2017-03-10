@@ -23,8 +23,13 @@ from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 class TestDirectives(ContentlibraryRenderingLayerTest):
 
-    def test_directives(self):
+    def test_uid_directive(self):
         from nti.contentlibrary_rendering.docutils.directives import uid
         assert_that(uid, validly_provides(IDirectivesModule))
         assert_that(docutils_directive('uid', None, None), is_(not_none()))
 
+    def test_sectioning_directive(self):
+        from nti.contentlibrary_rendering.docutils.directives import sectioning
+        assert_that(sectioning, validly_provides(IDirectivesModule))
+        assert_that(docutils_directive('fakesection', None, None), is_(not_none()))
+        assert_that(docutils_directive('fakesubsection', None, None), is_(not_none()))

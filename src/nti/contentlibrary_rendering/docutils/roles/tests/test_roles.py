@@ -30,9 +30,3 @@ class TestRoles(ContentlibraryRenderingLayerTest):
         assert_that(languages.en.roles['boldunderlined'], is_not(none()))
         assert_that(languages.en.roles['italicunderlined'], is_not(none()))
         assert_that(languages.en.roles['bolditalicunderlined'], is_not(none()))
-        
-    def test_sectioning_roles(self):
-        from nti.contentlibrary_rendering.docutils.roles import sectioning
-        assert_that(sectioning, validly_provides(IRolesModule)) 
-        assert_that(languages.en.roles['fakesection'], is_not(none()))
-        assert_that(languages.en.roles['fakesubsection'], is_not(none()))
