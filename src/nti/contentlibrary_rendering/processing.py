@@ -36,7 +36,7 @@ from nti.site.site import get_site_for_site_names
 from nti.site.transient import TrivialSite
 
 #: The max number of times we'll retry a job that is not found.
-MAX_RETRY_COUNT = 3
+MAX_RETRY_COUNT = 5
 
 
 def _dataserver_folder():
