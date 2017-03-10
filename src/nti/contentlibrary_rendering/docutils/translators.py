@@ -301,6 +301,7 @@ class FakesectionToPlastexNodeTranslator(TranslatorMixin):
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('fakesection')
+        tex_node.setAttribute('title', rst_node['title'])
         return tex_node
 
 
@@ -310,6 +311,7 @@ class FakesubsectionToPlastexNodeTranslator(TranslatorMixin):
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('fakesubsection')
+        tex_node.setAttribute('title', rst_node['title'])
         return tex_node
 
 
