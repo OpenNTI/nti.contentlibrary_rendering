@@ -36,8 +36,8 @@
 	<utility factory=".transformers.TextTransformer" name="text" />
 	<utility factory=".transformers.TextTransformer" name="text/plain" />
 
-	<utility factory=".transformers.LaTeXTransformer" name="TeX" />
-	<utility factory=".transformers.LaTeXTransformer" name="LaTeX" />
+	<utility factory=".transformers.LaTeXTransformer" name="tex" />
+	<utility factory=".transformers.LaTeXTransformer" name="latex" />
 	<utility factory=".transformers.LaTeXTransformer" name="application/x-latex" />
 
 	<!-- Validators -->
