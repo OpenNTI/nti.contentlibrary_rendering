@@ -44,6 +44,8 @@ from nti.contentlibrary.interfaces import ContentPackageLocationChanged
 from nti.contentlibrary.library import register_content_units
 from nti.contentlibrary.library import unregister_content_units
 
+from nti.contentlibrary.utils import get_published_contents
+
 from nti.contentlibrary.zodb import RenderableContentUnit
 from nti.contentlibrary.zodb import RenderableContentPackage
 
@@ -54,6 +56,7 @@ from nti.contentlibrary_rendering.common import mkdtemp
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
+from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
 from nti.contentrendering import nti_render
 
@@ -230,10 +233,24 @@ def render_document(source_doc, package=None, outfile_dir=None,
         os.chdir(current_dir)
 
 
+def _get_contents_to_render(package):
+    """
+    Get the latest published contents for our package, otherwise fall
+    back to the current contents on the package.
+    """
+    contents = get_published_contents(package)
+    if contents is None:
+        logger.warn('No published contents; falling back to current contents (%s)',
+                    package.ntiid)
+        contents = package.contents
+    return contents
+
+
 def transform_content(context, contentType):
+    contents = _get_contents_to_render(context)
     transformer = component.getUtility(IContentTransformer,
                                        name=str(contentType))
-    return transformer.transform(context.contents, context=context)
+    return transformer.transform(contents, context=context)
 
 
 def locate_rendered_content(tex_dom, package):
@@ -307,6 +324,18 @@ class _Participation(object):
         self.principal = principal
 
 
+def _get_jobs_to_update(render_job):
+    """
+    Fetch all pending jobs created *after* our given render_job.
+    It should be safe to mark these all as complete since we are
+    going to render the most recently published content.
+    """
+    meta = IContentPackageRenderMetadata(render_job)
+    baseline = render_job.created
+    return (x for x in meta.values()
+            if x.is_pending() and x.created >= baseline)
+
+
 def render_package_job(render_job):
     logger.info('Rendering content (%s) (%s)',
                 render_job.PackageNTIID,
@@ -318,12 +347,15 @@ def render_package_job(render_job):
         newInteraction(_Participation(IPrincipal(creator)))
         process_render_job(render_job)
     except Exception as e:
+        # XXX: Do we want to fail all applicable jobs?
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))
     else:
-        logger.info('Finished rendering content (%s) (%s)',
-                    render_job.PackageNTIID,
-                    render_job.job_id)
-        render_job.update_to_success_state()
+        jobs_to_update = _get_jobs_to_update(render_job)
+        for job in jobs_to_update:
+            logger.info('Finished rendering content (%s) (%s)',
+                        job.PackageNTIID,
+                        job.job_id)
+            job.update_to_success_state()
     finally:
         restoreInteraction()
