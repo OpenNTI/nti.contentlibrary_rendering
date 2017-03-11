@@ -54,7 +54,7 @@ def sha1_hex_digest(*inputs):
 def mkdtemp(tmpdir=None):
     tmpdir = tmpdir or tempfile.gettempdir()
     for _ in xrange(TMP_MAX):
-        digest = str(uuid.uuid4())[12:].upper().replace('-','')
+        digest = str(uuid.uuid4())[10:].upper().replace('-','')
         path = os.path.join(tmpdir, digest)
         if not os.path.exists(path):
             os.makedirs(path)
