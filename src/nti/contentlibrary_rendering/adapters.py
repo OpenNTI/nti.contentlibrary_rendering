@@ -38,8 +38,8 @@ from nti.traversal.traversal import find_interface
 from nti.zodb.containers import time_to_64bit_int
 
 
-@component.adapter(IRenderableContentPackage, IContained)
-@interface.implementer(IContentPackageRenderMetadata)
+@component.adapter(IRenderableContentPackage)
+@interface.implementer(IContentPackageRenderMetadata, IContained)
 class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTreeContainer):
     """
     A basic `IContentPackageRenderMetadata` implementation.
@@ -96,7 +96,7 @@ ContentPackageRenderMetadata = an_factory(DefaultContentPackageRenderMetadata,
 @component.adapter(IContentPackageRenderJob)
 @interface.implementer(IRenderableContentPackage)
 def _job_to_package(job):
-    result = find_interface(job, IRenderableContentPackage)
+    result = find_interface(job, IRenderableContentPackage, strict=False)
     return result
 
 
