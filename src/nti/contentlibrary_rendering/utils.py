@@ -39,6 +39,7 @@ def render_package(package, user, provider='NTI', mark_rendered=True):
     if IRenderableContentPackage.providedBy(package):
         job = _create_render_job(package, user, provider, mark_rendered)
         queue_add(CONTENT_UNITS_QUEUE, render_package_job, job)
+        return job
 
 
 def render_modified_package(package, user, provider='NTI', mark_rendered=True):
@@ -48,6 +49,7 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
     job = _create_render_job(package, user, provider, mark_rendered)
     if IRenderableContentPackage.providedBy(package) and is_published(package):
         queue_modified(CONTENT_UNITS_QUEUE, render_package_job, job)
+    return job
 
 
 def remove_renderered_package(package, root=None):
