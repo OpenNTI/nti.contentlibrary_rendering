@@ -113,7 +113,12 @@ class IContentPackageRenderMetadata(IContainer):
         Returns the most recent render `IContentPackageRenderJob` or None.
         """
     most_recent_render_job = mostRecentRenderJob
-
+    
+    def clear():
+        """
+        remove all jobs
+        """
+        
 
 class IContentQueueFactory(interface.Interface):
     """
