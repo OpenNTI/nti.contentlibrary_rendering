@@ -20,6 +20,8 @@ from zope.annotation.factory import factory as an_factory
 
 from zope.location.interfaces import IContained
 
+from zope.mimetype.interfaces import IContentTypeAware
+
 from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
 
 from nti.contentlibrary.interfaces import IRenderableContentPackage
@@ -39,7 +41,7 @@ from nti.zodb.containers import time_to_64bit_int
 
 
 @component.adapter(IRenderableContentPackage)
-@interface.implementer(IContentPackageRenderMetadata, IContained)
+@interface.implementer(IContentPackageRenderMetadata, IContained, IContentTypeAware)
 class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTreeContainer):
     """
     A basic `IContentPackageRenderMetadata` implementation.
@@ -50,6 +52,8 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
 
     __name__ = None
     __parent__ = None
+    
+    parameters = {}
 
     def __init__(self):
         super(DefaultContentPackageRenderMetadata, self).__init__()

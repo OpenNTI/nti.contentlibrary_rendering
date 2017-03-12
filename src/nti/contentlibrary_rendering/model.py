@@ -17,6 +17,8 @@ from zope.cachedescriptors.property import readproperty
 
 from zope.container.contained import Contained
 
+from zope.mimetype.interfaces import IContentTypeAware
+
 from nti.base._compat import unicode_
 
 from nti.contentlibrary.interfaces import IContentPackage
@@ -46,7 +48,7 @@ from nti.traversal.traversal import find_interface
 
 @EqHash('JobId')
 @total_ordering
-@interface.implementer(IContentPackageRenderJob)
+@interface.implementer(IContentPackageRenderJob, IContentTypeAware)
 class ContentPackageRenderJob(SchemaConfigured,
                               PersistentCreatedModDateTrackingObject,
                               Contained):
@@ -61,6 +63,8 @@ class ContentPackageRenderJob(SchemaConfigured,
     package = alias('PackageNTIID')
 
     OutputRoot = None
+
+    parameters = {}
 
     def __init__(self, *args, **kwargs):
         SchemaConfigured.__init__(self, *args, **kwargs)
