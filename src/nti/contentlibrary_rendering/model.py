@@ -32,6 +32,7 @@ from nti.contentlibrary_rendering.interfaces import SUCCESS
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
+from nti.coremetadata.interfaces import IContained as INTIContained
 
 from nti.dublincore.datastructures import PersistentCreatedModDateTrackingObject
 
@@ -48,7 +49,7 @@ from nti.traversal.traversal import find_interface
 
 @EqHash('JobId')
 @total_ordering
-@interface.implementer(IContentPackageRenderJob, IContentTypeAware)
+@interface.implementer(IContentPackageRenderJob, INTIContained, IContentTypeAware)
 class ContentPackageRenderJob(SchemaConfigured,
                               PersistentCreatedModDateTrackingObject,
                               Contained):
@@ -57,6 +58,7 @@ class ContentPackageRenderJob(SchemaConfigured,
     __external_class_name__ = u"ContentPackageRenderJob"
     mime_type = mimeType = u'application/vnd.nextthought.content.packagerenderjob'
 
+    id = alias('__name__')
     state = alias('State')
     provider = alias('Provider')
     jobId = job_id = alias('JobId')
@@ -90,6 +92,10 @@ class ContentPackageRenderJob(SchemaConfigured,
     def creator(self):
         package = find_interface(self, IContentPackage, strict=False)
         return get_creator(package) or SYSTEM_USER_ID
+
+    @property
+    def containerId(self):
+        return getattr(self.__parent__, 'containerId', None)
 
     def is_finished(self):
         """

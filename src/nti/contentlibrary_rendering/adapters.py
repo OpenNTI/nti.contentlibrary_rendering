@@ -18,8 +18,6 @@ from zope import interface
 
 from zope.annotation.factory import factory as an_factory
 
-from zope.location.interfaces import IContained
-
 from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
@@ -35,13 +33,17 @@ from nti.contentlibrary_rendering.model import ContentPackageRenderJob
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
+from nti.coremetadata.interfaces import IContained as INTIContained
+
+from nti.property.property import alias
+
 from nti.traversal.traversal import find_interface
 
 from nti.zodb.containers import time_to_64bit_int
 
 
 @component.adapter(IRenderableContentPackage)
-@interface.implementer(IContentPackageRenderMetadata, IContained, IContentTypeAware)
+@interface.implementer(IContentPackageRenderMetadata, INTIContained, IContentTypeAware)
 class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTreeContainer):
     """
     A basic `IContentPackageRenderMetadata` implementation.
@@ -54,7 +56,8 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     __parent__ = None
     
     parameters = {}
-
+    id = alias('__name__')
+    
     def __init__(self):
         super(DefaultContentPackageRenderMetadata, self).__init__()
 
@@ -79,6 +82,10 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         self[result.JobId] = result
         return result
     create_job = createJob
+
+    @property
+    def containerId(self):
+        return getattr(self.__parent__, 'ntiid', None)
 
     @property
     def render_jobs(self):
