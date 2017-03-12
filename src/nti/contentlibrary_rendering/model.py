@@ -17,7 +17,7 @@ from zope.cachedescriptors.property import readproperty
 
 from zope.container.contained import Contained
 
-from nti.base._compat import to_unicode
+from nti.base._compat import unicode_
 
 from nti.contentlibrary.interfaces import IContentPackage
 
@@ -58,7 +58,7 @@ class ContentPackageRenderJob(SchemaConfigured,
     state = alias('State')
     provider = alias('Provider')
     jobId = job_id = alias('JobId')
-    ntiid = package = alias('PackageNTIID')
+    package = alias('PackageNTIID')
 
     OutputRoot = None
 
@@ -111,7 +111,7 @@ class ContentPackageRenderJob(SchemaConfigured,
         """
         self.updateLastMod()
         self.State = FAILED
-        self.Error = to_unicode(reason)
+        self.Error = unicode_(reason)
 
     def update_to_success_state(self):
         """
