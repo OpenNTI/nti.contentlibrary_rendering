@@ -56,7 +56,7 @@ def _handle_missing_job(func, job_id, package_ntiid, retry_count, **kwargs):
     if meta is None:
         logger.error("Cannot get render metadata for package (%s,%s)",
                      package.mimeType, package.ntiid)
-	return
+        return
 
     keys = ''
     if meta:
