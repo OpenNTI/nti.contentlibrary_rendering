@@ -47,6 +47,11 @@ def _dataserver_folder():
 def _handle_missing_job(func, job_id, package_ntiid, retry_count, **kwargs):
     site_name = getSite().__name__
     package = find_object_with_ntiid(package_ntiid)
+    if package is None:
+        logger.error("Cannot find package with NTIID %s in site %s",
+                     package_ntiid, site_name)
+        return
+
     meta = IContentPackageRenderMetadata(package, None)
     if meta is None:
         logger.error("Cannot get render metadata for package %s/%s",
