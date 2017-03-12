@@ -44,10 +44,13 @@ def _dataserver_folder():
     return dataserver.root_folder['dataserver2']
 
 
-def _handle_missing_job( func, job_id, package_ntiid, retry_count, **kwargs ):
+def _handle_missing_job(func, job_id, package_ntiid, retry_count, **kwargs):
     site_name = getSite().__name__
-    package = find_object_with_ntiid( package_ntiid )
-    meta = IContentPackageRenderMetadata( package, None )
+    package = find_object_with_ntiid(package_ntiid)
+    meta = IContentPackageRenderMetadata(package, None)
+    if meta is None:
+        logger.error("Cannot get render metadata for package %s/%s",
+                     package.mimeType, package.ntiid)
     keys = ''
     if meta:
         keys = tuple(meta)
@@ -79,12 +82,12 @@ def _handle_missing_job( func, job_id, package_ntiid, retry_count, **kwargs ):
                     keys)
 
 
-def _do_execute_render_job( func, job_id=None, package_ntiid=None, retry_count=0,
-                            *args, **kwargs):
+def _do_execute_render_job(func, job_id=None, package_ntiid=None, retry_count=0,
+                           *args, **kwargs):
     render_job = get_render_job(package_ntiid, job_id)
     if render_job is None:
         # Job missing
-        _handle_missing_job( func, job_id, package_ntiid, retry_count, **kwargs )
+        _handle_missing_job(func, job_id, package_ntiid, retry_count, **kwargs)
     elif render_job.is_finished():
         # Job preemptively completed.
         logger.info('[%s] Job already completed, ignoring (%s) (%s)',
