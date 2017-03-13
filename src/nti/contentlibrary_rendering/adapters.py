@@ -66,9 +66,6 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     def __init__(self):
         super(DefaultContentPackageRenderMetadata, self).__init__()
 
-    def _get_job_base_ntiid(self, ntiid):
-        return make_ntiid(base=ntiid, nttype=RENDER_JOB)
-
     def _create_unique_job_key(self, job):
         username = get_creator(job) or SYSTEM_USER_ID
         current_time = time_to_64bit_int(time.time())
@@ -80,8 +77,8 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     def createJob(self, package=None, creator=None, provider='NTI', mark_rendered=True):
         package = package if package is not None else self.__parent__
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
-        result.MarkRendered = mark_rendered
         result.Provider = provider
+        result.MarkRendered = mark_rendered
         result.creator = get_creator(creator) or get_creator(package)
         result.JobId = self._create_unique_job_key(result)
         self[result.JobId] = result
