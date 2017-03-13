@@ -81,6 +81,7 @@ class Constructor(Processor):
     def process_args(self, args):
         setattr(args, 'redis', True)
         setattr(args, 'library', True)
+        setattr(args, 'priority', True)
         setattr(args, 'queue_names', QUEUE_NAMES)
         component.getGlobalSiteManager().registerHandler(reactor_started)
         component.getGlobalSiteManager().registerHandler(reactor_stopped)
