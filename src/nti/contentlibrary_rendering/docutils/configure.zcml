@@ -23,7 +23,7 @@
 	<!-- PlasTeX Generators -->
 	<utility factory=".translators.PlastexDocumentGenerator" name="rst" />
 	<utility factory=".translators.PlastexDocumentGenerator" name="text/x-rst" />
-	
+
 	<!-- Plastex Translators -->
 	<utility factory=".translators.DefaultNodeToPlastexNodeTranslator" />
 	<utility factory=".translators.MathToPlastexNodeTranslator" name="math" />
