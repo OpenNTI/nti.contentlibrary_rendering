@@ -167,34 +167,36 @@ class S3Locator(LocatorMixin):
     def _transfer(self, path, bucket_name, prefix='/', headers=None, debug=True):
         headers = dict() if headers is None else headers
         connection = self._connection(debug)
-        bucket = connection.get_bucket(bucket_name)
-        for dirpath, _, files in os.walk(path):
-            for filename in files:
-                if filename in IGNORED_DOTFILES:
-                    continue
+        try:
+            bucket = connection.get_bucket(bucket_name)
+            for dirpath, _, files in os.walk(path):
+                for filename in files:
+                    if filename in IGNORED_DOTFILES:
+                        continue
 
-                fullpath = os.path.join(dirpath, filename)
-                key_name = get_key_name(fullpath, prefix)
-                if debug:
-                    logger.info('Copying %s to %s/%s',
-                                filename, bucket_name, key_name)
+                    fullpath = os.path.join(dirpath, filename)
+                    key_name = get_key_name(fullpath, prefix)
+                    if debug:
+                        logger.info('Copying %s to %s/%s',
+                                    filename, bucket_name, key_name)
 
-                key = bucket.new_key(key_name)
-                file_headers = s3_upload_file(key,
-                                              fullpath,
-                                              gzip_types=(),
-                                              headers=headers,
-                                              policy=self.grant)
+                    key = bucket.new_key(key_name)
+                    file_headers = s3_upload_file(key,
+                                                  fullpath,
+                                                  gzip_types=(),
+                                                  headers=headers,
+                                                  policy=self.grant)
 
-                if debug:
-                    logger.info('Copied %s to %s/%s as type %s encoding %s',
-                                filename, bucket_name, key_name,
-                                file_headers.get(
-                                    'Content-Type',
-                                    'application/octet-stream'),
-                                file_headers.get('Content-Encoding', 'identity'))
-        connection.close()
-        return bucket
+                    if debug:
+                        logger.info('Copied %s to %s/%s as type %s encoding %s',
+                                    filename, bucket_name, key_name,
+                                    file_headers.get(
+                                        'Content-Type',
+                                        'application/octet-stream'),
+                                    file_headers.get('Content-Encoding', 'identity'))
+            return bucket
+        finally:
+            connection.close()
 
     def _do_locate(self, path, root, context, debug=True):
         prefix = os.path.split(path)[0]
