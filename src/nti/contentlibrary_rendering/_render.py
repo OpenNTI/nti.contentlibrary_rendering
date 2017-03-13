@@ -298,7 +298,7 @@ def process_render_job(render_job):
 
         # 3. Place in target location
         key_or_bucket = locate_rendered_content(tex_dom, package)
-        render_job.OutputRoot = key_or_bucket # save
+        render_job.OutputRoot = key_or_bucket  # save
 
         # 4. copy from target
         copy_package_data(key_or_bucket, package)
@@ -358,5 +358,8 @@ def render_package_job(render_job):
                         job.PackageNTIID,
                         job.job_id)
             job.update_to_success_state()
+            lifecycleevent.modified(job)
     finally:
         restoreInteraction()
+        lifecycleevent.modified(render_job)
+        lifecycleevent.modified(IContentPackageRenderMetadata(render_job))
