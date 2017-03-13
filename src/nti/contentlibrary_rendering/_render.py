@@ -325,13 +325,17 @@ class _Participation(object):
         self.principal = principal
 
 
+def _get_metadata(context):
+    return IContentPackageRenderMetadata(context, None)
+
+
 def _get_jobs_to_update(render_job):
     """
     Fetch all pending jobs created *after* our given render_job.
     It should be safe to mark these all as complete since we are
     going to render the most recently published content.
     """
-    meta = IContentPackageRenderMetadata(render_job)
+    meta = _get_metadata(render_job)
     baseline = render_job.created
     return (x for x in meta.values()
             if x.is_pending() and x.created >= baseline)
@@ -362,4 +366,4 @@ def render_package_job(render_job):
     finally:
         restoreInteraction()
         lifecycleevent.modified(render_job)
-        lifecycleevent.modified(IContentPackageRenderMetadata(render_job))
+        lifecycleevent.modified(_get_metadata(render_job))
