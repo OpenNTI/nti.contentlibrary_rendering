@@ -41,6 +41,8 @@ from nti.contentlibrary_rendering.common import sha1_hex_digest
 
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
+from nti.namedfile.file import safe_filename
+
 from nti.property.property import Lazy
 
 from nti.site.hostpolicy import get_host_site
@@ -94,11 +96,14 @@ class LocatorMixin(object):
 @interface.implementer(IRenderedContentLocator)
 class FilesystemLocator(LocatorMixin):
 
-    AUTHORED_PREFIX = "_authored_"
+    AUTHORED_PREFIX = "_authored"
 
     def _out_name(self, context):
         intid = self._get_id(context)
-        name = "%s%s.%s" % (self.AUTHORED_PREFIX, intid, self._hex(intid))
+        hostname = socket.gethostname()
+        name = "%s_%s_%s.%s" % (self.AUTHORED_PREFIX, hostname,
+                                intid, self._hex(intid))
+        name = safe_filename(name)
         return name
 
     def _move(self, source, destination):

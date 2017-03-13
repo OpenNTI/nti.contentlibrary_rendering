@@ -17,6 +17,7 @@ from hamcrest import contains_string
 import fudge
 
 import os
+import socket
 import shutil
 import tempfile
 
@@ -42,7 +43,9 @@ class TestLocator(ContentlibraryRenderingLayerTest):
             root.absolute_path = target_dir
             bucket = locator._do_locate(source_dir, root=root, context=None)
             assert_that(bucket, is_not(none()))
-            assert_that(bucket.absolute_path, contains_string("authored_1000"))
+            assert_that(bucket.absolute_path, contains_string("_authored_"))
+            assert_that(bucket.absolute_path, contains_string(socket.gethostname()))
+            assert_that(bucket.absolute_path, contains_string("_1000"))
             assert_that(bucket.absolute_path, starts_with(target_dir))
             assert_that(os.path.exists(bucket.absolute_path), is_(True))
             assert_that(os.path.isdir(bucket.absolute_path), is_(True))

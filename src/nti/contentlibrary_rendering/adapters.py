@@ -59,10 +59,10 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
 
     __name__ = None
     __parent__ = None
-    
+
     parameters = {}
     id = alias('__name__')
-    
+
     def __init__(self):
         super(DefaultContentPackageRenderMetadata, self).__init__()
 
