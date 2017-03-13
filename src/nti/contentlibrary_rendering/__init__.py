@@ -22,6 +22,9 @@ LaTeX_MIMETYPE = b'application/x-latex'
 #: reStructuredText mime type
 RST_MIMETYPE = b'text/x-rst'
 
+#: Render job NTIID Type
+RENDER_JOB = 'RenderJob'
+
 #: Rendering redis queue name
 CONTENT_UNITS_QUEUE = '++etc++contentlibrary++queue++contentunits'
 

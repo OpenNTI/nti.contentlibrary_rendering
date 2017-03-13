@@ -24,6 +24,8 @@ from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeCo
 
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
+from nti.contentlibrary_rendering import RENDER_JOB
+
 from nti.contentlibrary_rendering.common import get_creator
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
@@ -34,6 +36,9 @@ from nti.contentlibrary_rendering.model import ContentPackageRenderJob
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
 from nti.coremetadata.interfaces import IContained as INTIContained
+
+from nti.ntiids.ntiids import make_ntiid
+from nti.ntiids.ntiids import make_specific_safe
 
 from nti.property.property import alias
 
@@ -61,16 +66,16 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     def __init__(self):
         super(DefaultContentPackageRenderMetadata, self).__init__()
 
-    def _create_unique_job_key(self, job):
-        current_time = time_to_64bit_int(time.time())
-        username = getattr(job.creator, 'username', 'system')
-        result = '%s.%s.%s' % (job.PackageNTIID, username, current_time)
-        return result
+    def _get_job_base_ntiid(self, ntiid):
+        return make_ntiid(base=ntiid, nttype=RENDER_JOB)
 
-    def _creator(self, creator=None):
-        creator = getattr(creator, 'username', creator) or SYSTEM_USER_ID
-        creator = getattr(creator, 'id', creator)  # in case of a principal
-        return creator
+    def _create_unique_job_key(self, job):
+        username = get_creator(job) or SYSTEM_USER_ID
+        current_time = time_to_64bit_int(time.time())
+        specific = make_specific_safe("%s.%s" % (username, current_time))
+        base_ntiid = make_ntiid(base=job.PackageNTIID, nttype=RENDER_JOB)
+        result = '%s.%s' % (base_ntiid, specific)
+        return result
 
     def createJob(self, package=None, creator=None, provider='NTI', mark_rendered=True):
         package = package if package is not None else self.__parent__
