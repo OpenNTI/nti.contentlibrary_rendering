@@ -272,13 +272,13 @@ def locate_rendered_content(tex_dom, package):
     return result
 
 
-def write_meta_info(package, render_job, outfile_dir):
+def write_meta_info(package, job, outfile_dir):
     name = os.path.join(outfile_dir, "meta.info")
     with open(name, "wb") as fp:
-        fp.write("NTIID:\t%s\n" % package.ntiid)
-        fp.write("JOBID:\t%s\n" % render_job.job_id)
-        fp.write("CREATOR:\t%s\n" % render_job.creator)
-        fp.write("OID:\t%s\n" % to_external_ntiid_oid(package))
+        fp.write("JobID: %s\n" % job.job_id)
+        fp.write("JobCreator: %s\n" % job.creator)
+        fp.write("PackageNTIID: %s\n" % package.ntiid)
+        fp.write("PackageOID: %s\n" % to_external_ntiid_oid(package))
 
 
 def process_render_job(render_job):
