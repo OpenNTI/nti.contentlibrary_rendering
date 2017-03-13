@@ -66,6 +66,8 @@ from nti.contentrendering.render_document import load_packages
 from nti.contentrendering.render_document import setup_environ
 from nti.contentrendering.render_document import prepare_document_settings
 
+from nti.externalization.oids import to_external_ntiid_oid
+
 from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.interfaces import UpdatedNTIIDEvent
@@ -270,6 +272,15 @@ def locate_rendered_content(tex_dom, package):
     return result
 
 
+def write_meta_info(package, render_job, outfile_dir):
+    name = os.path.join(outfile_dir, "meta.info")
+    with open(name, "wb") as fp:
+        fp.write("NTIID:\t%s\n" % package.ntiid)
+        fp.write("JOBID:\t%s\n" % render_job.job_id)
+        fp.write("CREATOR:\t%s\n" % render_job.creator)
+        fp.write("OID:\t%s\n" % to_external_ntiid_oid(package))
+
+
 def process_render_job(render_job):
     ntiid = render_job.PackageNTIID
     provider = render_job.Provider
@@ -296,14 +307,17 @@ def process_render_job(render_job):
                                   content_type=contentType,
                                   outfile_dir=outfile_dir)
 
-        # 3. Place in target location
+        # 3. Write meta-info
+        write_meta_info(package, render_job, outfile_dir)
+
+        # 4. Place in target location
         key_or_bucket = locate_rendered_content(tex_dom, package)
         render_job.OutputRoot = key_or_bucket  # save
 
-        # 4. copy from target
+        # 5. copy from target
         copy_package_data(key_or_bucket, package)
 
-        # 5. marked as rendered
+        # 6. marked as rendered
         if render_job.MarkRendered:
             interface.alsoProvides(package, IContentRendered)
             event_notify(ContentPackageRenderedEvent(package))
