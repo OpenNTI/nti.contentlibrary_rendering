@@ -80,9 +80,6 @@ class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
     __name__ = u''
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
-        # Bypass all system messages
-        if rst_node.tagname == 'system_message':
-            return
         result = tex_doc.createElement(rst_node.tagname)
         return result
 
@@ -378,6 +375,9 @@ def build_nodes(rst_node, tex_parent, tex_doc):
     Handle our node by translating it and adding it to the doc
     and then processing the children.
     """
+    # Bypass all system messages
+    if rst_node.tagname == 'system_message':
+        return
     tex_node = handle_node(rst_node, tex_parent, tex_doc)
     process_children(rst_node, tex_node, tex_doc)
     depart_node(rst_node, tex_node, tex_doc)
