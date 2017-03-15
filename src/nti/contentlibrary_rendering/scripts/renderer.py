@@ -22,13 +22,10 @@ from z3c.autoinclude.zcml import includePluginsDirective
 
 from nti.async.interfaces import IReactorStarted
 from nti.async.interfaces import IReactorStopped
-from nti.async.interfaces import IJobAbortedEvent
 
 from nti.async.utils.processor import Processor
 
 from nti.contentlibrary_rendering import QUEUE_NAMES
-
-from nti.contentlibrary_rendering.processing import _handle_job_aborted
 
 from nti.contentrendering.utils.chameleon import setupChameleonCache
 
@@ -61,13 +58,6 @@ def reactor_stopped(context):
         pass
 
 
-@component.adapter(IJobAbortedEvent)
-def job_aborted(context):
-    job = context.job
-    logger.warn("JOB ABORTED %s/%s", type(job), job)
-    _handle_job_aborted(*job.args, **job.kwargs)
-
-
 class Constructor(Processor):
 
     def set_log_formatter(self, args):
@@ -93,7 +83,6 @@ class Constructor(Processor):
         setattr(args, 'library', True)
         setattr(args, 'priority', True)
         setattr(args, 'queue_names', QUEUE_NAMES)
-        component.getGlobalSiteManager().registerHandler(job_aborted)
         component.getGlobalSiteManager().registerHandler(reactor_started)
         component.getGlobalSiteManager().registerHandler(reactor_stopped)
         Processor.process_args(self, args)

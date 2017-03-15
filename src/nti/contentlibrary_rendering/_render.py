@@ -11,6 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 import os
 
+import transaction
+
 from plasTeX import Base
 from plasTeX import TeXDocument
 
@@ -318,8 +320,17 @@ def process_render_job(render_job):
         write_meta_info(package, render_job, outfile_dir)
 
         # 4. Place in target location
+        locator = component.getUtility(IRenderedContentLocator)
         key_or_bucket = locate_rendered_content(tex_dom, package)
         render_job.OutputRoot = key_or_bucket  # save
+
+        # make sure we clean up if there is an abort
+        def after_commit_or_abort(success=False):
+            if not success:
+                logger.warn("Rolling back rendered content %s",
+                            key_or_bucket)
+                locator.remove(key_or_bucket)
+        transaction.get().addAfterCommitHook(after_commit_or_abort)
 
         # 5. copy from target
         copy_package_data(key_or_bucket, package)
