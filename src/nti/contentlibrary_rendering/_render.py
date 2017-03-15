@@ -76,11 +76,8 @@ from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.externalization.proxy import removeAllProxies
 
-from nti.ntiids.interfaces import UpdatedNTIIDEvent
 from nti.ntiids.interfaces import WillUpdateNTIIDEvent
 
-from nti.ntiids.ntiids import TYPE_OID
-from nti.ntiids.ntiids import is_ntiid_of_type
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 
@@ -131,46 +128,33 @@ def copy_package_data(item, target):
                                    RenderableContentUnit)
     assert package is not None, "Invalid rendered content directory"
 
-    # 1. remove target package to clear internal structures
-    library = component.queryUtility(IContentPackageLibrary)
-    if library is not None:
-        library.remove(target, event=False, unregister=False)
-
-    # 2. copy all new content package attributes
+    # 1. copy all new content package attributes
     copy_attributes(package, target, IContentPackage.names())
 
-    # 3a. copy unit attributes
+    # 2 copy unit attributes
     attributes = set(IContentUnit.names()) - {'children', 'ntiid', 'icon'}
     copy_attributes(package, target, attributes)
 
-    # 3b. copy icon
+    # 3. copy icon
     if not target.icon and package.icon:
         target.icon = package.icon
 
     # 4. copy displayable content attributes
     copy_attributes(package, target, ('PlatformPresentationResources',))
 
-    # 5. make sure we copy the new ntiid
-    old_ntiid = target.ntiid
-    if not target.ntiid or is_ntiid_of_type(target.ntiid, TYPE_OID):
-        update_package_ntiid(target, package)
-
-    # 6. unregister from the intid facility the target old children
+    # 5. unregister from the intid facility the target old children
     for unit in target.children or ():
         unregister_content_units(unit)
 
-    # 7. register with the intid facility the new children
+    # 6. register with the intid facility the new children
     target.children = target.children_iterable_factory(package.children or ())
     register_content_units(target, target)
 
-    # 8. [re]register target package in the library to populate internal
+    # 7. register target package in the library to populate internal
     # structures
-    if library is not None:
+    library = component.queryUtility(IContentPackageLibrary)
+    if library is not None and target.children:
         library.add(target, event=False)
-
-    # 9. Must broadcast ntiid change event after inserting into library.
-    if old_ntiid != target.ntiid:
-        event_notify(UpdatedNTIIDEvent(target, old_ntiid, target.ntiid))
 
     return target
 
@@ -384,15 +368,10 @@ def render_package_job(render_job):
                 render_job.job_id)
     job_id = render_job.job_id
     creator = render_job.creator
-    output_root = render_job.OutputRoot
     endInteraction()
     try:
         newInteraction(_Participation(IPrincipal(creator)))
-        if output_root is None:
-            process_render_job(render_job)
-        else:
-            logger.warn("Processing already completed for job %s", 
-                        render_job.job_id)
+        process_render_job(render_job)
     except Exception as e:
         # XXX: Do we want to fail all applicable jobs?
         logger.exception('Render job %s failed', job_id)
