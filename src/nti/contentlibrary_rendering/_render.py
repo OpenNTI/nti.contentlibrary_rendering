@@ -45,6 +45,7 @@ from nti.contentlibrary.library import register_content_units
 from nti.contentlibrary.library import unregister_content_units
 
 from nti.contentlibrary.utils import get_published_contents
+from nti.contentlibrary.utils import get_published_snapshot
 
 from nti.contentlibrary.zodb import RenderableContentUnit
 from nti.contentlibrary.zodb import RenderableContentPackage
@@ -248,8 +249,9 @@ def _get_contents_to_render(package):
     return contents
 
 
-def transform_content(context, contentType):
-    contents = _get_contents_to_render(context)
+def transform_content(context, contentType, contents=None):
+    if contents is None:
+        contents = _get_contents_to_render(context)
     transformer = component.getUtility(IContentTransformer,
                                        name=str(contentType))
     return transformer.transform(contents, context=context)
@@ -298,8 +300,13 @@ def process_render_job(render_job):
         os.chdir(outfile_dir)
 
         # 1. Transform content into dom
-        source_doc = transform_content(package, contentType)
-
+        snapshot = get_published_snapshot(package)
+        version = snapshot.version if snapshot else None
+        contents = snapshot.contents if snapshot else None
+        source_doc = transform_content(package, contentType, contents)
+        # save version
+        render_job.Version = version 
+        
         # 2. Render
         tex_dom = render_document(source_doc,
                                   provider=provider,

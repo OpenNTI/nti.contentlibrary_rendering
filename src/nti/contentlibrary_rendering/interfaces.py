@@ -56,6 +56,10 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
     Error = Text(title="Rendering error.",
                  required=False)
 
+    Version = ValidTextLine(title="Rendered contents version",
+                            required=False)
+    Version.setTaggedValue('_ext_excluded_out', True)
+    
     MarkRendered = Bool(title="Mark package as rendered.",
                         required=False,
                         default=True)
