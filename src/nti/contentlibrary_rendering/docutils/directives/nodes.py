@@ -23,3 +23,7 @@ class fakeparagraph(General, Element):
 
 class fakesubsection(General, Element):
     pass
+
+
+class fakesubsubsection(General, Element):
+    pass
