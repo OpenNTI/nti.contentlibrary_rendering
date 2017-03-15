@@ -40,6 +40,7 @@
 	<utility factory=".translators.ItalicUnderlinedToPlastexNodeTranslator" name="italicunderlined" />
 	<utility factory=".translators.BoldItalicUnderlinedToPlastexNodeTranslator" name="bolditalicunderlined" />
 
+	<utility factory=".translators.LabelToPlastexNodeTranslator" name="label" />
 	<utility factory=".translators.TitleToPlastexNodeTranslator" name="title" />
 	<utility factory=".translators.SubtitleToPlastexNodeTranslator" name="subtitle" />
 

@@ -95,6 +95,10 @@ class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
 # Titles
 
 
+class LabelToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
+    __name__ = "label"
+
+
 class TitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "title"
@@ -224,8 +228,8 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
 
     def _get_title(self, rst_node, tex_doc):
         result = rst_node.attributes.get('title') \
-             or  rst_node.attributes.get('id') \
-             or 'par_%s' % tex_doc.px_inc_paragraph_counter()
+            or  rst_node.attributes.get('id') \
+            or 'par_%s' % tex_doc.px_inc_paragraph_counter()
         return result
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
