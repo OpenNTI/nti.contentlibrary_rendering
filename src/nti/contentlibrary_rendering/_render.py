@@ -368,10 +368,15 @@ def render_package_job(render_job):
                 render_job.job_id)
     job_id = render_job.job_id
     creator = render_job.creator
+    output_root = render_job.OutputRoot
     endInteraction()
     try:
         newInteraction(_Participation(IPrincipal(creator)))
-        process_render_job(render_job)
+        if output_root is None:
+            process_render_job(render_job)
+        else:
+            logger.warn("Processing already completed for job %s", 
+                        render_job.job_id)
     except Exception as e:
         # XXX: Do we want to fail all applicable jobs?
         logger.exception('Render job %s failed', job_id)
