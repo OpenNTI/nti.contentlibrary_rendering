@@ -31,11 +31,15 @@ class TestDirectives(ContentlibraryRenderingLayerTest):
     def test_pseudo_types_directives(self):
         from nti.contentlibrary_rendering.docutils.directives import pseudo_types
         assert_that(pseudo_types, validly_provides(IDirectivesModule))
-        assert_that(docutils_directive('fakesection', None, None), is_(not_none()))
-        assert_that(docutils_directive('fakeparagraph', None, None), is_(not_none()))
-        assert_that(docutils_directive('fakesubsection', None, None), is_(not_none()))
-        assert_that(docutils_directive('fakesubsubsection', None, None), is_(not_none()))
-        
+        assert_that(docutils_directive('fakesection', None, None), 
+                    is_(not_none()))
+        assert_that(docutils_directive('fakeparagraph', None, None), 
+                    is_(not_none()))
+        assert_that(docutils_directive('fakesubsection', None, None), 
+                    is_(not_none()))
+        assert_that(docutils_directive('fakesubsubsection', None, None), 
+                    is_(not_none()))
+
     def test_label_directive(self):
         from nti.contentlibrary_rendering.docutils.directives import label
         assert_that(label, validly_provides(IDirectivesModule))

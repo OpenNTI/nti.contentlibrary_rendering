@@ -36,7 +36,7 @@ class Label(Directive):
                 'Error in "%s" directive: missing label' % self.name)
 
         result = label()
-        result['label'] = arg
+        result['label'] = result['id'] = arg
         return [result]
 
 
