@@ -17,5 +17,9 @@ class fakesection(General, Element):
     pass
 
 
+class fakeparagraph(General, Element):
+    pass
+
+
 class fakesubsection(General, Element):
     pass

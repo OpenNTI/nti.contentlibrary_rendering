@@ -15,10 +15,11 @@ from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 
 from nti.contentlibrary_rendering.docutils.directives.nodes import fakesection
+from nti.contentlibrary_rendering.docutils.directives.nodes import fakeparagraph
 from nti.contentlibrary_rendering.docutils.directives.nodes import fakesubsection
 
 
-class BaseFakesection(Directive):
+class BaseFake(Directive):
 
     has_content = False
     required_arguments = 1
@@ -39,16 +40,21 @@ class BaseFakesection(Directive):
         return [result]
 
 
-class Fakesection(BaseFakesection):
+class Fakesection(BaseFake):
     node_class = fakesection
 
 
-class Fakesubsection(BaseFakesection):
+class Fakesubsection(BaseFake):
     node_class = fakesubsection
+
+
+class Fakeparagraph(BaseFake):
+    node_class = fakeparagraph
 
 
 def register_directives():
     directives.register_directive("fakesection", Fakesection)
+    directives.register_directive("fakeparagraph", Fakeparagraph)
     directives.register_directive("fakesubsection", Fakesubsection)
 register_directives()
 
