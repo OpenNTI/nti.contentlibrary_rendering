@@ -46,12 +46,13 @@ def _dataserver_folder():
     return dataserver.root_folder['dataserver2']
 
 
-def _handle_job_aborted(job_id, *args, **kwargs):
+def _handle_job_aborted(*args, **kwargs):
     package_ntiid = kwargs.get('package_ntiid') or u''
+    job_id = kwargs.get('job_id') or kwargs.get('id') or u''
     render_job = get_render_job(package_ntiid, job_id)
-    logger.warn("Job %s was aborted", job_id)
     if      IContentPackageRenderJob.providedBy(render_job) \
         and render_job.OutputRoot is not None:
+        logger.warn("Job %s was aborted", job_id)
         locator = component.queryUtility(IRenderedContentLocator)
         if locator is not None:
             try:

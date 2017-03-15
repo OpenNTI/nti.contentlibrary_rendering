@@ -64,7 +64,8 @@ def reactor_stopped(context):
 @component.adapter(IJobAbortedEvent)
 def job_aborted(context):
     job = context.job
-    _handle_job_aborted(job_id=job.id, *job.args, **job.kwargs)
+    logger.warn("JOB ABORTED %s/%s", type(job), job)
+    _handle_job_aborted(*job.args, **job.kwargs)
 
 
 class Constructor(Processor):
