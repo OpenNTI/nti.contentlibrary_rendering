@@ -25,8 +25,6 @@ from nti.contentlibrary_rendering import get_factory
 from nti.contentlibrary_rendering.common import get_site
 from nti.contentlibrary_rendering.common import get_render_job
 
-from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
-from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
 from nti.dataserver.interfaces import IDataserver
@@ -128,25 +126,6 @@ def _get_job_site(job_site_name=None):
     return job_site
 
 
-def _handle_job_aborted(*args, **kwargs):
-    job_id = kwargs.get('job_id')
-    site_name = kwargs.get('site_name')
-    package_ntiid = kwargs.get('package_ntiid')
-    event_site = _get_job_site(site_name)
-    with current_site(event_site):
-        render_job = get_render_job(package_ntiid, job_id)
-        if      IContentPackageRenderJob.providedBy(render_job) \
-            and render_job.OutputRoot is not None:
-            logger.warn("Job %s was aborted", job_id)
-            locator = component.queryUtility(IRenderedContentLocator)
-            if locator is not None:
-                try:
-                    logger.warn("Rolling back rendered output %s", 
-                                render_job.OutputRoot)
-                    locator.remove(render_job.OutputRoot)
-                except Exception:
-                    logger.exception("Cannot remove %s", render_job.OutputRoot)
-
 def _execute_job(job_runner, *args, **kwargs):
     """
     Performs the actual execution of a job.  We'll attempt to do
@@ -201,11 +180,11 @@ def queue_add(name, func, obj, **kwargs):
 queue_modified = queue_add
 
 
-def queue_removed(queue_name, func, obj, job_id=None, **kwargs):
+def queue_removed(queue_name, func, obj, job_id=None, site_name=None, **kwargs):
     """
     Queue up a job to remove package data.
     """
-    site = get_site()
+    site = get_site(site_name)
     queue = get_job_queue(queue_name)
     job = create_job(_execute_generic_job,
                      func,

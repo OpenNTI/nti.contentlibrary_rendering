@@ -19,10 +19,9 @@ from nti.contentlibrary_rendering.common import is_published
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
-from nti.contentlibrary_rendering.unpublish import remove_rendered_package
+from nti.contentlibrary_rendering.unpublish import queue_remove_rendered_package
 
 from nti.contentlibrary_rendering.processing import queue_add
-from nti.contentlibrary_rendering.processing import queue_removed
 from nti.contentlibrary_rendering.processing import queue_modified
 
 
@@ -52,16 +51,8 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
     return job
 
 
-def remove_renderered_package(package, root=None):
+def remove_rendered_package(package, root=None, site_name=None):
     assert IRenderableContentPackage.providedBy(package)
-    # Have to pass the bucket to the package remove function since
-    # the package will no longer be resolvable outside this transaction.
-    # This must be enough info to cleanup whatever needs to be cleaned up.
     root = root or package.root
     if root is not None:
-        job_id = "remover_%s_%s" % (package.ntiid, root.name)
-        logger.info("Queuing remover job %s", root.name)
-        queue_removed(CONTENT_UNITS_QUEUE,
-                      remove_rendered_package,
-                      root,
-                      job_id=job_id)
+        queue_remove_rendered_package(package, root, site_name)
