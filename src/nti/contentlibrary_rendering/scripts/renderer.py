@@ -22,10 +22,14 @@ from z3c.autoinclude.zcml import includePluginsDirective
 
 from nti.async.interfaces import IReactorStarted
 from nti.async.interfaces import IReactorStopped
+from nti.async.interfaces import IJobAbortedEvent
 
 from nti.async.utils.processor import Processor
 
 from nti.contentlibrary_rendering import QUEUE_NAMES
+
+from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
+from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 
 from nti.contentrendering.utils.chameleon import setupChameleonCache
 
@@ -58,6 +62,19 @@ def reactor_stopped(context):
         pass
 
 
+@component.adapter(IJobAbortedEvent)
+def job_aborted(context):
+    job = context.job
+    if      IContentPackageRenderJob.providedBy(job) \
+        and job.OutputRoot is not None:
+        locator = component.queryUtility(IRenderedContentLocator)
+        if locator is not None:
+            try:
+                locator.remove(job.OutputRoot)
+            except Exception:
+                logger.exception("Cannot remove %s", job.OutputRoot)
+
+
 class Constructor(Processor):
 
     def set_log_formatter(self, args):
@@ -83,6 +100,7 @@ class Constructor(Processor):
         setattr(args, 'library', True)
         setattr(args, 'priority', True)
         setattr(args, 'queue_names', QUEUE_NAMES)
+        component.getGlobalSiteManager().registerHandler(job_aborted)
         component.getGlobalSiteManager().registerHandler(reactor_started)
         component.getGlobalSiteManager().registerHandler(reactor_stopped)
         Processor.process_args(self, args)
