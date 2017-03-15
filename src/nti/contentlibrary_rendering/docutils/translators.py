@@ -103,13 +103,31 @@ class TitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "title"
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def _process_document_title(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement('maketitle')
         tex_doc.userdata['title'] = rst_node.astext()
         tex_doc.userdata['author'] = ''
         tex_doc.userdata['date'] = ''
         tex_doc.userdata['thanks'] = ''
+        # Make sure we remove child node
+        rst_node.children = rst_node.children[1:]
         return result
+
+    def _process_title(self, rst_node, tex_doc, tex_parent):
+        result = tex_doc.createElement(rst_node.tagname)
+        assert rst_node.children
+        # We actually get the text from the child node
+        title_text = tex_doc.createTextNode(rst_node.astext())
+        result.append(title_text)
+        # Make sure we remove child node
+        rst_node.children = rst_node.children[1:]
+        return result
+
+    def do_translate(self, rst_node, tex_doc, tex_parent):
+        if tex_doc.userdata.get('title') is None:
+            return self._process_document_title(rst_node, tex_doc, tex_parent)
+        else:
+            return self._process_title(rst_node, tex_doc, tex_parent)
 
 
 class SubtitleToPlastexNodeTranslator(TranslatorMixin):

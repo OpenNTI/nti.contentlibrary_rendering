@@ -106,4 +106,4 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         index = self._generate_from_file('fakesections.rst')        
         assert_that(index, contains_string('<div class="subsection title" id="2">this is a fake subsection</div>'))
         assert_that(index, contains_string('<div class="chapter title">this is a fake section</div>'))
-        assert_that(index, contains_string('<div class="title">Another title</div>'))
+        assert_that(index, contains_string('<div class="chapter title">Another title</div>'))
