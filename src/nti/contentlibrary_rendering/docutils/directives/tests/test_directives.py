@@ -34,3 +34,4 @@ class TestDirectives(ContentlibraryRenderingLayerTest):
         assert_that(docutils_directive('fakesection', None, None), is_(not_none()))
         assert_that(docutils_directive('fakeparagraph', None, None), is_(not_none()))
         assert_that(docutils_directive('fakesubsection', None, None), is_(not_none()))
+        assert_that(docutils_directive('fakesubsubsection', None, None), is_(not_none()))
