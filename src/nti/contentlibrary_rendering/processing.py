@@ -25,6 +25,8 @@ from nti.contentlibrary_rendering import get_factory
 from nti.contentlibrary_rendering.common import get_site
 from nti.contentlibrary_rendering.common import get_render_job
 
+from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
+from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
 from nti.dataserver.interfaces import IDataserver
@@ -42,6 +44,22 @@ MAX_RETRY_COUNT = 5
 def _dataserver_folder():
     dataserver = component.getUtility(IDataserver)
     return dataserver.root_folder['dataserver2']
+
+
+def _handle_job_aborted(job_id, *args, **kwargs):
+    package_ntiid = kwargs.get('package_ntiid') or u''
+    render_job = get_render_job(package_ntiid, job_id)
+    logger.warn("Job %s was aborted", job_id)
+    if      IContentPackageRenderJob.providedBy(render_job) \
+        and render_job.OutputRoot is not None:
+        locator = component.queryUtility(IRenderedContentLocator)
+        if locator is not None:
+            try:
+                logger.warn(
+                    "Rolling back rendered output %s", render_job.OutputRoot)
+                locator.remove(render_job.OutputRoot)
+            except Exception:
+                logger.exception("Cannot remove %s", render_job.OutputRoot)
 
 
 def _handle_missing_job(func, job_id, package_ntiid, retry_count, **kwargs):

@@ -28,8 +28,7 @@ from nti.async.utils.processor import Processor
 
 from nti.contentlibrary_rendering import QUEUE_NAMES
 
-from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
-from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
+from nti.contentlibrary_rendering.processing import _handle_job_aborted
 
 from nti.contentrendering.utils.chameleon import setupChameleonCache
 
@@ -65,14 +64,7 @@ def reactor_stopped(context):
 @component.adapter(IJobAbortedEvent)
 def job_aborted(context):
     job = context.job
-    if      IContentPackageRenderJob.providedBy(job) \
-        and job.OutputRoot is not None:
-        locator = component.queryUtility(IRenderedContentLocator)
-        if locator is not None:
-            try:
-                locator.remove(job.OutputRoot)
-            except Exception:
-                logger.exception("Cannot remove %s", job.OutputRoot)
+    _handle_job_aborted(job_id=job.id, *job.args, **job.kwargs)
 
 
 class Constructor(Processor):
