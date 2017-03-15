@@ -46,23 +46,6 @@ def _dataserver_folder():
     return dataserver.root_folder['dataserver2']
 
 
-def _handle_job_aborted(*args, **kwargs):
-    package_ntiid = kwargs.get('package_ntiid') or u''
-    job_id = kwargs.get('job_id') or kwargs.get('id') or u''
-    render_job = get_render_job(package_ntiid, job_id)
-    if      IContentPackageRenderJob.providedBy(render_job) \
-        and render_job.OutputRoot is not None:
-        logger.warn("Job %s was aborted", job_id)
-        locator = component.queryUtility(IRenderedContentLocator)
-        if locator is not None:
-            try:
-                logger.warn("Rolling back rendered output %s", 
-                            render_job.OutputRoot)
-                locator.remove(render_job.OutputRoot)
-            except Exception:
-                logger.exception("Cannot remove %s", render_job.OutputRoot)
-
-
 def _handle_missing_job(func, job_id, package_ntiid, retry_count, **kwargs):
     site_name = getSite().__name__
     package = find_object_with_ntiid(package_ntiid)
@@ -144,6 +127,25 @@ def _get_job_site(job_site_name=None):
             raise ValueError('No site found for (%s)' % job_site_name)
     return job_site
 
+
+def _handle_job_aborted(*args, **kwargs):
+    job_id = kwargs.get('job_id')
+    site_name = kwargs.get('site_name')
+    package_ntiid = kwargs.get('package_ntiid')
+    event_site = _get_job_site(site_name)
+    with current_site(event_site):
+        render_job = get_render_job(package_ntiid, job_id)
+        if      IContentPackageRenderJob.providedBy(render_job) \
+            and render_job.OutputRoot is not None:
+            logger.warn("Job %s was aborted", job_id)
+            locator = component.queryUtility(IRenderedContentLocator)
+            if locator is not None:
+                try:
+                    logger.warn("Rolling back rendered output %s", 
+                                render_job.OutputRoot)
+                    locator.remove(render_job.OutputRoot)
+                except Exception:
+                    logger.exception("Cannot remove %s", render_job.OutputRoot)
 
 def _execute_job(job_runner, *args, **kwargs):
     """
