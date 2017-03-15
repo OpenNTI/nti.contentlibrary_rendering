@@ -29,7 +29,7 @@ class BaseFakesection(Directive):
 
     def run(self):
         title = directives.unchanged(self.arguments[0]) or u''
-        title.replace('\\','') # replace scapes
+        title = title.replace('\\','') # replace escape chars
         if not title:
             raise self.error(
                 'Error in "%s" directive: missing tile' % self.name)
