@@ -48,6 +48,7 @@
 	<utility factory=".translators.ParagraphToPlastexNodeTranslator" name="paragraph" />
 	<utility factory=".translators.BlockQuoteToPlastexNodeTranslator" name="block_quote" />
 	<utility factory=".translators.FakesectionToPlastexNodeTranslator" name="fakesection" />
+	<utility factory=".translators.FakeparagraphToPlastexNodeTranslator" name="fakeparagraph" />
 	<utility factory=".translators.FakesubsectionToPlastexNodeTranslator" name="fakesubsection" />
 
 	<utility factory=".translators.ListItemToPlastexNodeTranslator" name="list_item" />

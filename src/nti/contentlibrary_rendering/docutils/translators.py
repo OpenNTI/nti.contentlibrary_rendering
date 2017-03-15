@@ -327,6 +327,16 @@ class FakesubsectionToPlastexNodeTranslator(TranslatorMixin):
         return tex_node
 
 
+class FakeparagraphToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'fakeparagraph'
+
+    def do_translate(self, rst_node, tex_doc, tex_parent):
+        tex_node = tex_doc.createElement('fakeparagraph')
+        tex_node.setAttribute('title', rst_node['title'])
+        return tex_node
+
+
 # Document
 
 
