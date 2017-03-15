@@ -101,8 +101,12 @@ class TitleToPlastexNodeTranslator(TranslatorMixin):
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement(rst_node.tagname)
+        assert rst_node.children
+        # We actually get the text from the child node
         title_text = tex_doc.createTextNode(rst_node.astext())
         result.append(title_text)
+        # Make sure we remove child node
+        rst_node.children = rst_node.children[1:]
         return result
 
 
@@ -117,8 +121,8 @@ class SubtitleToPlastexNodeTranslator(TranslatorMixin):
         assert rst_node.children
         title_child = rst_node.children[0]
         assert title_child.tagname == '#text'
-        translator = self.translator('title')
-        title_node = translator.translate(title_child, tex_doc, tex_node)
+        node_translator = get_translator(title_child.tagname)
+        title_node = node_translator.translate(title_child, tex_doc, tex_node)
         tex_node.setAttribute('title', title_node)
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
