@@ -55,8 +55,8 @@ def _handle_job_aborted(job_id, *args, **kwargs):
         locator = component.queryUtility(IRenderedContentLocator)
         if locator is not None:
             try:
-                logger.warn(
-                    "Rolling back rendered output %s", render_job.OutputRoot)
+                logger.warn("Rolling back rendered output %s", 
+                            render_job.OutputRoot)
                 locator.remove(render_job.OutputRoot)
             except Exception:
                 logger.exception("Cannot remove %s", render_job.OutputRoot)
