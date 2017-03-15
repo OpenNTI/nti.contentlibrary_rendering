@@ -107,7 +107,7 @@ def get_creator(context):
     return result
 
 
-def pickle(context):
+def dump(context):
     bio = BytesIO()
     pickle.dump(context, bio)
     bio.seek(0)

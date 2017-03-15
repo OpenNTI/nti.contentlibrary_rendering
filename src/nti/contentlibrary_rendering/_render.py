@@ -11,8 +11,6 @@ logger = __import__('logging').getLogger(__name__)
 
 import os
 
-import transaction
-
 from plasTeX import Base
 from plasTeX import TeXDocument
 
@@ -53,16 +51,16 @@ from nti.contentlibrary.zodb import RenderableContentUnit
 from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.contentlibrary_rendering import RST_MIMETYPE
+from nti.contentlibrary_rendering import CONTENT_UNITS_HSET
 
+from nti.contentlibrary_rendering.common import dump
 from nti.contentlibrary_rendering.common import mkdtemp
-from nti.contentlibrary_rendering.common import get_site
+from nti.contentlibrary_rendering.common import unpickle
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
-
-from nti.contentlibrary_rendering.unpublish import queue_remove_rendered_package
 
 from nti.contentrendering import nti_render
 
@@ -87,8 +85,8 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 patch_all()
 
 
-def redis():
-    return component.getUtility(IRedisClient)
+def redis_client():
+    return component.queryUtility(IRedisClient)
 
 
 def copy_attributes(source, target, names):
@@ -278,16 +276,55 @@ def write_meta_info(package, job, outfile_dir):
         fp.write("PackageOID: %s\n" % to_external_ntiid_oid(package))
 
 
-def process_render_job(render_job):
+def save_delimited_item(job_id, item, expiry=300):
+    redis = redis_client()
+    if redis is not None:
+        data = dump(item)
+        pipe = redis.pipeline()
+        pipe.hset(CONTENT_UNITS_HSET, job_id, data).expire(job_id, expiry)
+        pipe.execute()
+        return True
+    return False
+
+
+def get_delimited_item(job_id):
+    redis = redis_client()
+    if redis is not None:
+        data = redis.hget(CONTENT_UNITS_HSET, job_id)
+        if data is not None:
+            return unpickle(data)
+    return None
+
+
+def copy_and_notify(bucket, package, render_job):
+    # 5. copy from target
+    copy_package_data(bucket, package)
+
+    # 6. marked as rendered
+    if render_job.MarkRendered:
+        interface.alsoProvides(package, IContentRendered)
+        event_notify(ContentPackageRenderedEvent(package))
+
+    # marked changed
+    lifecycleevent.modified(package)
+    return package
+
+
+def get_package(render_job):
     ntiid = render_job.PackageNTIID
-    provider = render_job.Provider
     package = find_object_with_ntiid(ntiid)
     package = removeAllProxies(package)
-    contentType = package.contentType or RST_MIMETYPE
     if package is None:
         raise ValueError("Package not found", ntiid)
     elif not IRenderableContentPackage.providedBy(package):
         raise TypeError("Invalid content package", ntiid)
+    return package
+
+
+def process_render_job(render_job):
+    provider = render_job.Provider
+    package = get_package(render_job)
+    contentType = package.contentType or RST_MIMETYPE
 
     current_dir = os.getcwd()
     outfile_dir = mkdtemp()
@@ -315,28 +352,12 @@ def process_render_job(render_job):
         # 4. Place in target location
         key_or_bucket = locate_rendered_content(tex_dom, package)
         render_job.OutputRoot = key_or_bucket  # save
-
-        # make sure we clean up if there is an abort
-        site = get_site()
-        def after_commit_or_abort(success=False):
-            if not success:
-                logger.warn("Rolling back rendered content %s",
-                            key_or_bucket)
-                queue_remove_rendered_package(ntiid,
-                                              key_or_bucket,
-                                              site_name=site)
-        transaction.get().addAfterCommitHook(after_commit_or_abort)
-
-        # 5. copy from target
-        copy_package_data(key_or_bucket, package)
-
-        # 6. marked as rendered
-        if render_job.MarkRendered:
-            interface.alsoProvides(package, IContentRendered)
-            event_notify(ContentPackageRenderedEvent(package))
-
-        # marked changed
-        lifecycleevent.modified(package)
+        
+        # 4a. save location in redis in case an retrial
+        save_delimited_item(render_job.job_id, key_or_bucket)
+        
+        # copy rendered data and notify
+        copy_and_notify(key_or_bucket, package, render_job)
         return package
     finally:
         os.chdir(current_dir)
@@ -377,7 +398,16 @@ def render_package_job(render_job):
     endInteraction()
     try:
         newInteraction(_Participation(IPrincipal(creator)))
-        process_render_job(render_job)
+        key_or_bucket = get_delimited_item(job_id)
+        if key_or_bucket is None:
+            process_render_job(render_job)
+        else:
+            # if the transaction has aborted don't render
+            # simply copy the contents again
+            package = get_package(render_job)
+            logger.info("Copying data from previous render operation for package %s",
+                        package.ntiid)
+            copy_and_notify(key_or_bucket, package, render_job)
     except Exception as e:
         # XXX: Do we want to fail all applicable jobs?
         logger.exception('Render job %s failed', job_id)
