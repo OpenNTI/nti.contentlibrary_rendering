@@ -11,6 +11,6 @@
 
 	<module module=".uid" />
 	<module module=".label" />
-	<module module=".pseudo_types" />
+	<module module=".sectioning" />
 
 </configure>
