@@ -12,9 +12,12 @@ logger = __import__('logging').getLogger(__name__)
 import os
 import six
 import uuid
+import zlib
+import pickle
 import hashlib
 import binascii
 import tempfile
+from io import BytesIO
 from datetime import datetime
 
 import isodate
@@ -28,6 +31,7 @@ from nti.coremetadata.interfaces import IPublishable
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 TMP_MAX = 10000
+
 
 def hex_encode(raw_bytes):
     if not isinstance(raw_bytes, six.binary_type):
@@ -54,7 +58,7 @@ def sha1_hex_digest(*inputs):
 def mkdtemp(tmpdir=None):
     tmpdir = tmpdir or tempfile.gettempdir()
     for _ in xrange(TMP_MAX):
-        digest = str(uuid.uuid4())[10:].upper().replace('-','')
+        digest = str(uuid.uuid4())[10:].upper().replace('-', '')
         path = os.path.join(tmpdir, digest)
         if not os.path.exists(path):
             os.makedirs(path)
@@ -100,4 +104,20 @@ def get_creator(context):
     result = getattr(context, 'creator', context)
     result = getattr(result, 'username', result)
     result = getattr(result, 'id', result)  # check 4 principal
+    return result
+
+
+def pickle(context):
+    bio = BytesIO()
+    pickle.dump(context, bio)
+    bio.seek(0)
+    result = zlib.compress(bio.read())
+    return result
+
+
+def unpickle(data):
+    data = zlib.decompress(data)
+    bio = BytesIO(data)
+    bio.seek(0)
+    result = pickle.load(bio)
     return result
