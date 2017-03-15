@@ -110,16 +110,23 @@ class SubtitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'subtitle'
 
+    def _set_title(self, rst_node, tex_doc, tex_node):
+        """
+        Titles are required by sections.
+        """
+        assert rst_node.children
+        title_child = rst_node.children[0]
+        assert title_child.tagname == '#text'
+        translator = self.translator('title')
+        title_node = translator.translate(title_child, tex_doc, tex_node)
+        tex_node.setAttribute('title', title_node)
+
     def do_translate(self, rst_node, tex_doc, tex_parent):
-        # TODO: Do we want a new section here?
         result = tex_doc.createElement('section')
-        names = rst_node.attributes.get('names')
-        if names:
-            title = names[0]
-        else:
-            title = rst_node.astext()
-        title = tex_doc.createTextNode(title)
-        result.setAttribute('title', title)
+        self._set_title(rst_node, tex_doc, result)
+        # This title gets rendered, so we need to make sure
+        # the child title is not also rendered.
+        rst_node.children = rst_node.children[1:]
         return result
 
 
@@ -292,6 +299,7 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
         section_tag = self._get_section_tag(rst_node)
         result = tex_doc.createElement(section_tag)
         self._set_title(rst_node, tex_doc, result)
+        rst_node.children = rst_node.children[1:]
         return result
 
 
