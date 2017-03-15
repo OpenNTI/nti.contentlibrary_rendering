@@ -29,7 +29,8 @@ class TestDirectives(ContentlibraryRenderingLayerTest):
         assert_that(docutils_directive('uid', None, None), is_(not_none()))
 
     def test_sectioning_directive(self):
-        from nti.contentlibrary_rendering.docutils.directives import sectioning
-        assert_that(sectioning, validly_provides(IDirectivesModule))
+        from nti.contentlibrary_rendering.docutils.directives import pseudo_types
+        assert_that(pseudo_types, validly_provides(IDirectivesModule))
         assert_that(docutils_directive('fakesection', None, None), is_(not_none()))
+        assert_that(docutils_directive('fakeparagraph', None, None), is_(not_none()))
         assert_that(docutils_directive('fakesubsection', None, None), is_(not_none()))
