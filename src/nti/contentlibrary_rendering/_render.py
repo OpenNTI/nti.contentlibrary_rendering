@@ -72,6 +72,8 @@ from nti.contentrendering.render_document import load_packages
 from nti.contentrendering.render_document import setup_environ
 from nti.contentrendering.render_document import prepare_document_settings
 
+from nti.coremetadata.interfaces import IRedisClient
+
 from nti.externalization.oids import to_external_ntiid_oid
 
 from nti.externalization.proxy import removeAllProxies
@@ -83,6 +85,10 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 # Patch our plastex early.
 patch_all()
+
+
+def redis():
+    return component.getUtility(IRedisClient)
 
 
 def copy_attributes(source, target, names):
@@ -294,8 +300,8 @@ def process_render_job(render_job):
         contents = snapshot.contents if snapshot else None
         source_doc = transform_content(package, contentType, contents)
         # save version
-        render_job.Version = version 
-        
+        render_job.Version = version
+
         # 2. Render
         tex_dom = render_document(source_doc,
                                   provider=provider,
@@ -312,11 +318,12 @@ def process_render_job(render_job):
 
         # make sure we clean up if there is an abort
         site = get_site()
+
         def after_commit_or_abort(success=False):
             if not success:
                 logger.warn("Rolling back rendered content %s",
                             key_or_bucket)
-                queue_remove_rendered_package(package, 
+                queue_remove_rendered_package(package,
                                               key_or_bucket,
                                               site_name=site)
         transaction.get().addAfterCommitHook(after_commit_or_abort)
