@@ -13,6 +13,10 @@ from docutils.nodes import Element
 from docutils.nodes import General
 
 
+class label(General, Element):
+    pass
+
+
 class fakesection(General, Element):
     pass
 

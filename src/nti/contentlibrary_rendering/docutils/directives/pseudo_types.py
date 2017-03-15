@@ -34,7 +34,7 @@ class BaseFake(Directive):
         title = title.replace('\\', '')  # replace escape chars
         if not title:
             raise self.error(
-                'Error in "%s" directive: missing tile' % self.name)
+                'Error in "%s" directive: missing title' % self.name)
 
         result = self.node_class()
         result['title'] = title
