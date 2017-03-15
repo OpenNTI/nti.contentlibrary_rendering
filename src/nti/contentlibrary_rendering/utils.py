@@ -55,4 +55,4 @@ def remove_rendered_package(package, root=None, site_name=None):
     assert IRenderableContentPackage.providedBy(package)
     root = root or package.root
     if root is not None:
-        queue_remove_rendered_package(package, root, site_name)
+        queue_remove_rendered_package(package.ntiid, root, site_name)

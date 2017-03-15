@@ -318,12 +318,11 @@ def process_render_job(render_job):
 
         # make sure we clean up if there is an abort
         site = get_site()
-
         def after_commit_or_abort(success=False):
             if not success:
                 logger.warn("Rolling back rendered content %s",
                             key_or_bucket)
-                queue_remove_rendered_package(package,
+                queue_remove_rendered_package(ntiid,
                                               key_or_bucket,
                                               site_name=site)
         transaction.get().addAfterCommitHook(after_commit_or_abort)
