@@ -73,8 +73,6 @@ from nti.contentrendering.render_document import prepare_document_settings
 
 from nti.coremetadata.interfaces import IRedisClient
 
-from nti.externalization.oids import to_external_ntiid_oid
-
 from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.interfaces import WillUpdateNTIIDEvent
@@ -268,15 +266,6 @@ def locate_rendered_content(tex_dom, package):
     return result
 
 
-def write_meta_info(package, job, outfile_dir):
-    name = os.path.join(outfile_dir, "meta.info")
-    with open(name, "wb") as fp:
-        fp.write("JobID: %s\n" % job.job_id)
-        fp.write("JobCreator: %s\n" % job.creator)
-        fp.write("PackageNTIID: %s\n" % package.ntiid)
-        fp.write("PackageOID: %s\n" % to_external_ntiid_oid(package))
-
-
 def save_delimited_item(job_id, item, expiry=CONTENT_UNITS_HSET_EXPIRY):
     redis = redis_client()
     if redis is not None:
@@ -298,10 +287,10 @@ def get_delimited_item(job_id):
 
 
 def copy_and_notify(bucket, package, render_job):
-    # 5. copy from target
+    # 4. copy from target
     copy_package_data(bucket, package)
 
-    # 6. marked as rendered
+    # 5. marked as rendered
     if render_job.MarkRendered:
         interface.alsoProvides(package, IContentRendered)
         event_notify(ContentPackageRenderedEvent(package))
@@ -347,14 +336,11 @@ def process_render_job(render_job):
                                   content_type=contentType,
                                   outfile_dir=outfile_dir)
 
-        # 3. Write meta-info
-        write_meta_info(package, render_job, outfile_dir)
-
-        # 4. Place in target location
+        # 3. Place in target location
         key_or_bucket = locate_rendered_content(tex_dom, package)
         render_job.OutputRoot = key_or_bucket  # save
         
-        # 4a. save location in redis in case an retrial
+        # 3a. save location in redis in case an retrial
         save_delimited_item(render_job.job_id, key_or_bucket)
         
         # copy rendered data and notify
@@ -386,8 +372,8 @@ def _get_jobs_to_update(render_job):
     """
     meta = _get_metadata(render_job)
     baseline = render_job.created
-    return (x for x in meta.values()
-            if x.is_pending() and x.created >= baseline)
+    return [x for x in meta.values()
+            if x.is_pending() and x.created >= baseline]
 
 
 def render_package_job(render_job):
@@ -407,7 +393,7 @@ def render_package_job(render_job):
             # simply copy the contents again from previous
             # render operation
             package = get_package(render_job)
-            logger.warn("Due to transaction abort, copy data from %s for package %s",
+            logger.warn("Due to a transaction abort, copy data from %s for package %s",
                         key_or_bucket, package.ntiid)
             copy_and_notify(key_or_bucket, package, render_job)
     except Exception as e:
