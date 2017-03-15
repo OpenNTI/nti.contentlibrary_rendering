@@ -52,6 +52,7 @@ from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.contentlibrary_rendering import RST_MIMETYPE
 from nti.contentlibrary_rendering import CONTENT_UNITS_HSET
+from nti.contentlibrary_rendering import CONTENT_UNITS_HSET_EXPIRY
 
 from nti.contentlibrary_rendering.common import dump
 from nti.contentlibrary_rendering.common import mkdtemp
@@ -276,7 +277,7 @@ def write_meta_info(package, job, outfile_dir):
         fp.write("PackageOID: %s\n" % to_external_ntiid_oid(package))
 
 
-def save_delimited_item(job_id, item, expiry=300):
+def save_delimited_item(job_id, item, expiry=CONTENT_UNITS_HSET_EXPIRY):
     redis = redis_client()
     if redis is not None:
         data = dump(item)
