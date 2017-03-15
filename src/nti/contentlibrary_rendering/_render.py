@@ -403,10 +403,11 @@ def render_package_job(render_job):
             process_render_job(render_job)
         else:
             # if the transaction has aborted don't render
-            # simply copy the contents again
+            # simply copy the contents again from previous
+            # render operation
             package = get_package(render_job)
-            logger.info("Copying data from previous render operation for package %s",
-                        package.ntiid)
+            logger.warn("Due to transaction abort, copy data from %s for package %s",
+                        key_or_bucket, package.ntiid)
             copy_and_notify(key_or_bucket, package, render_job)
     except Exception as e:
         # XXX: Do we want to fail all applicable jobs?
