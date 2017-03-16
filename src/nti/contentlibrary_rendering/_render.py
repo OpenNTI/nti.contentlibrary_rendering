@@ -177,6 +177,7 @@ def prepare_tex_document(package=None, provider='NTI', jobname=None,
         if package is not None:
             intids = component.getUtility(IIntIds)
             specific_ntiid = jobname = intids.getId(package)
+            tex_dom.userdata['document_ntiid'] = package.ntiid
         else:
             specific_ntiid = jobname = id(tex_dom)
     jobname = str(jobname)
