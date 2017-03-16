@@ -28,8 +28,7 @@ class UIDAttribute(Transform):
     default_priority = 210  # same as Class
 
     def apply(self):
-        pending = self.startnode
-        child = pending
+        child = pending = self.startnode
         parent = pending.parent
         while parent:
             # Check for appropriate following siblings:
