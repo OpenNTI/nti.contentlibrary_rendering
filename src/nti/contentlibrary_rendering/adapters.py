@@ -12,6 +12,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import time
+import uuid
 
 from zope import component
 from zope import interface
@@ -32,8 +33,6 @@ from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
 from nti.contentlibrary_rendering.model import ContentPackageRenderJob
-
-from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
 from nti.coremetadata.interfaces import IContained as INTIContained
 
@@ -66,10 +65,13 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     def __init__(self):
         super(DefaultContentPackageRenderMetadata, self).__init__()
 
+    @property
+    def _extra(self):
+        return str(uuid.uuid4()).split('-')[0].upper()
+
     def _create_unique_job_key(self, job):
-        username = get_creator(job) or SYSTEM_USER_ID
         current_time = time_to_64bit_int(time.time())
-        specific = make_specific_safe("%s.%s" % (username, current_time))
+        specific = make_specific_safe("%s_%s" % (current_time, self._extra))
         base_ntiid = make_ntiid(base=job.PackageNTIID, nttype=RENDER_JOB)
         result = '%s.%s' % (base_ntiid, specific)
         return result
