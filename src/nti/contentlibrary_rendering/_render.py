@@ -267,22 +267,30 @@ def locate_rendered_content(tex_dom, package):
 
 
 def save_delimited_item(job_id, item, expiry=CONTENT_UNITS_HSET_EXPIRY):
-    redis = redis_client()
-    if redis is not None:
-        data = dump(item)
-        pipe = redis.pipeline()
-        pipe.hset(CONTENT_UNITS_HSET, job_id, data).expire(job_id, expiry)
-        pipe.execute()
-        return True
+    try:
+        redis = redis_client()
+        if redis is not None:
+            data = dump(item)
+            pipe = redis.pipeline()
+            pipe.hset(CONTENT_UNITS_HSET, job_id, data).expire(job_id, expiry)
+            pipe.execute()
+            return True
+    except Exception:
+        logger.exception("Could not place %s in %s for %s",
+                         item, CONTENT_UNITS_HSET, job_id)
     return False
 
 
 def get_delimited_item(job_id):
-    redis = redis_client()
-    if redis is not None:
-        data = redis.hget(CONTENT_UNITS_HSET, job_id)
-        if data is not None:
-            return unpickle(data)
+    try:
+        redis = redis_client()
+        if redis is not None:
+            data = redis.hget(CONTENT_UNITS_HSET, job_id)
+            if data is not None:
+                return unpickle(data)
+    except Exception:
+        logger.exception("Could not get item from %s for %s",
+                         CONTENT_UNITS_HSET, job_id)
     return None
 
 
