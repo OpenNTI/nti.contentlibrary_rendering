@@ -44,6 +44,9 @@
 	<utility factory=".validators.TextValidator" name="text" />
 	<utility factory=".validators.TextValidator" name="text/plain" />
 
+	<!-- Traversal -->
+	<utility factory=".ntiids._ContentRenderJobResolver" name="RenderJob" />
+
 	<!-- Rendering -->
 	<configure zcml:condition="have testmode">
 		<renderer:registerImmediateProcessingQueue />
