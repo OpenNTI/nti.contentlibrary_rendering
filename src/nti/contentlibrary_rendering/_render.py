@@ -347,10 +347,10 @@ def process_render_job(render_job):
         # 3. Place in target location
         key_or_bucket = locate_rendered_content(tex_dom, package)
         render_job.OutputRoot = key_or_bucket  # save
-        
+
         # 3a. save location in redis in case an retrial
         save_delimited_item(render_job.job_id, key_or_bucket)
-        
+
         # copy rendered data and notify
         copy_and_notify(key_or_bucket, package, render_job)
         return package
