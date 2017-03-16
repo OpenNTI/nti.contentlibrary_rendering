@@ -57,6 +57,7 @@ setup(
         'nti.contentrendering',
         'nti.coremetadata',
         'nti.externalization',
+        'nti.namedfile',
         'nti.ntiids',
         'nti.site',
         'nti.traversal',
