@@ -44,6 +44,7 @@
 	<utility factory=".translators.TitleToPlastexNodeTranslator" name="title" />
 	<utility factory=".translators.SubtitleToPlastexNodeTranslator" name="subtitle" />
 
+	<utility factory=".translators.ChapterToPlastexNodeTranslator" name="chapter" />
 	<utility factory=".translators.SectionToPlastexNodeTranslator" name="section" />
 	<utility factory=".translators.DocumentToPlastexNodeTranslator" name="document" />
 	<utility factory=".translators.ParagraphToPlastexNodeTranslator" name="paragraph" />
@@ -61,3 +62,4 @@
 	<utility factory=".transformers.RSTTransformer" name="text/x-rst" />
 
 </configure>
+

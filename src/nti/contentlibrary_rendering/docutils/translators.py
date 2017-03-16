@@ -303,6 +303,19 @@ class ParagraphToPlastexNodeTranslator(LabelMixin):
         return tex_node
 
 
+# Chapter
+
+
+class ChapterToPlastexNodeTranslator(LabelMixin):
+
+    __name__ = 'chapter'
+    
+    def do_translate(self, rst_node, tex_doc, tex_parent):
+        tex_node = tex_doc.createElement('chapter')
+        self._handle_label(rst_node, tex_node, tex_doc)
+        return tex_node
+
+
 # Sections
 
 
