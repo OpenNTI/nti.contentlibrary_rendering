@@ -419,4 +419,3 @@ def render_package_job(render_job):
     finally:
         restoreInteraction()
         lifecycleevent.modified(render_job)
-        lifecycleevent.modified(_get_metadata(render_job))
