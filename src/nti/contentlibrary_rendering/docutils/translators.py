@@ -263,6 +263,20 @@ class BulletListToPlastexNodeTranslator(TranslatorMixin):
         return tex_node
 
 
+# Sectioning
+
+
+class LabelMixin(TranslatorMixin):
+    
+    def _handle_label(self, rst_node, tex_doc, tex_node):
+        children = rst_node.children
+        nid = rst_node.attributes.get('id')
+        if not nid and children and children[0].tagname == 'label':
+            tex_node.id = children[0]['id']
+            tex_node.setAttribute('id', tex_node.id)
+            rst_node.children = children[1:]
+
+
 # Paragraph
 
 
@@ -270,11 +284,11 @@ class BlockQuoteToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     __name__ = 'block_quote'
 
 
-class ParagraphToPlastexNodeTranslator(TranslatorMixin):
+class ParagraphToPlastexNodeTranslator(LabelMixin):
 
     __name__ = 'paragraph'
 
-    def _set_title(self, rst_node, tex_node, tex_doc):
+    def _handle_title(self, rst_node, tex_node, tex_doc):
         # XXX: We need a title for a paragraph b/c the renderer uses it
         # to generate and ntiid for it
         title = rst_node.attributes.get('title') \
@@ -282,24 +296,17 @@ class ParagraphToPlastexNodeTranslator(TranslatorMixin):
             or 'par_%s' % tex_doc.px_inc_paragraph_counter()
         tex_node.title = unicode_(title)
 
-    def _set_id(self, rst_node, tex_node, tex_doc):
-        children = rst_node.children
-        nid = rst_node.attributes.get('id')
-        if not nid and children and children[0].tagname == 'label':
-            tex_node.setAttribute('id', children[0]['id'])
-            rst_node.children = children[1:]
-
     def do_translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('par')
-        self._set_id(rst_node, tex_node, tex_doc)
-        self._set_title(rst_node, tex_node, tex_doc)
+        self._handle_title(rst_node, tex_node, tex_doc)
+        self._handle_label(rst_node, tex_node, tex_doc)
         return tex_node
 
 
 # Sections
 
 
-class SectionToPlastexNodeTranslator(TranslatorMixin):
+class SectionToPlastexNodeTranslator(LabelMixin):
 
     __name__ = 'section'
 
@@ -316,27 +323,22 @@ class SectionToPlastexNodeTranslator(TranslatorMixin):
         section_val = self.SECTION_MAP[section_level]
         return section_val
 
-    def _set_title_and_label(self, rst_node, tex_doc, tex_node):
+    def _handle_title(self, rst_node, tex_doc, tex_node):
         # Titles are required by sections.
-        children = rst_node.children
-        assert children
-        title_child = children[0]
+        assert  rst_node.children
+        title_child = rst_node.children[0]
         assert title_child.tagname == 'title'
         translator = self.translator('title')
         title_node = translator.translate(title_child, tex_doc, tex_node)
         tex_node.setAttribute('title', title_node)
-        children = children[1:]
-        # Check for label
-        label_child = children[0] if children else None
-        if label_child and label_child.tagname == 'label':
-            tex_node.setAttribute('id', label_child['id'])
-            children = children[1:]
-        rst_node.children = children
+        # Make sure we remove the node
+        rst_node.children = rst_node.children[1:]
 
     def do_translate(self, rst_node, tex_doc, tex_parent):
         section_tag = self._get_section_tag(rst_node)
         result = tex_doc.createElement(section_tag)
-        self._set_title_and_label(rst_node, tex_doc, result)
+        self._handle_title(rst_node, tex_doc, result)
+        self._handle_label(rst_node, tex_doc, result)
         return result
 
 
