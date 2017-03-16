@@ -10,12 +10,13 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
-import tempfile
 
 from zope import component
 from zope import interface
 
 from zope.intid.interfaces import IIntIds
+
+from nti.contentlibrary_rendering.common import mkdtemp
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 
@@ -54,7 +55,7 @@ class LaTeXTransformer(TransformerMixin):
             fp.write(content)
 
     def transform(self, content, context):
-        out_dir = tempfile.mkdtemp()
+        out_dir = mkdtemp()
         latex_file = os.path.join(out_dir, self._out_file(context))
         try:
             self.write_out(content, latex_file)
