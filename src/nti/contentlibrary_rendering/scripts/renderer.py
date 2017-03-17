@@ -82,6 +82,7 @@ class Constructor(Processor):
         setattr(args, 'redis', True)
         setattr(args, 'library', True)
         setattr(args, 'priority', True)
+        setattr(args, 'trx_retries', 9)
         setattr(args, 'queue_names', QUEUE_NAMES)
         component.getGlobalSiteManager().registerHandler(reactor_started)
         component.getGlobalSiteManager().registerHandler(reactor_stopped)
