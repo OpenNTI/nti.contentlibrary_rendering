@@ -279,6 +279,17 @@ def get_delimited_item(job_id):
     return None
 
 
+def delete_delimited_item(job_id):
+    try:
+        redis = redis_client()
+        if redis is not None:
+            redis.hdel(CONTENT_UNITS_HSET, job_id)
+    except Exception:
+        logger.exception("Could not delete item from %s for %s",
+                         CONTENT_UNITS_HSET, job_id)
+    return None
+
+
 def copy_and_notify(bucket, package, render_job):
     # 4. copy from target
     copy_package_data(bucket, package)
@@ -379,7 +390,7 @@ def render_package_job(render_job):
     try:
         newInteraction(_Participation(IPrincipal(creator)))
         key_or_bucket = get_delimited_item(job_id)
-        if key_or_bucket is None:
+        if key_or_bucket is None or not key_or_bucket.exists():
             process_render_job(render_job)
         else:
             # if the transaction has aborted don't render
