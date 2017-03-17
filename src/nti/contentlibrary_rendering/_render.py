@@ -75,8 +75,6 @@ from nti.coremetadata.interfaces import IRedisClient
 
 from nti.externalization.proxy import removeAllProxies
 
-from nti.ntiids.interfaces import WillUpdateNTIIDEvent
-
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 
@@ -105,20 +103,6 @@ def _copy_annotations(package, old_annotations):
         return
     for key, value in old_annotations.items():
         new_annotations[key] = value
-
-
-def update_package_ntiid(target, source_package):
-    """
-    Update our package with the now-rendered ntiid, making sure we copy
-    our annotations over (since we store by ntiid).
-    """
-    old_ntiid = target.ntiid
-    event_notify(WillUpdateNTIIDEvent(target, old_ntiid, source_package.ntiid))
-    annotes = IAnnotations(target)
-    logger.info('Updating ntiid (old=%s) (new=%s)',
-                old_ntiid, source_package.ntiid)
-    target.ntiid = source_package.ntiid
-    _copy_annotations(target, annotes)
 
 
 def copy_package_data(item, target):
