@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-.. $Id: render.py 109016 2017-03-16 20:29:46Z carlos.sanchez $
+.. $Id$
 """
 
 from __future__ import print_function, unicode_literals, absolute_import, division
@@ -10,8 +10,6 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
-
-import transaction
 
 from plasTeX import Base
 from plasTeX import TeXDocument
@@ -25,8 +23,6 @@ from zope.security.interfaces import IPrincipal
 from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
-
-from nti.async.threadlocal import get_current_job
 
 from nti.contentlibrary.utils import get_published_contents
 from nti.contentlibrary.utils import get_published_snapshot
@@ -178,28 +174,20 @@ def process_render_job(render_job):
     return outfile_dir
 
 
-def render_package_job(render_job):
+def render_package_job(render_job, bucket):
     logger.info('Rendering content (%s) (%s)',
                 render_job.PackageNTIID,
                 render_job.job_id)
     job_id = render_job.job_id
     creator = render_job.creator
     endInteraction()
-    async_job = get_current_job()
     try:
-        # set async to be side effect free
-        if async_job is not None:
-            async_job.is_side_effect_free = True
         # process
         newInteraction(Participation(IPrincipal(creator)))
-        outfile_dir = process_render_job(render_job)
-        place_next_job(render_job, outfile_dir)
+        process_render_job(render_job)
     except Exception as e:
         # XXX: Do we want to fail all applicable jobs?
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))
-    else:
-        if async_job is not None:
-            transaction.abort()
     finally:
         restoreInteraction()

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-.. $Id: locator.py 109016 2017-03-16 20:29:46Z carlos.sanchez $
+.. $Id$
 """
 
 from __future__ import print_function, unicode_literals, absolute_import, division
@@ -27,6 +27,8 @@ from nti.contentlibrary_rendering.rendering import dump
 from nti.contentlibrary_rendering.rendering import get_package
 from nti.contentlibrary_rendering.rendering import Participation
 
+from nti.contentlibrary_rendering.rendering.sync import sync_package_job
+
 
 def locate_rendered_content(package, output_dir):
     path, name = os.path.split(output_dir)
@@ -47,7 +49,10 @@ def process_render_job(render_job, output_dir):
 
 def place_next_job(render_job, bucket):
     bucket = dump(bucket)
-    add_to_queue()
+    add_to_queue("sync_queue",
+                 sync_package_job,
+                 render_job,
+                 bucket=bucket)
 
 
 def locate_package_job(render_job, output_dir):
