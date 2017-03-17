@@ -31,7 +31,6 @@ class BaseFake(Directive):
 
     def run(self):
         title = directives.unchanged(self.arguments[0]) or u''
-        title = title.replace('\\', '')  # replace escape chars
         if not title:
             raise self.error(
                 'Error in "%s" directive: missing title' % self.name)
