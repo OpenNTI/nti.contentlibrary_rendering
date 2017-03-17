@@ -267,7 +267,7 @@ class BulletListToPlastexNodeTranslator(TranslatorMixin):
 
 
 class LabelMixin(TranslatorMixin):
-    
+
     def _handle_label(self, rst_node, tex_doc, tex_node):
         children = rst_node.children
         nid = rst_node.attributes.get('id')
@@ -309,7 +309,7 @@ class ParagraphToPlastexNodeTranslator(LabelMixin):
 class ChapterToPlastexNodeTranslator(LabelMixin):
 
     __name__ = 'chapter'
-    
+
     def do_translate(self, rst_node, tex_doc, tex_parent):
         tex_node = tex_doc.createElement('chapter')
         self._handle_label(rst_node, tex_node, tex_doc)
@@ -441,13 +441,16 @@ def process_children(rst_node, tex_node, tex_doc):
         build_nodes(rst_child, tex_node, tex_doc)
 
 
+def skip_node(node):
+    # XXX: or should we not just default to including node
+    return node.tagname in ('system_message', 'comment')
+
 def build_nodes(rst_node, tex_parent, tex_doc):
     """
     Handle our node by translating it and adding it to the doc
     and then processing the children.
     """
-    # Bypass all system messages
-    if rst_node.tagname == 'system_message':
+    if skip_node(rst_node):
         return
     tex_node = handle_node(rst_node, tex_parent, tex_doc)
     process_children(rst_node, tex_node, tex_doc)
