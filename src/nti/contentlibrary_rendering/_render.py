@@ -115,32 +115,36 @@ def copy_package_data(item, target):
                                    RenderableContentUnit)
     assert package is not None, "Invalid rendered content directory"
 
-    # 1. copy all new content package attributes
+    # 1. remove target package to clear internal structures
+    library = component.queryUtility(IContentPackageLibrary)
+    if library is not None: # tests
+        library.remove(target, event=False, unregister=False)
+
+    # 2. copy all new content package attributes
     copy_attributes(package, target, IContentPackage.names())
 
-    # 2 copy unit attributes
+    # 3. copy unit attributes
     attributes = set(IContentUnit.names()) - {'children', 'ntiid', 'icon'}
     copy_attributes(package, target, attributes)
 
-    # 3. copy icon
+    # 4. copy icon
     if not target.icon and package.icon:
         target.icon = package.icon
 
-    # 4. copy displayable content attributes
+    # 5. copy displayable content attributes
     copy_attributes(package, target, ('PlatformPresentationResources',))
 
-    # 5. unregister from the intid facility the target old children
+    # 6. unregister from the intid facility the target old children
     for unit in target.children or ():
         unregister_content_units(unit)
 
-    # 6. register with the intid facility the new children
+    # 7. register with the intid facility the new children
     target.children = target.children_iterable_factory(package.children or ())
     register_content_units(target, target)
 
-    # 7. register target package in the library to populate internal
+    # 8. register target package in the library to populate internal
     # structures
-    library = component.queryUtility(IContentPackageLibrary)
-    if library is not None and target.children:
+    if library is not None: # tests
         library.add(target, event=False)
 
     return target
