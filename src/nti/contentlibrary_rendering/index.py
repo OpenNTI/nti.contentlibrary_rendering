@@ -19,9 +19,15 @@ from zope.location import locate
 
 import BTrees
 
+from nti.base._compat import unicode_
+
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 
 from nti.coremetadata.interfaces import ICreatedUsername
+
+from nti.site.interfaces import IHostPolicyFolder
+
+from nti.traversal.traversal import find_interface
 
 from nti.zope_catalog.catalog import Catalog
 
@@ -34,6 +40,10 @@ from nti.zope_catalog.index import IntegerValueIndex as RawIntegerValueIndex
 
 from nti.zope_catalog.string import StringTokenNormalizer
 
+#: Content render job index name
+CATALOG_NAME = 'nti.dataserver.++etc++contentrenderjob-catalog'
+
+IX_SITE = 'site'
 IX_JOBID = 'jobId'
 IX_STATE = 'state'
 IX_CREATOR = 'creator'
@@ -42,8 +52,24 @@ IX_ENDTIME = IX_LASTMODIFIED = 'endTime'
 IX_STARTTIME = IX_CREATEDTIME = 'startTime'
 IX_CONTAINER = IX_PACKAGE_NTIID = 'packageNTIID'
 
-#: Content render job index name
-CATALOG_NAME = 'nti.dataserver.++etc++contentrenderjob-catalog'
+
+class ValidatingSiteName(object):
+
+    __slots__ = (b'site',)
+
+    def __init__(self, obj, default=None):
+        if IContentPackageRenderJob.providedBy(obj):
+            folder = find_interface(obj, IHostPolicyFolder, strict=False)
+            if folder is not None:
+                self.site = unicode_(folder.__name__)
+
+    def __reduce__(self):
+        raise TypeError()
+
+
+class SiteIndex(ValueIndex):
+    default_field_name = 'site'
+    default_interface = ValidatingSiteName
 
 
 class JobIdIndex(ValueIndex):
@@ -137,7 +163,8 @@ def install_contentrenderjob_catalog(site_manager_container, intids=None):
     intids.register(catalog)
     lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
 
-    for name, clazz in ((IX_JOBID, JobIdIndex),
+    for name, clazz in ((IX_SITE, SiteIndex),
+                        (IX_JOBID, JobIdIndex),
                         (IX_STATE, StateIndex),
                         (IX_ENDTIME, EndTimeIndex),
                         (IX_CREATOR, CreatorIndex),
