@@ -117,7 +117,7 @@ def copy_package_data(item, target):
 
     # 1. remove target package to clear internal structures
     library = component.queryUtility(IContentPackageLibrary)
-    if library is not None: # tests
+    if library is not None:  # tests
         library.remove(target, event=False, unregister=False)
 
     # 2. copy all new content package attributes
@@ -144,7 +144,7 @@ def copy_package_data(item, target):
 
     # 8. register target package in the library to populate internal
     # structures
-    if library is not None: # tests
+    if library is not None:  # tests
         library.add(target, event=False)
 
     return target
@@ -238,6 +238,11 @@ def transform_content(context, contentType, contents=None):
     return transformer.transform(contents, context=context)
 
 
+def content_package_pocation_changed(package, old, new):
+    if old is not None:
+        event_notify(ContentPackageLocationChanged(package, old, new))
+
+
 def locate_rendered_content(tex_dom, package):
     # get path to rendered contents
     output_dir = tex_dom.userdata['working-dir']
@@ -250,8 +255,7 @@ def locate_rendered_content(tex_dom, package):
     locator = component.getUtility(IRenderedContentLocator)
     result = locator.locate(path, package)
     # notify location changed
-    if old_root is not None:
-        event_notify(ContentPackageLocationChanged(package, old_root, result))
+    content_package_pocation_changed(package, old_root, result)
     return result
 
 
@@ -403,7 +407,10 @@ def render_package_job(render_job):
             package = get_package(render_job)
             logger.warn("Due to a transaction abort, copy data from %s for package %s",
                         key_or_bucket, package.ntiid)
+            old_root = package.root
             copy_and_notify(key_or_bucket, package, render_job)
+            render_job.OutputRoot = key_or_bucket  # save
+            content_package_pocation_changed(package, old_root, key_or_bucket)
     except Exception as e:
         # XXX: Do we want to fail all applicable jobs?
         logger.exception('Render job %s failed', job_id)
