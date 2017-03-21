@@ -24,6 +24,8 @@ import isodate
 
 from zope.component.hooks import getSite
 
+from nti.contentlibrary import AUTHORED_PREFIX
+
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
 from nti.coremetadata.interfaces import IPublishable
@@ -31,7 +33,6 @@ from nti.coremetadata.interfaces import IPublishable
 from nti.ntiids.ntiids import find_object_with_ntiid
 
 TMP_MAX = 10000
-
 
 def hex_encode(raw_bytes):
     if not isinstance(raw_bytes, six.binary_type):
@@ -59,6 +60,7 @@ def mkdtemp(tmpdir=None):
     tmpdir = tmpdir or tempfile.gettempdir()
     for _ in xrange(TMP_MAX):
         digest = str(uuid.uuid4())[10:].upper().replace('-', '')
+        digest = "%s_%s" % (AUTHORED_PREFIX, digest)
         path = os.path.join(tmpdir, digest)
         if not os.path.exists(path):
             os.makedirs(path)

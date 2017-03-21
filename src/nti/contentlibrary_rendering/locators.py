@@ -56,7 +56,7 @@ from nti.traversal.traversal import find_interface
 
 @interface.implementer(IRenderedContentLocator)
 class LocatorMixin(object):
-
+    
     @Lazy
     def _intids(self):
         return component.getUtility(IIntIds)
