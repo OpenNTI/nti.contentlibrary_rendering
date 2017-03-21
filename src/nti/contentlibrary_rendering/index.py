@@ -143,7 +143,6 @@ def install_contentrenderjob_catalog(site_manager_container, intids=None):
                         (IX_CREATOR, CreatorIndex),
                         (IX_MIMETYPE, MimeTypeIndex),
                         (IX_STARTTIME, StartTimeIndex),
-                        (IX_CREATEDTIME, StartTimeIndex),
                         (IX_PACKAGE_NTIID, PackageNTIIDIndex)):
         index = clazz(family=intids.family)
         intids.register(index)

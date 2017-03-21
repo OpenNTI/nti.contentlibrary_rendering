@@ -61,13 +61,15 @@ setup(
         'nti.ntiids',
         'nti.site',
         'nti.traversal',
+        'nti.zope_catalog',
         'z3c.autoinclude',
         'zc.blist',
         'zope.cachedescriptors',
+        'zope.catalog',
         'zope.component',
         'zope.interface',
         'zope.location',
-        'zope.security',
+        'zope.security'
     ],
     extras_require={
         'test': TESTS_REQUIRE,
