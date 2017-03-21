@@ -27,6 +27,8 @@ from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
 
+from nti.contentlibrary import AUTHORED_PREFIX
+
 from nti.contentlibrary.filesystem import FilesystemBucket
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -96,12 +98,10 @@ class LocatorMixin(object):
 @interface.implementer(IRenderedContentLocator)
 class FilesystemLocator(LocatorMixin):
 
-    AUTHORED_PREFIX = "_authored"
-
     def _out_name(self, context):
         intid = self._get_id(context)
         hostname = socket.gethostname()
-        name = "%s_%s_%s.%s" % (self.AUTHORED_PREFIX, hostname,
+        name = "%s_%s_%s.%s" % (AUTHORED_PREFIX, hostname,
                                 intid, self._hex(intid))
         name = safe_filename(name)
         return name
