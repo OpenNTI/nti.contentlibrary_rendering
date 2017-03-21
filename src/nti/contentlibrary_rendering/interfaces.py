@@ -28,12 +28,11 @@ from nti.schema.field import Choice
 from nti.schema.field import IndexedIterable
 from nti.schema.field import TextLine as ValidTextLine
 
-SUCCESS = 'Success'
-PENDING = 'Pending'
 FAILED = 'Failed'
+PENDING = 'Pending'
+SUCCESS = 'Success'
 RENDER_STATES = (SUCCESS, PENDING, FAILED)
-RENDER_STATE_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(_x) for _x in RENDER_STATES])
+RENDER_STATE_VOCABULARY = SimpleVocabulary([SimpleTerm(x) for x in RENDER_STATES])
 
 
 class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
