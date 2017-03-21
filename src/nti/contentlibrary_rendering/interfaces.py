@@ -178,7 +178,7 @@ class IRenderedContentLocator(interface.Interface):
 
     def remove(bucket):
         """
-        [re]remove the rendered content
+        remove the rendered content specified but the bucket
 
         :param bucket the :class:`IEnumerableDelimitedHierarchyBucket` bucket
         """
