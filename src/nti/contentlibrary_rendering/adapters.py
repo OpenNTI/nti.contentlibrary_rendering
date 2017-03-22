@@ -17,8 +17,6 @@ import uuid
 from zope import component
 from zope import interface
 
-from zope.annotation.factory import factory as an_factory
-
 from zope.mimetype.interfaces import IContentTypeAware
 
 from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeContainer
@@ -103,9 +101,17 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         return result
     most_recent_render_job = mostRecentRenderJob
 
-PACKAGE_RENDER_KEY = 'nti.contentlibrary.rendering.ContentPackageRenderMetadata'
-ContentPackageRenderMetadata = an_factory(DefaultContentPackageRenderMetadata,
-                                          PACKAGE_RENDER_KEY)
+
+def render_meta_factory(package):
+    try:
+        result = package._package_render_metadata
+        return result
+    except AttributeError:
+        result = package._package_render_metadata = DefaultContentPackageRenderMetadata()
+        result.createdTime = time.time()
+        result.__parent__ = package
+        result.__name__ = '_package_render_metadata'
+        return result
 
 
 @component.adapter(IContentPackageRenderJob)

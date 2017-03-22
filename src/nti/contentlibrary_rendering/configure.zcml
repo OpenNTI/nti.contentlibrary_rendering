@@ -21,7 +21,10 @@
     <!-- Adapters -->
     <adapter factory=".adapters._job_to_meta" />
     <adapter factory=".adapters._job_to_package" />
-    <adapter factory=".adapters.ContentPackageRenderMetadata" />
+
+    <adapter factory=".adapters.render_meta_factory"
+             for="nti.contentlibrary.interfaces.IRenderableContentPackage"
+             provides="nti.contentlibrary_rendering.interfaces.IContentPackageRenderMetadata" />
 
     <!-- Externalization -->
     <include package="nti.externalization" file="meta.zcml" />
@@ -47,7 +50,7 @@
 	<utility factory=".generators._IdDocumentGenerator" name="tex" />
 	<utility factory=".generators._IdDocumentGenerator" name="latex" />
 	<utility factory=".generators._IdDocumentGenerator" name="application/x-latex" />
-	
+
 	<!-- Validators -->
 	<utility factory=".validators.TextValidator" name="text" />
 	<utility factory=".validators.TextValidator" name="text/plain" />
