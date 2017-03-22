@@ -39,6 +39,7 @@ from nti.contentlibrary.nti_s3put import IGNORED_DOTFILES
 from nti.contentlibrary.nti_s3put import get_key_name
 from nti.contentlibrary.nti_s3put import s3_upload_file
 
+from nti.contentlibrary_rendering.common import get_site
 from nti.contentlibrary_rendering.common import sha1_hex_digest
 
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
@@ -48,10 +49,6 @@ from nti.namedfile.file import safe_filename
 from nti.property.property import Lazy
 
 from nti.site.hostpolicy import get_host_site
-
-from nti.site.interfaces import IHostPolicyFolder
-
-from nti.traversal.traversal import find_interface
 
 
 @interface.implementer(IRenderedContentLocator)
@@ -84,8 +81,8 @@ class LocatorMixin(object):
         if not os.path.isdir(path):
             raise OSError("'%s' is not a directory" % path)
         # move using use package site
-        folder = find_interface(context, IHostPolicyFolder, strict=False)
-        with current_site(get_host_site(folder.__name__)):
+        site_name = get_site(context=context)
+        with current_site(get_host_site(site_name)):
             library = component.getUtility(IContentPackageLibrary)
             enumeration = IDelimitedHierarchyContentPackageEnumeration(library)
             return self._do_locate(path, enumeration.root, context)
