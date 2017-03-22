@@ -151,24 +151,25 @@ def get_job_queue(name):
     return factory.get_queue(name)
 
 
-def put_render_job(queue_name, func, job_id=None, *args, **kwargs):
-    site = get_site()
+def put_render_job(queue_name, func, job_id=None, site_name=None, *args, **kwargs):
+    site_name = get_site(site_name)
     queue = get_job_queue(queue_name)
     job = create_job(_execute_render_job,
                      func,
                      job_id=job_id,
-                     site_name=site,
+                     site_name=site_name,
                      *args, **kwargs)
     job.id = job_id
     queue.put(job)
     return job
 
 
-def add_to_queue(queue_name, func, obj, **kwargs):
+def add_to_queue(queue_name, func, obj, site_name=None, **kwargs):
     return put_render_job(queue_name,
                           func,
                           job_id=obj.JobId,
                           package_ntiid=obj.PackageNTIID,
+                          site_name=site_name,
                           **kwargs)
 
 
@@ -184,7 +185,7 @@ def queue_removed(queue_name, func, obj, job_id=None, site_name=None, **kwargs):
     """
     Queue up a job to remove package data.
     """
-    site = get_site(site_name)
+    site = get_site(site_name, obj)
     queue = get_job_queue(queue_name)
     job = create_job(_execute_generic_job,
                      func,

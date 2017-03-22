@@ -15,6 +15,7 @@ from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
 
 from nti.contentlibrary_rendering._render import render_package_job
 
+from nti.contentlibrary_rendering.common import get_site
 from nti.contentlibrary_rendering.common import is_published
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
@@ -36,8 +37,12 @@ def render_package(package, user, provider='NTI', mark_rendered=True):
     Render the given package. This may not be performed synchronously.
     """
     if IRenderableContentPackage.providedBy(package):
+        site_name = get_site(context=package)
         job = _create_render_job(package, user, provider, mark_rendered)
-        queue_add(CONTENT_UNITS_QUEUE, render_package_job, job)
+        queue_add(CONTENT_UNITS_QUEUE, 
+                  render_package_job, 
+                  job, 
+                  site_name=site_name)
         return job
 
 
@@ -47,7 +52,11 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
     """
     job = _create_render_job(package, user, provider, mark_rendered)
     if IRenderableContentPackage.providedBy(package) and is_published(package):
-        queue_modified(CONTENT_UNITS_QUEUE, render_package_job, job)
+        site_name = get_site(context=package)
+        queue_modified(CONTENT_UNITS_QUEUE, 
+                       render_package_job, 
+                       job,
+                       site_name=site_name)
     return job
 
 
@@ -55,4 +64,5 @@ def remove_rendered_package(package, root=None, site_name=None):
     assert IRenderableContentPackage.providedBy(package)
     root = root or package.root
     if root is not None:
+        site_name = get_site(site_name, context=package)
         queue_remove_rendered_package(package.ntiid, root, site_name)

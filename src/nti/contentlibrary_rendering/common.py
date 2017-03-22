@@ -32,6 +32,11 @@ from nti.coremetadata.interfaces import IPublishable
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
+from nti.site.interfaces import IHostPolicyFolder
+
+from nti.traversal.traversal import find_interface
+
+
 TMP_MAX = 10000
 
 def hex_encode(raw_bytes):
@@ -73,8 +78,11 @@ def is_published(obj):
 isPublished = is_published
 
 
-def get_site(site_name=None):
-    if site_name is None:
+def get_site(site_name=None, context=None):
+    if context is not None and not site_name:
+        folder = find_interface(context, IHostPolicyFolder, strict=False)
+        site_name = getattr(folder, '__name__', None)
+    if not site_name:
         site = getSite()
         site_name = site.__name__ if site is not None else None
     return site_name
