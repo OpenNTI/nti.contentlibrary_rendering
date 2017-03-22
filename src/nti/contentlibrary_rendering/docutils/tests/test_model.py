@@ -42,4 +42,4 @@ class TestModel(ContentlibraryRenderingLayerTest):
                                 u'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
                                 u'NTIID', u'tag:nextthought.com,2011-10:NTI-HTML-human_physiology',
                                 u'title', is_(u'Human Physiology'),
-                                u'contents', has_length(262)))
+                                u'contents', has_length(200)))
