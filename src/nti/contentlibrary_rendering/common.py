@@ -79,7 +79,7 @@ isPublished = is_published
 
 
 def get_site(site_name=None, context=None):
-    if context is not None and not site_name:
+    if not site_name and context is not None:
         folder = find_interface(context, IHostPolicyFolder, strict=False)
         site_name = getattr(folder, '__name__', None)
     if not site_name:
