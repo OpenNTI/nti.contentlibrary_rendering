@@ -405,7 +405,7 @@ def render_package_job(render_job):
             # simply copy the contents again from previous
             # render operation
             package = get_package(render_job)
-            logger.warn("Due to a transaction abort, copy data from %s for package %s",
+            logger.warn("Due to a transaction abort, copying data from %s for package %s",
                         key_or_bucket, package.ntiid)
             old_root = package.root
             copy_and_notify(key_or_bucket, package, render_job)
