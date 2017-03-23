@@ -11,6 +11,8 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import interface
 
+from nti.contentlibrary import HTML
+
 from nti.contentlibrary.interfaces import IContentPackage
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
@@ -31,7 +33,7 @@ class _ContentRenderJobResolver(object):
         ntiid = make_ntiid(date=parts.date,
                            specific=specific,
                            provider=parts.provider,
-                           nttype='HTML')
+                           nttype=HTML)
         package = find_object_with_ntiid(ntiid)
         if IContentPackage.providedBy(package):
             meta = IContentPackageRenderMetadata(package, None)
