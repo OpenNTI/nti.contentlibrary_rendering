@@ -35,6 +35,7 @@ from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
 from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import ContentUnitRemovedEvent
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
@@ -135,14 +136,21 @@ def copy_package_data(item, target):
     copy_attributes(package, target, ('PlatformPresentationResources',))
 
     # 6. unregister from the intid facility the target old children
-    for unit in target.children or ():
+    old_children = list(target.children or ())
+    for unit in old_children:
         unregister_content_units(unit)
 
     # 7. register with the intid facility the new children
     target.children = target.children_iterable_factory(package.children or ())
     register_content_units(target, target)
 
-    # 8. register target package in the library to populate internal
+    # 8. Broadcast unit removal
+    new_children_ntiids = [x.ntiid for x in target.children]
+    for child in old_children:
+        if child.ntiid not in new_children_ntiids:
+            event_notify(ContentUnitRemovedEvent(child))
+
+    # 9. register target package in the library to populate internal
     # structures
     if library is not None:  # tests
         library.add(target, event=False)
