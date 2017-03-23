@@ -212,7 +212,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
         apply_config_overrides(tex_dom)
         # Generate our plasTeX DOM and render.
         generate_document(source_doc, tex_dom, content_type)
-        return nti_render.process_document(tex_dom, jobname)
+        return nti_render.process_document(tex_dom, jobname, docachefile=False)
     finally:
         os.chdir(current_dir)
 
