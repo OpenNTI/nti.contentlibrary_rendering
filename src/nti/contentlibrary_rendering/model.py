@@ -115,6 +115,13 @@ class ContentPackageRenderJob(SchemaConfigured,
         """
         return self.State == SUCCESS
 
+    def is_failed(self):
+        """
+        Returns whether the job has failed.
+        """
+        return self.State == FAILED
+    has_failed = is_failed
+
     def update_to_failed_state(self, reason=None):
         """
         Mark this job as failing.

@@ -82,6 +82,12 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
         Returns whether the job has succeeded.
         """
 
+    def is_failed():
+        """
+        Returns whether the job has failed.
+        """
+    has_failed = is_failed
+
     def update_to_failed_state(reason=None):
         """
         Mark this job as failing.
