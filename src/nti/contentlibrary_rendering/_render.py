@@ -145,7 +145,7 @@ def copy_package_data(item, target):
     register_content_units(target, target)
 
     # 8. Broadcast unit removal
-    new_children_ntiids = [x.ntiid for x in target.children]
+    new_children_ntiids = set(x.ntiid for x in target.children)
     for child in old_children:
         if child.ntiid not in new_children_ntiids:
             event_notify(ContentUnitRemovedEvent(child))
