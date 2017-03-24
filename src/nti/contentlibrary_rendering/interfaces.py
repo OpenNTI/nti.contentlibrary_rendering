@@ -30,8 +30,9 @@ from nti.schema.field import TextLine as ValidTextLine
 
 FAILED = 'Failed'
 PENDING = 'Pending'
+RUNNING = 'Running'
 SUCCESS = 'Success'
-RENDER_STATES = (SUCCESS, PENDING, FAILED)
+RENDER_STATES = (SUCCESS, PENDING, FAILED, RUNNING)
 RENDER_STATE_VOCABULARY = SimpleVocabulary([SimpleTerm(x) for x in RENDER_STATES])
 
 
