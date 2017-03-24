@@ -29,11 +29,11 @@ def is_archive(source, magic):
 
 
 def is_gzip(source):
-    return is_archive(source, "\x1f\x8b\x08")
+    return is_archive(source, b"\x1f\x8b\x08")
 
 
 def is_bz2(source):
-    return is_archive(source, "\x42\x5a\x68")
+    return is_archive(source, b"\x42\x5a\x68")
 
 
 def process_source(source):
@@ -71,7 +71,7 @@ def process_source(source):
 
 def find_renderable(archive):
     if os.path.isfile(archive):
-        raise archive  # assume renderable
+        return archive  # assume renderable
     tex = os.path.basename(archive) + '.tex'
     if os.path.exists(os.path.join(archive, tex)):
         return os.path.join(archive, tex)
