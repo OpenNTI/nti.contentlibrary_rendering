@@ -93,7 +93,7 @@ class ContentPackageRenderJob(SchemaConfigured,
         package = find_interface(self, IContentPackage, strict=False)
         return get_creator(package) or SYSTEM_USER_ID
 
-    @property
+    @readproperty
     def containerId(self):
         return getattr(self.__parent__, 'containerId', None)
 
