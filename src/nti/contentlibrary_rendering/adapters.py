@@ -102,14 +102,14 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     most_recent_render_job = mostRecentRenderJob
 
 
-def render_meta_factory(package):
+def render_meta_factory(context):
     try:
-        result = package._package_render_metadata
+        result = context._package_render_metadata
         return result
     except AttributeError:
-        result = package._package_render_metadata = DefaultContentPackageRenderMetadata()
+        result = context._package_render_metadata = DefaultContentPackageRenderMetadata()
         result.createdTime = time.time()
-        result.__parent__ = package
+        result.__parent__ = context
         result.__name__ = '_package_render_metadata'
         return result
 
