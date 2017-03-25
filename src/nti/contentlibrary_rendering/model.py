@@ -29,6 +29,7 @@ from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
 from nti.contentlibrary_rendering.interfaces import SUCCESS
 
+from nti.contentlibrary_rendering.interfaces import IRenderJob
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
@@ -49,20 +50,19 @@ from nti.traversal.traversal import find_interface
 
 @EqHash('JobId')
 @total_ordering
-@interface.implementer(IContentPackageRenderJob, INTIContained, IContentTypeAware)
-class ContentPackageRenderJob(SchemaConfigured,
-                              PersistentCreatedModDateTrackingObject,
-                              Contained):
-    createDirectFieldProperties(IContentPackageRenderJob)
+@interface.implementer(IRenderJob, IContentTypeAware)
+class RenderJob(SchemaConfigured,
+                PersistentCreatedModDateTrackingObject,
+                Contained):
+    createDirectFieldProperties(IRenderJob)
 
-    __external_class_name__ = u"ContentPackageRenderJob"
-    mime_type = mimeType = u'application/vnd.nextthought.content.packagerenderjob'
+    __external_class_name__ = u"IRenderJob"
+    mime_type = mimeType = u'application/vnd.nextthought.content.renderjob'
 
     id = alias('__name__')
     state = alias('State')
     provider = alias('Provider')
     jobId = job_id = alias('JobId')
-    package = alias('PackageNTIID')
 
     OutputRoot = None
 
@@ -90,12 +90,7 @@ class ContentPackageRenderJob(SchemaConfigured,
 
     @readproperty
     def creator(self):
-        package = find_interface(self, IContentPackage, strict=False)
-        return get_creator(package) or SYSTEM_USER_ID
-
-    @readproperty
-    def containerId(self):
-        return getattr(self.__parent__, 'containerId', None)
+        return SYSTEM_USER_ID
 
     def is_finished(self):
         """
@@ -136,3 +131,21 @@ class ContentPackageRenderJob(SchemaConfigured,
         """
         self.updateLastMod()
         self.State = SUCCESS
+
+
+@interface.implementer(IContentPackageRenderJob, INTIContained)
+class ContentPackageRenderJob(RenderJob):
+
+    __external_class_name__ = u"ContentPackageRenderJob"
+    mime_type = mimeType = u'application/vnd.nextthought.content.packagerenderjob'
+
+    package = alias('PackageNTIID')
+
+    @readproperty
+    def creator(self):
+        package = find_interface(self, IContentPackage, strict=False)
+        return get_creator(package) or SYSTEM_USER_ID
+
+    @readproperty
+    def containerId(self):
+        return getattr(self.__parent__, 'containerId', None)

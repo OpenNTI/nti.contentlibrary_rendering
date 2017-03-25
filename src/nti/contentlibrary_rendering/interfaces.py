@@ -33,14 +33,14 @@ PENDING = 'Pending'
 RUNNING = 'Running'
 SUCCESS = 'Success'
 RENDER_STATES = (SUCCESS, PENDING, FAILED, RUNNING)
-RENDER_STATE_VOCABULARY = SimpleVocabulary([SimpleTerm(x) for x in RENDER_STATES])
+RENDER_STATE_VOCABULARY = SimpleVocabulary(
+    [SimpleTerm(x) for x in RENDER_STATES])
 
 
-class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
+class IRenderJob(ILastModified, ICreated, IZContained):
     """
-    Contains status on a specific rendering of a :class:`IContentPackage`.
+    Contains status on a specific rendering job
     """
-    PackageNTIID = ValidTextLine(title="The package ntiid.")
 
     JobId = ValidTextLine(title="The unique job identifier.")
 
@@ -55,15 +55,6 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
 
     Error = Text(title="Rendering error.",
                  required=False)
-
-    Version = ValidTextLine(title="Rendered contents version",
-                            required=False)
-    Version.setTaggedValue('_ext_excluded_out', True)
-    
-    MarkRendered = Bool(title="Mark package as rendered.",
-                        required=False,
-                        default=True)
-    MarkRendered.setTaggedValue('_ext_excluded_out', True)
 
     OutputRoot = interface.Attribute("Render output location")
     OutputRoot.setTaggedValue('_ext_excluded_out', True)
@@ -100,6 +91,22 @@ class IContentPackageRenderJob(ILastModified, ICreated, IZContained):
         """
 
 
+class IContentPackageRenderJob(IRenderJob):
+    """
+    Contains status on a specific rendering of a :class:`IContentPackage`.
+    """
+    PackageNTIID = ValidTextLine(title="The package ntiid.")
+
+    Version = ValidTextLine(title="Rendered contents version",
+                            required=False)
+    Version.setTaggedValue('_ext_excluded_out', True)
+
+    MarkRendered = Bool(title="Mark package as rendered.",
+                        required=False,
+                        default=True)
+    MarkRendered.setTaggedValue('_ext_excluded_out', True)
+
+
 class IContentPackageRenderMetadata(IContainer):
     """
     Contains information on :class:`IContentPackage` rendering,
@@ -123,12 +130,12 @@ class IContentPackageRenderMetadata(IContainer):
         Returns the most recent render `IContentPackageRenderJob` or None.
         """
     most_recent_render_job = mostRecentRenderJob
-    
+
     def clear():
         """
         remove all jobs
         """
-        
+
 
 class IContentQueueFactory(interface.Interface):
     """
