@@ -21,6 +21,8 @@ import socket
 import shutil
 import tempfile
 
+from nti.contentlibrary import AUTHORED_PREFIX
+
 from nti.contentlibrary.filesystem import FilesystemBucket
 
 from nti.contentlibrary_rendering.locators import FilesystemLocator
@@ -43,7 +45,7 @@ class TestLocator(ContentlibraryRenderingLayerTest):
             root.absolute_path = target_dir
             bucket = locator._do_locate(source_dir, root=root, context=None)
             assert_that(bucket, is_not(none()))
-            assert_that(bucket.absolute_path, contains_string("_authored_"))
+            assert_that(bucket.absolute_path, contains_string(AUTHORED_PREFIX))
             assert_that(bucket.absolute_path, contains_string(socket.gethostname()))
             assert_that(bucket.absolute_path, contains_string("_1000"))
             assert_that(bucket.absolute_path, starts_with(target_dir))
