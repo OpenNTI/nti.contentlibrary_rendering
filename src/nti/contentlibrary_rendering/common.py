@@ -22,13 +22,19 @@ from datetime import datetime
 
 import isodate
 
+from zope import component
+from zope import interface
+
 from zope.component.hooks import getSite
+
+from zope.security.interfaces import IParticipation
 
 from nti.contentlibrary import AUTHORED_PREFIX
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
 from nti.coremetadata.interfaces import IPublishable
+from nti.coremetadata.interfaces import IRedisClient
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 
@@ -36,8 +42,22 @@ from nti.site.interfaces import IHostPolicyFolder
 
 from nti.traversal.traversal import find_interface
 
-
 TMP_MAX = 10000
+
+
+@interface.implementer(IParticipation)
+class Participation(object):
+
+    __slots__ = (b'interaction', b'principal')
+
+    def __init__(self, principal):
+        self.interaction = None
+        self.principal = principal
+
+
+def redis_client():
+    return component.queryUtility(IRedisClient)
+
 
 def hex_encode(raw_bytes):
     if not isinstance(raw_bytes, six.binary_type):

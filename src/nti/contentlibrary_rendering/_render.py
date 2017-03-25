@@ -25,7 +25,6 @@ from zope.event import notify as event_notify
 from zope.intid.interfaces import IIntIds
 
 from zope.security.interfaces import IPrincipal
-from zope.security.interfaces import IParticipation
 
 from zope.security.management import endInteraction
 from zope.security.management import newInteraction
@@ -58,6 +57,8 @@ from nti.contentlibrary_rendering import CONTENT_UNITS_HSET_EXPIRY
 from nti.contentlibrary_rendering.common import dump
 from nti.contentlibrary_rendering.common import mkdtemp
 from nti.contentlibrary_rendering.common import unpickle
+from nti.contentlibrary_rendering.common import redis_client
+from nti.contentlibrary_rendering.common import Participation
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
@@ -72,8 +73,6 @@ from nti.contentrendering.render_document import load_packages
 from nti.contentrendering.render_document import setup_environ
 from nti.contentrendering.render_document import prepare_document_settings
 
-from nti.coremetadata.interfaces import IRedisClient
-
 from nti.externalization.proxy import removeAllProxies
 
 from nti.ntiids.ntiids import find_object_with_ntiid
@@ -81,10 +80,6 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 # Patch our plastex early.
 patch_all()
-
-
-def redis_client():
-    return component.queryUtility(IRedisClient)
 
 
 def copy_attributes(source, target, names):
@@ -370,16 +365,6 @@ def process_render_job(render_job):
         os.chdir(current_dir)
 
 
-@interface.implementer(IParticipation)
-class _Participation(object):
-
-    __slots__ = (b'interaction', b'principal')
-
-    def __init__(self, principal):
-        self.interaction = None
-        self.principal = principal
-
-
 def _get_metadata(context):
     return IContentPackageRenderMetadata(context, None)
 
@@ -404,7 +389,7 @@ def render_package_job(render_job):
     creator = render_job.creator
     endInteraction()
     try:
-        newInteraction(_Participation(IPrincipal(creator)))
+        newInteraction(Participation(IPrincipal(creator)))
         key_or_bucket = get_delimited_item(job_id)
         if key_or_bucket is None or not key_or_bucket.exists():
             process_render_job(render_job)

@@ -17,7 +17,17 @@ import zipfile
 import tarfile
 import tempfile
 
+from zope import lifecycleevent
+
+from zope.security.interfaces import IPrincipal
+
+from zope.security.management import endInteraction
+from zope.security.management import newInteraction
+from zope.security.management import restoreInteraction
+
 from nti.contentrendering.nti_render import render
+
+from nti.contentlibrary_rendering.common import Participation
 
 
 def is_archive(source, magic):
@@ -96,3 +106,21 @@ def render_archive(source, provider='NTI', docachefile=False):
     finally:
         os.chdir(current_dir)
     return archive
+
+
+def render_library_job(render_job):
+    logger.info('Rendering content (%s)', render_job.job_id)
+    job_id = render_job.job_id
+    creator = render_job.creator
+    endInteraction()
+    try:
+        newInteraction(Participation(IPrincipal(creator)))
+    except Exception as e:
+        logger.exception('Render job %s failed', job_id)
+        render_job.update_to_failed_state(str(e))
+    else:
+        render_job.update_to_success_state()
+        lifecycleevent.modified(render_job)
+    finally:
+        restoreInteraction()
+        lifecycleevent.modified(render_job)
