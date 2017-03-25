@@ -83,19 +83,20 @@ def job_id_error(jobId):
     return "%s=error" % jobId
 
 
-def update_job_status(jobId, status):
+def update_job_status(jobId, status, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
         key = job_id_status(jobId)
-        redis.setex(key, status, EXPIRY_TIME)
+        redis.setex(key, value=status, time=expiry)
+        return key
 
 
-def update_job_error(jobId, error):
+def update_job_error(jobId, error, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
         key = job_id_error(jobId)
-        redis.setex(key, error, EXPIRY_TIME)
-
+        redis.setex(key, value=error, time=expiry)
+        return key
 
 # source
 

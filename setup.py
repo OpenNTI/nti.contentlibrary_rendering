@@ -12,6 +12,7 @@ entry_points = {
 
 TESTS_REQUIRE = [
     'fudge',
+    'fakeredis',
     'nose2[coverage_plugin]',
     'nti.testing',
     'pyhamcrest',
