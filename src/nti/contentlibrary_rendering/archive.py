@@ -33,7 +33,12 @@ from nti.contentrendering.nti_render import render
 
 from nti.contentlibrary_rendering import LIBRARY_RENDER_JOB
 
+from nti.contentlibrary_rendering.common import redis_client
 from nti.contentlibrary_rendering.common import Participation
+
+from nti.contentlibrary_rendering.interfaces import FAILED
+from nti.contentlibrary_rendering.interfaces import RUNNING
+from nti.contentlibrary_rendering.interfaces import SUCCESS
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
@@ -41,6 +46,25 @@ from nti.zodb.containers import time_to_64bit_int
 
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import make_specific_safe
+
+
+EXPIRY_TIME = 86400  # 24hrs
+
+# common
+
+
+def format_exception(e):
+    result = []
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    result['message'] = str(e)
+    result['code'] = e.__class__.__name__
+    result['traceback'] = repr(traceback.format_exception(exc_type,
+                                                          exc_value,
+                                                          exc_traceback))
+    return simplejson.dumps(result, indent='\t')
+
+
+# jobs
 
 
 def generate_job_id(source, creator=None):
@@ -57,6 +81,23 @@ def job_id_status(jobId):
 
 def job_id_error(jobId):
     return "%s=error" % jobId
+
+
+def update_job_status(jobId, status):
+    redis = redis_client()
+    if redis is not None:
+        key = job_id_status(jobId)
+        redis.setex(key, status, EXPIRY_TIME)
+
+
+def update_job_error(jobId, error):
+    redis = redis_client()
+    if redis is not None:
+        key = job_id_error(jobId)
+        redis.setex(key, error, EXPIRY_TIME)
+
+
+# source
 
 
 def is_archive(source, magic):
@@ -110,6 +151,18 @@ def process_source(source):
         raise ValueError("Unsupported format")
 
 
+def save_source(source, path=None):
+    path = path or tempfile.mkdtemp()
+    name = os.path.split(source.filename)[1]
+    name = os.path.join(path, name)
+    with open(name, "wb") as fp:
+        fp.write(source.data)
+    return name
+
+
+# rendering
+
+
 def find_renderable(archive):
     if os.path.isfile(archive):
         return archive  # assume renderable
@@ -137,26 +190,6 @@ def render_archive(source, provider='NTI', docachefile=False):
     return archive
 
 
-def save_source(source, path=None):
-    path = path or tempfile.mkdtemp()
-    name = os.path.split(source.filename)[1]
-    name = os.path.join(path, name)
-    with open(name, "wb") as fp:
-        fp.write(source.data)
-    return name
-
-
-def format_exception(e):
-    result = []
-    exc_type, exc_value, exc_traceback = sys.exc_info()
-    result['message'] = str(e)
-    result['code'] = e.__class__.__name__
-    result['traceback'] = repr(traceback.format_exception(exc_type,
-                                                          exc_value,
-                                                          exc_traceback))
-    return simplejson.dumps(result, indent='\t')
-
-
 def render_library_job(render_job):
     logger.info('Rendering content (%s)', render_job.job_id)
     job_id = render_job.job_id
@@ -164,6 +197,7 @@ def render_library_job(render_job):
     tmp_dir = tempfile.mkdtemp()
     endInteraction()
     try:
+        update_job_status(job_id, RUNNING)
         newInteraction(Participation(IPrincipal(creator)))
         source = save_source(render_job.Source, tmp_dir)
         render_archive(source, render_job.Provider)
@@ -171,7 +205,10 @@ def render_library_job(render_job):
         logger.exception('Render job %s failed', job_id)
         traceback_msg = format_exception(e)
         render_job.update_to_failed_state(traceback_msg)
+        update_job_status(job_id, FAILED)
+        update_job_error(job_id, traceback_msg)
     else:
+        update_job_status(job_id, SUCCESS)
         render_job.update_to_success_state()
         lifecycleevent.modified(render_job)
     finally:
