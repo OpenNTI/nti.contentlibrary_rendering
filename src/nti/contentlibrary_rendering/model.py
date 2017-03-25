@@ -56,7 +56,7 @@ class RenderJob(SchemaConfigured,
                 Contained):
     createDirectFieldProperties(IRenderJob)
 
-    __external_class_name__ = u"IRenderJob"
+    __external_class_name__ = u"RenderJob"
     mime_type = mimeType = u'application/vnd.nextthought.content.renderjob'
 
     id = alias('__name__')
@@ -159,4 +159,4 @@ class LibraryRenderJob(RenderJob):
     __external_class_name__ = u"LibraryRenderJob"
     mime_type = mimeType = u'application/vnd.nextthought.content.libraryrenderjob'
 
-
+    source = alias('Source')

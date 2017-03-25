@@ -11,11 +11,15 @@ logger = __import__('logging').getLogger(__name__)
 
 import os
 import bz2
+import sys
 import gzip
+import time
 import shutil
 import zipfile
 import tarfile
 import tempfile
+import traceback
+import simplejson
 
 from zope import lifecycleevent
 
@@ -27,7 +31,32 @@ from zope.security.management import restoreInteraction
 
 from nti.contentrendering.nti_render import render
 
+from nti.contentlibrary_rendering import LIBRARY_RENDER_JOB
+
 from nti.contentlibrary_rendering.common import Participation
+
+from nti.coremetadata.interfaces import SYSTEM_USER_ID
+
+from nti.zodb.containers import time_to_64bit_int
+
+from nti.ntiids.ntiids import make_ntiid
+from nti.ntiids.ntiids import make_specific_safe
+
+
+def generate_job_id(source, creator=None):
+    creator = creator or SYSTEM_USER_ID
+    current_time = time_to_64bit_int(time.time())
+    specific = "%s_%s_%s" % (creator, source.filename, current_time)
+    specific = make_specific_safe(specific)
+    return make_ntiid(nttype=LIBRARY_RENDER_JOB, specific=specific)
+
+
+def job_id_status(jobId):
+    return "%s=status" % jobId
+
+
+def job_id_error(jobId):
+    return "%s=error" % jobId
 
 
 def is_archive(source, magic):
@@ -102,25 +131,51 @@ def render_archive(source, provider='NTI', docachefile=False):
     current_dir = os.getcwd()
     try:
         os.chdir(path)
-        return render(tex_file, provider, docachefile=docachefile)
+        render(tex_file, provider, docachefile=docachefile)
     finally:
         os.chdir(current_dir)
     return archive
+
+
+def save_source(source, path=None):
+    path = path or tempfile.mkdtemp()
+    name = os.path.split(source.filename)[1]
+    name = os.path.join(path, name)
+    with open(name, "wb") as fp:
+        fp.write(source.data)
+    return name
+
+
+def format_exception(e):
+    result = []
+    exc_type, exc_value, exc_traceback = sys.exc_info()
+    result['message'] = str(e)
+    result['code'] = e.__class__.__name__
+    result['traceback'] = repr(traceback.format_exception(exc_type,
+                                                          exc_value,
+                                                          exc_traceback))
+    return simplejson.dumps(result, indent='\t')
 
 
 def render_library_job(render_job):
     logger.info('Rendering content (%s)', render_job.job_id)
     job_id = render_job.job_id
     creator = render_job.creator
+    tmp_dir = tempfile.mkdtemp()
     endInteraction()
     try:
         newInteraction(Participation(IPrincipal(creator)))
+        source = save_source(render_job.Source, tmp_dir)
+        render_archive(source, render_job.Provider)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
-        render_job.update_to_failed_state(str(e))
+        traceback_msg = format_exception(e)
+        render_job.update_to_failed_state(traceback_msg)
     else:
         render_job.update_to_success_state()
         lifecycleevent.modified(render_job)
     finally:
         restoreInteraction()
         lifecycleevent.modified(render_job)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+    return render_job

@@ -25,6 +25,9 @@ RST_MIMETYPE = b'text/x-rst'
 #: Render job NTIID Type
 RENDER_JOB = 'RenderJob'
 
+#: Library ender job NTIID Type
+LIBRARY_RENDER_JOB = 'LibraryRenderJob'
+
 #: redis hset
 CONTENT_UNITS_HSET = '++etc++contentlibrary++contentunits++hset'
 
