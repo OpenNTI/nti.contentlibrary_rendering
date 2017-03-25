@@ -21,11 +21,13 @@ from nti.contentrendering.nti_render import render
 
 
 def is_archive(source, magic):
-    with open(source, "rb") as fp:
-        file_start = fp.read(len(magic))
-        if file_start.startswith(magic):
-            return True
-    return False
+    if hasattr(source, "read"):
+        source.seek(0)
+        file_start = source.read(len(magic))
+    else:
+        with open(source, "rb") as fp:
+            file_start = fp.read(len(magic))
+    return file_start.startswith(magic)
 
 
 def is_gzip(source):

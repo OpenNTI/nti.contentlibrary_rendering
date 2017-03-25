@@ -19,6 +19,7 @@ import gzip
 import shutil
 import tarfile
 import tempfile
+from io import BytesIO
 
 from nti.contentlibrary_rendering.archive import is_bz2
 from nti.contentlibrary_rendering.archive import is_gzip
@@ -33,14 +34,10 @@ class TestArchive(ContentlibraryRenderingLayerTest):
     data = b'ichigo and aizen'
 
     def test_is_gzip(self):
-        tmp_dir = tempfile.mkdtemp()
-        try:
-            out_name = os.path.join(tmp_dir, 'data.dat')
-            with gzip.GzipFile(out_name, mode="wb") as fp:
-                fp.write(self.data)
-            assert_that(is_gzip(out_name), is_(True))
-        finally:
-            shutil.rmtree(tmp_dir, True)
+        bio = BytesIO()
+        with gzip.GzipFile(fileobj=bio, mode="wb") as fp:
+            fp.write(self.data)
+        assert_that(is_gzip(bio), is_(True))
 
     def test_is_bz2(self):
         tmp_dir = tempfile.mkdtemp()
