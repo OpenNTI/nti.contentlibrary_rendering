@@ -19,6 +19,7 @@ from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 
 from nti.base.interfaces import ICreated
+from nti.base.interfaces import INamedFile
 from nti.base.interfaces import ILastModified
 
 from nti.schema.field import Bool
@@ -105,6 +106,14 @@ class IContentPackageRenderJob(IRenderJob):
                         required=False,
                         default=True)
     MarkRendered.setTaggedValue('_ext_excluded_out', True)
+
+
+class ILibraryRenderJob(IRenderJob):
+    """
+    Contains status on a specific rendering of a source
+    """
+    Source = Object(INamedFile, title="The source.")
+    Source.setTaggedValue('_ext_excluded_out', True)
 
 
 class IContentPackageRenderMetadata(IContainer):

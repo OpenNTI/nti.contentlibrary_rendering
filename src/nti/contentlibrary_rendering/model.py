@@ -25,7 +25,7 @@ from nti.contentlibrary.interfaces import IContentPackage
 
 from nti.contentlibrary_rendering.common import get_creator
 
-from nti.contentlibrary_rendering.interfaces import FAILED
+from nti.contentlibrary_rendering.interfaces import FAILED, ILibraryRenderJob
 from nti.contentlibrary_rendering.interfaces import PENDING
 from nti.contentlibrary_rendering.interfaces import SUCCESS
 
@@ -135,6 +135,7 @@ class RenderJob(SchemaConfigured,
 
 @interface.implementer(IContentPackageRenderJob, INTIContained)
 class ContentPackageRenderJob(RenderJob):
+    createDirectFieldProperties(IContentPackageRenderJob)
 
     __external_class_name__ = u"ContentPackageRenderJob"
     mime_type = mimeType = u'application/vnd.nextthought.content.packagerenderjob'
@@ -149,3 +150,13 @@ class ContentPackageRenderJob(RenderJob):
     @readproperty
     def containerId(self):
         return getattr(self.__parent__, 'containerId', None)
+
+
+@interface.implementer(ILibraryRenderJob)
+class LibraryRenderJob(RenderJob):
+    createDirectFieldProperties(ILibraryRenderJob)
+
+    __external_class_name__ = u"LibraryRenderJob"
+    mime_type = mimeType = u'application/vnd.nextthought.content.libraryrenderjob'
+
+
