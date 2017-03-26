@@ -35,6 +35,8 @@ from nti.contentlibrary.filesystem import FilesystemBucket
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
+from nti.contentlibrary.utils import get_content_package_site
+
 from nti.contentlibrary_rendering import LIBRARY_RENDER_JOB
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
 
@@ -238,6 +240,23 @@ def update_library(ntiid, path):
     if library is None:  # tests
         return
     move_content(library, path)
+    package = library.get(ntiid)
+    is_new  = (package is None or \
+               get_content_package_site(package) != get_site())
+    
+    # enumerate all content packages to build new pkgs
+    enumeration = library.enumeration
+    content_packages = enumeration.enumerateContentPackages()
+    content_packages = {x.ntiid:x for x in content_packages}
+    assert ntiid in content_packages
+
+    # replace or add
+    updated = content_packages[ntiid]
+    if not is_new:
+        library.replace(updated)
+    else:
+        library.add(updated)
+    return updated
 
 
 # rendering
