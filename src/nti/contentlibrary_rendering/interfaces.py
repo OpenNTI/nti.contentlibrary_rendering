@@ -204,3 +204,11 @@ class IRenderedContentLocator(interface.Interface):
 
         :param bucket the :class:`IEnumerableDelimitedHierarchyBucket` bucket
         """
+        
+    def move(source, bucket):
+        """
+        move the specified source files to the destination bucket
+
+        :param source Location of the rendered content
+        :param bucket the :class:`IEnumerableDelimitedHierarchyBucket` bucket
+        """ 

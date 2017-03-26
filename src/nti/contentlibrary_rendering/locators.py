@@ -31,6 +31,7 @@ from nti.contentlibrary import AUTHORED_PREFIX
 
 from nti.contentlibrary.filesystem import FilesystemBucket
 
+from nti.contentlibrary.interfaces import IFilesystemBucket
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
 
@@ -67,6 +68,9 @@ class LocatorMixin(object):
     def _do_remove(self, root, context):
         pass
 
+    def _do_move(self, source, bucket):
+        pass
+
     def _hex(self, intid, now=None):
         now = now or time.time()
         digest = sha1_hex_digest(six.binary_type(intid),
@@ -88,7 +92,11 @@ class LocatorMixin(object):
             return self._do_locate(path, enumeration.root, context)
 
     def remove(self, bucket):
-        logger.info("Removing bucket (%s)", bucket.absolute_path)
+        logger.info("Removing bucket (%s)", bucket)
+        return self._do_move(bucket)
+    
+    def move(self, source, bucket):
+        logger.info("Moving %s to bucket (%s)", source, bucket)
         return self._do_remove(bucket)
 
 
@@ -103,11 +111,11 @@ class FilesystemLocator(LocatorMixin):
         name = safe_filename(name)
         return name
 
-    def _move(self, source, destination):
+    @classmethod
+    def _move_content(self, source, destination):
         # Make the destination so perms are correct.
         if not os.path.isdir(destination):
             os.makedirs(destination)
-
         for child in os.listdir(source):
             dest_path = os.path.join(destination, child)
             source_path = os.path.join(source, child)
@@ -124,12 +132,18 @@ class FilesystemLocator(LocatorMixin):
             shutil.rmtree(child.absolute_path)
         else:
             destination = os.path.join(root.absolute_path, name)
-        self._move(path, destination)
+        self._move_content(path, destination)
         return root.getChildNamed(name)
 
     def _do_remove(self, bucket):
         if os.path.exists(bucket.absolute_path):
             shutil.rmtree(bucket.absolute_path)
+    
+    def _do_move(self, source, bucket):
+        self._do_remove(bucket)
+        if IFilesystemBucket.providedBy(source):
+            source = source.absolute_path
+        self._move_content(source, bucket.absolute_path)
 
 
 @interface.implementer(IRenderedContentLocator)
@@ -217,3 +231,10 @@ class S3Locator(LocatorMixin):
         finally:
             connection.close()
         return True
+
+    def _do_move(self, source, bucket):
+        self._do_remove(bucket)
+        prefix = str(bucket.name)
+        self._transfer(source, self.bucket_name,
+                       prefix=prefix,
+                       headers=self.headers)
