@@ -25,31 +25,41 @@ from io import BytesIO
 import fudge
 import fakeredis
 
+from zope import interface
+
+from zope.security.interfaces import IPrincipal
+
+from nti.base.interfaces import INamedFile
+
 from nti.contentlibrary_rendering.archive import is_bz2
 from nti.contentlibrary_rendering.archive import is_gzip
+from nti.contentlibrary_rendering.archive import load_job
+from nti.contentlibrary_rendering.archive import store_job
 from nti.contentlibrary_rendering.archive import process_source
 from nti.contentlibrary_rendering.archive import find_renderable
 from nti.contentlibrary_rendering.archive import generate_job_id
+from nti.contentlibrary_rendering.archive import create_render_job
 from nti.contentlibrary_rendering.archive import update_job_status
+from nti.contentlibrary_rendering.archive import render_library_job
 
 from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
+
+
+@interface.implementer(INamedFile)
+class _Source(object):
+    data = b'ichigo'
+    filename = "bleach.zip"
+
+
+@interface.implementer(IPrincipal)
+class _Principal(object):
+    id = 'ichigo'
+    title = "shinigami"
 
 
 class TestArchive(ContentlibraryRenderingLayerTest):
 
     data = b'ichigo and aizen'
-
-    @fudge.patch('nti.contentlibrary_rendering.archive.redis_client')
-    def test_job_id(self, mock_rc):
-        mock_rc.is_callable().with_args().returns(fakeredis.FakeStrictRedis())
-        source = fudge.Fake()
-        source.filename = "bleach.zip"
-        jid = generate_job_id(source, "tite kubo")
-        assert_that(jid, 
-                    starts_with('tag:nextthought.com,2011-10:LibraryRenderJob-tite_kubo_bleach_zip_'))
-        key = update_job_status(jid, "SUCCESS")
-        assert_that(key, starts_with(jid))
-        assert_that(key, ends_with("=status"))
 
     def test_is_gzip(self):
         bio = BytesIO()
@@ -88,3 +98,33 @@ class TestArchive(ContentlibraryRenderingLayerTest):
             shutil.rmtree(source, True)
         finally:
             shutil.rmtree(tmp_dir, True)
+
+    @fudge.patch('nti.contentlibrary_rendering.archive.redis_client')
+    def test_job_id_ops(self, mock_rc):
+        mock_rc.is_callable().with_args().returns(fakeredis.FakeStrictRedis())
+        source = _Source()
+        jid = generate_job_id(source, "tite kubo")
+        assert_that(jid,
+                    starts_with('tag:nextthought.com,2011-10:LibraryRenderJob-tite_kubo_bleach_zip_'))
+
+        key = update_job_status(jid, "SUCCESS")
+        assert_that(key, starts_with(jid))
+        assert_that(key, ends_with("=status"))
+
+    @fudge.patch('nti.contentlibrary_rendering.archive.redis_client')
+    def test_job_ops(self, mock_rc):
+        mock_rc.is_callable().with_args().returns(fakeredis.FakeStrictRedis())
+        source = _Source()
+        job = create_render_job(source, "tite kubo")
+        store_job(job)
+        loaded = load_job(job.jobId)
+        assert_that(loaded, is_(job))
+
+    def test_render_library_job(self):
+        source = _Source()
+        source.filename = 'sample.tex'
+        path = os.path.join(os.path.dirname(__file__), 'sample.tex')
+        with open(path, "rb") as fp:
+            source.data = fp.read()
+        job = create_render_job(source, _Principal())
+        render_library_job(job)

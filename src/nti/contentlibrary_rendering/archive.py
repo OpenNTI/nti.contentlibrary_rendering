@@ -32,13 +32,23 @@ from zope.security.management import restoreInteraction
 from nti.contentrendering.nti_render import render
 
 from nti.contentlibrary_rendering import LIBRARY_RENDER_JOB
+from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
 
+from nti.contentlibrary_rendering.common import dump
+from nti.contentlibrary_rendering.common import unpickle
+from nti.contentlibrary_rendering.common import get_site
+from nti.contentlibrary_rendering.common import get_creator
 from nti.contentlibrary_rendering.common import redis_client
 from nti.contentlibrary_rendering.common import Participation
 
 from nti.contentlibrary_rendering.interfaces import FAILED
+from nti.contentlibrary_rendering.interfaces import PENDING
 from nti.contentlibrary_rendering.interfaces import RUNNING
 from nti.contentlibrary_rendering.interfaces import SUCCESS
+
+from nti.contentlibrary_rendering.model import LibraryRenderJob
+
+from nti.contentlibrary_rendering.processing import put_generic_job
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
@@ -68,35 +78,60 @@ def format_exception(e):
 
 
 def generate_job_id(source, creator=None):
-    creator = creator or SYSTEM_USER_ID
+    creator = get_creator(creator) or SYSTEM_USER_ID
     current_time = time_to_64bit_int(time.time())
     specific = "%s_%s_%s" % (creator, source.filename, current_time)
     specific = make_specific_safe(specific)
     return make_ntiid(nttype=LIBRARY_RENDER_JOB, specific=specific)
 
 
-def job_id_status(jobId):
-    return "%s=status" % jobId
+def job_id_status(job_id):
+    return "%s=status" % job_id
 
 
-def job_id_error(jobId):
-    return "%s=error" % jobId
+def job_id_error(job_id):
+    return "%s=error" % job_id
 
 
-def update_job_status(jobId, status, expiry=EXPIRY_TIME):
+def update_job_status(job_id, status, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
-        key = job_id_status(jobId)
+        key = job_id_status(job_id)
         redis.setex(key, value=status, time=expiry)
         return key
 
 
-def update_job_error(jobId, error, expiry=EXPIRY_TIME):
+def update_job_error(job_id, error, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
-        key = job_id_error(jobId)
+        key = job_id_error(job_id)
         redis.setex(key, value=error, time=expiry)
         return key
+
+
+def create_render_job(source, creator, provider='NTI'):
+    result = LibraryRenderJob()
+    result.job_id = generate_job_id(source, creator)
+    result.source = source
+    result.creator = creator
+    result.provider = provider
+    return result
+
+
+def store_job(job, expiry=EXPIRY_TIME):
+    redis = redis_client()
+    redis.setex(job.job_id, value=dump(job), time=expiry)
+    return job
+
+
+def load_job(job_id):
+    redis = redis_client()
+    pipe = redis.pipeline()
+    result = pipe.get(job_id).delete(job_id).execute()
+    job = result[0] if result else None
+    job = unpickle(job) if job is not None else None
+    return job
+
 
 # source
 
@@ -149,7 +184,7 @@ def process_source(source):
             target = os.path.join(target, files[0])
         return process_source(target)
     else:
-        raise ValueError("Unsupported format")
+        return source # assume renderable
 
 
 def save_source(source, path=None):
@@ -177,7 +212,7 @@ def find_renderable(archive):
     raise ValueError("Cannot find renderable LaTeX file")
 
 
-def render_archive(source, provider='NTI', docachefile=False):
+def render_source(source, provider='NTI', docachefile=False):
     source = os.path.abspath(source)
     archive = process_source(source)
     tex_file = find_renderable(archive)
@@ -188,20 +223,20 @@ def render_archive(source, provider='NTI', docachefile=False):
         render(tex_file, provider, docachefile=docachefile)
     finally:
         os.chdir(current_dir)
-    return archive
+    return tex_file
 
 
 def render_library_job(render_job):
     logger.info('Rendering content (%s)', render_job.job_id)
     job_id = render_job.job_id
     creator = render_job.creator
-    tmp_dir = tempfile.mkdtemp()
     endInteraction()
     try:
+        tmp_dir = tempfile.mkdtemp()
         update_job_status(job_id, RUNNING)
         newInteraction(Participation(IPrincipal(creator)))
-        source = save_source(render_job.Source, tmp_dir)
-        render_archive(source, render_job.Provider)
+        source = save_source(render_job.source, tmp_dir)
+        render_source(source, render_job.Provider)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
         traceback_msg = format_exception(e)
@@ -217,3 +252,30 @@ def render_library_job(render_job):
         lifecycleevent.modified(render_job)
         shutil.rmtree(tmp_dir, ignore_errors=True)
     return render_job
+
+
+def render_job(job_id):
+    job = load_job(job_id)
+    if job is None:
+        update_job_status(job_id, FAILED)
+        update_job_error(job_id, 
+                         simplejson.dumps("Job is missing"))
+        logger.error("Job %s is missing", job_id)
+    else:
+        render_library_job(job)
+
+
+def render_archive(source, creator, provider='NTI', site=None):
+    site_name = get_site(site)
+    # 1. create job
+    job = create_render_job(source, get_creator(creator), provider)
+    # 2. store job
+    store_job(job)
+    # 3. update status
+    result = update_job_status(job.job_id, PENDING)
+    # 4. queue job
+    put_generic_job(CONTENT_UNITS_QUEUE,
+                    render_job,
+                    job_id=job.job_id,
+                    site_name=site_name)
+    return result

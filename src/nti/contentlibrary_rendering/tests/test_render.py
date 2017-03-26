@@ -58,7 +58,7 @@ class TestRender(ContentlibraryRenderingLayerTest):
             assert_that(target,
                         has_property('ntiid', 'tag:nextthought.com,2011-10:NTI-HTML-sample.0'))
             assert_that(target,
-                        has_property('children', has_length(3)))
+                        has_property('children', has_length(1)))
         finally:
             os.chdir(cwd)
             shutil.rmtree(tmp_dir, True)
