@@ -227,11 +227,10 @@ def get_rendered_package(path):
 
 def move_content(library, path):
     enumeration = library.enumeration
-    bucket = getattr(enumeration, 'root', None) \
-          or getattr(enumeration, 'bucket', None)
-    assert bucket is not None, "Invalid library enumeration"
+    root = getattr(enumeration, 'root', None) \
+        or getattr(enumeration, 'bucket', None)
     locator = component.getUtility(IRenderedContentLocator)
-    locator.move(path, bucket)
+    locator.move(path, root)
 
 
 def update_library(ntiid, path):
