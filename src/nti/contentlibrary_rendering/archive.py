@@ -29,7 +29,7 @@ from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
 
-from nti.contentrendering.nti_render import render
+from nti.contentrendering.nti_render import render as nti_render
 
 from nti.contentlibrary_rendering import LIBRARY_RENDER_JOB
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
@@ -50,6 +50,8 @@ from nti.contentlibrary_rendering.model import LibraryRenderJob
 
 from nti.contentlibrary_rendering.processing import put_generic_job
 
+from nti.contentrendering.plastexids import patch_all
+
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
 from nti.zodb.containers import time_to_64bit_int
@@ -57,10 +59,12 @@ from nti.zodb.containers import time_to_64bit_int
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import make_specific_safe
 
-
-EXPIRY_TIME = 86400  # 24hrs
+# Patch our plastex early.
+patch_all()
 
 # common
+
+EXPIRY_TIME = 86400  # 24hrs
 
 
 def format_exception(e):
@@ -184,7 +188,7 @@ def process_source(source):
             target = os.path.join(target, files[0])
         return process_source(target)
     else:
-        return source # assume renderable
+        return source  # assume renderable
 
 
 def save_source(source, path=None):
@@ -220,7 +224,11 @@ def render_source(source, provider='NTI', docachefile=False):
     current_dir = os.getcwd()
     try:
         os.chdir(path)
-        render(tex_file, provider, docachefile=docachefile)
+        nti_render(tex_file,
+                   provider,
+                   load_configs=False,
+                   docachefile=docachefile,
+                   set_chameleon_cache=False)
     finally:
         os.chdir(current_dir)
     return tex_file
@@ -244,6 +252,7 @@ def render_library_job(render_job):
         update_job_status(job_id, FAILED)
         update_job_error(job_id, traceback_msg)
     else:
+        logger.info('Render (%s) completed', job_id)
         update_job_status(job_id, SUCCESS)
         render_job.update_to_success_state()
         lifecycleevent.modified(render_job)
@@ -258,7 +267,7 @@ def render_job(job_id):
     job = load_job(job_id)
     if job is None:
         update_job_status(job_id, FAILED)
-        update_job_error(job_id, 
+        update_job_error(job_id,
                          simplejson.dumps("Job is missing"))
         logger.error("Job %s is missing", job_id)
     else:

@@ -36,8 +36,9 @@ class TestRender(ContentlibraryRenderingLayerTest):
     def _parse_sample(self, tmp_dir):
         source = os.path.join(os.path.dirname(__file__), 'sample.tex')
         document, _, jobname, _ = parse_tex(source,
+                                            provider='NTI',
                                             outdir=tmp_dir,
-                                            provider='NTI')
+                                            load_configs=False)
         return process_document(document, jobname=jobname)
 
     def test_render_copy(self):
