@@ -31,16 +31,16 @@ from zope.security.interfaces import IPrincipal
 
 from nti.base.interfaces import INamedFile
 
-from nti.contentlibrary_rendering.archive import is_bz2
-from nti.contentlibrary_rendering.archive import is_gzip
-from nti.contentlibrary_rendering.archive import load_job
-from nti.contentlibrary_rendering.archive import store_job
-from nti.contentlibrary_rendering.archive import process_source
-from nti.contentlibrary_rendering.archive import find_renderable
-from nti.contentlibrary_rendering.archive import generate_job_id
-from nti.contentlibrary_rendering.archive import create_render_job
-from nti.contentlibrary_rendering.archive import update_job_status
-from nti.contentlibrary_rendering.archive import render_library_job
+from nti.contentlibrary_rendering._archive import is_bz2
+from nti.contentlibrary_rendering._archive import is_gzip
+from nti.contentlibrary_rendering._archive import load_job
+from nti.contentlibrary_rendering._archive import store_job
+from nti.contentlibrary_rendering._archive import process_source
+from nti.contentlibrary_rendering._archive import find_renderable
+from nti.contentlibrary_rendering._archive import generate_job_id
+from nti.contentlibrary_rendering._archive import create_render_job
+from nti.contentlibrary_rendering._archive import update_job_status
+from nti.contentlibrary_rendering._archive import render_library_job
 
 from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
@@ -99,7 +99,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         finally:
             shutil.rmtree(tmp_dir, True)
 
-    @fudge.patch('nti.contentlibrary_rendering.archive.redis_client')
+    @fudge.patch('nti.contentlibrary_rendering._archive.redis_client')
     def test_job_id_ops(self, mock_rc):
         mock_rc.is_callable().with_args().returns(fakeredis.FakeStrictRedis())
         source = _Source()
@@ -111,7 +111,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         assert_that(key, starts_with(jid))
         assert_that(key, ends_with("=status"))
 
-    @fudge.patch('nti.contentlibrary_rendering.archive.redis_client')
+    @fudge.patch('nti.contentlibrary_rendering._archive.redis_client')
     def test_job_ops(self, mock_rc):
         mock_rc.is_callable().with_args().returns(fakeredis.FakeStrictRedis())
         source = _Source()
