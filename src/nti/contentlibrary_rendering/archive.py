@@ -21,6 +21,7 @@ import tempfile
 import traceback
 import simplejson
 
+from zope import component
 from zope import lifecycleevent
 
 from zope.security.interfaces import IPrincipal
@@ -29,7 +30,10 @@ from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
 
-from nti.contentrendering.nti_render import render as nti_render
+from nti.contentlibrary.filesystem import FilesystemBucket
+
+from nti.contentlibrary.interfaces import IContentPackageLibrary
+from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
 from nti.contentlibrary_rendering import LIBRARY_RENDER_JOB
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
@@ -49,6 +53,8 @@ from nti.contentlibrary_rendering.interfaces import SUCCESS
 from nti.contentlibrary_rendering.model import LibraryRenderJob
 
 from nti.contentlibrary_rendering.processing import put_generic_job
+
+from nti.contentrendering.nti_render import render as nti_render
 
 from nti.contentrendering.plastexids import patch_all
 
@@ -200,6 +206,23 @@ def save_source(source, path=None):
     return name
 
 
+# content pacakges
+
+
+def library():
+    return component.queryUtility(IContentPackageLibrary)
+
+
+def get_rendered_package(path):
+    name = os.path.split(path)[1]
+    bucket = FilesystemBucket(name=name)
+    bucket.absolute_path = path  # local path
+    factory = IEclipseContentPackageFactory(bucket)
+    package = factory.new_instance(bucket)
+    assert package is not None, "Invalid rendered content directory"
+    return package
+
+
 # rendering
 
 
@@ -243,8 +266,12 @@ def render_library_job(render_job):
         tmp_dir = tempfile.mkdtemp()
         update_job_status(job_id, RUNNING)
         newInteraction(Participation(IPrincipal(creator)))
+        # 1. save source to a local path
         source = save_source(render_job.source, tmp_dir)
-        render_source(source, render_job.Provider)
+        # 2. render contents
+        tex_file = render_source(source, render_job.Provider)
+        out_path = os.path.splitext(tex_file)[0]
+        get_rendered_package(out_path)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
         traceback_msg = format_exception(e)
