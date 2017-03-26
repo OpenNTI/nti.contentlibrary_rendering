@@ -335,29 +335,24 @@ def process_render_job(render_job):
     outfile_dir = mkdtemp()
     try:
         os.chdir(outfile_dir)
-
         # 1. Transform content into dom
         snapshot = get_published_snapshot(package)
         version = snapshot.version if snapshot else None
         contents = snapshot.contents if snapshot else None
         source_doc = transform_content(package, contentType, contents)
-        # save version
+        # 1a. version
         render_job.Version = version
-
         # 2. Render
         tex_dom = render_document(source_doc,
                                   provider=provider,
                                   package=package,
                                   content_type=contentType,
                                   outfile_dir=outfile_dir)
-
         # 3. Place in target location
         key_or_bucket = locate_rendered_content(tex_dom, package)
         render_job.OutputRoot = key_or_bucket  # save
-
         # 3a. save location in redis in case an retrial
         save_delimited_item(render_job.job_id, key_or_bucket)
-
         # copy rendered data and notify
         copy_and_notify(key_or_bucket, package, render_job)
         return package

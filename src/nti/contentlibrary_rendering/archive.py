@@ -21,6 +21,8 @@ import tempfile
 import traceback
 import simplejson
 
+import transaction
+
 from zope import component
 from zope import lifecycleevent
 
@@ -37,6 +39,7 @@ from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
 from nti.contentlibrary.utils import get_content_package_site
 
+from nti.contentlibrary_rendering import CONTENT_UNITS_HSET
 from nti.contentlibrary_rendering import LIBRARY_RENDER_JOB
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
 
@@ -107,6 +110,13 @@ def job_id_error(job_id):
     return "%s=error" % job_id
 
 
+def get_job_status(job_id):
+    redis = redis_client()
+    if redis is not None:
+        key = job_id_status(job_id)
+        return redis.get(key)
+
+
 def update_job_status(job_id, status, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
@@ -145,6 +155,23 @@ def load_job(job_id):
     job = result[0] if result else None
     job = unpickle(job) if job is not None else None
     return job
+
+
+def save_delimited_item(job_id, item, expiry=EXPIRY_TIME):
+    redis = redis_client()
+    if redis is not None:
+        pipe = redis.pipeline()
+        pipe.hset(CONTENT_UNITS_HSET, job_id, item).expire(job_id, expiry)
+        pipe.execute()
+        return True
+    return False
+
+
+def get_delimited_item(job_id):
+    redis = redis_client()
+    if redis is not None:
+        return redis.hget(CONTENT_UNITS_HSET, job_id)
+    return None
 
 
 # source
@@ -235,21 +262,20 @@ def move_content(library, path):
     locator.move(path, root)
 
 
-def update_library(ntiid, path):
+def update_library(ntiid, path, retry=False):
     library = content_package_library()
     if library is None:  # tests
         return
-    move_content(library, path)
+    if not retry:  # trx retry
+        move_content(library, path)
     package = library.get(ntiid)
-    is_new  = (package is None or \
-               get_content_package_site(package) != get_site())
-    
+    is_new = (package is None or
+              get_content_package_site(package) != get_site())
     # enumerate all content packages to build new pkgs
     enumeration = library.enumeration
     content_packages = enumeration.enumerateContentPackages()
-    content_packages = {x.ntiid:x for x in content_packages}
+    content_packages = {x.ntiid: x for x in content_packages}
     assert ntiid in content_packages
-
     # replace or add
     updated = content_packages[ntiid]
     if not is_new:
@@ -299,18 +325,33 @@ def render_library_job(render_job):
     creator = render_job.creator
     endInteraction()
     try:
-        tmp_dir = tempfile.mkdtemp()
+        retry = False
         update_job_status(job_id, RUNNING)
-        newInteraction(Participation(IPrincipal(creator)))
-        # 1. save source to a local path
-        source = save_source(render_job.source, tmp_dir)
-        # 2. render contents
-        tex_file = render_source(source, render_job.Provider)
+        tex_file = get_delimited_item(job_id)
+        if tex_file is None:
+            tmp_dir = tempfile.mkdtemp()
+            newInteraction(Participation(IPrincipal(creator)))
+            # 1. save source to a local path
+            source = save_source(render_job.source, tmp_dir)
+            # 2. render contents
+            tex_file = render_source(source, render_job.Provider)
+            # 3. save in case of a retry
+            save_delimited_item(job_id, tex_file)
+        else:
+            retry = True
+            logger.warn("Due to a transaction abort, using data from %s for job %s",
+                        tex_file, job_id)
+        # 4. Get package info
         out_path = os.path.splitext(tex_file)[0]
-        # 3. Get package info
         package = get_rendered_package(out_path)
-        # 4. Update library
-        update_library(package.ntiid, out_path)
+        # 5. Update library
+        update_library(package.ntiid, out_path, retry)
+        # 6. clean on commit
+        def after_commit_or_abort(success=False):
+            if success:
+                update_job_status(job_id, SUCCESS)
+                shutil.rmtree(tmp_dir, ignore_errors=True)
+        transaction.get().addAfterCommitHook(after_commit_or_abort)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
         traceback_msg = format_exception(e)
@@ -319,13 +360,11 @@ def render_library_job(render_job):
         update_job_error(job_id, traceback_msg)
     else:
         logger.info('Render (%s) completed', job_id)
-        update_job_status(job_id, SUCCESS)
         render_job.update_to_success_state()
         lifecycleevent.modified(render_job)
     finally:
         restoreInteraction()
         lifecycleevent.modified(render_job)
-        shutil.rmtree(tmp_dir, ignore_errors=True)
     return render_job
 
 
