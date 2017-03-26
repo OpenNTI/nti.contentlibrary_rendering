@@ -49,6 +49,7 @@ from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
 from nti.contentlibrary_rendering.interfaces import RUNNING
 from nti.contentlibrary_rendering.interfaces import SUCCESS
+from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
 from nti.contentlibrary_rendering.model import LibraryRenderJob
 
@@ -64,6 +65,7 @@ from nti.zodb.containers import time_to_64bit_int
 
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import make_specific_safe
+
 
 # Patch our plastex early.
 patch_all()
@@ -209,7 +211,7 @@ def save_source(source, path=None):
 # content pacakges
 
 
-def library():
+def content_package_library():
     return component.queryUtility(IContentPackageLibrary)
 
 
@@ -221,6 +223,22 @@ def get_rendered_package(path):
     package = factory.new_instance(bucket)
     assert package is not None, "Invalid rendered content directory"
     return package
+
+
+def move_content(library, path):
+    enumeration = library.enumeration
+    bucket = getattr(enumeration, 'root', None) \
+          or getattr(enumeration, 'bucket', None)
+    assert bucket is not None, "Invalid library enumeration"
+    locator = component.getUtility(IRenderedContentLocator)
+    locator.move(path, bucket)
+
+
+def update_library(ntiid, path):
+    library = content_package_library()
+    if library is None:  # tests
+        return
+    move_content(library, path)
 
 
 # rendering
@@ -271,7 +289,10 @@ def render_library_job(render_job):
         # 2. render contents
         tex_file = render_source(source, render_job.Provider)
         out_path = os.path.splitext(tex_file)[0]
-        get_rendered_package(out_path)
+        # 3. Get package info
+        package = get_rendered_package(out_path)
+        # 4. Update library
+        update_library(package.ntiid, out_path)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
         traceback_msg = format_exception(e)
