@@ -31,7 +31,8 @@
     <include package="nti.externalization" />
 
     <ext:registerAutoPackageIO
-        root_interfaces=".interfaces.IContentPackageRenderJob
+        root_interfaces=".interfaces.ILibraryRenderJob
+        				 .interfaces.IContentPackageRenderJob
                          .interfaces.IContentPackageRenderMetadata"
         modules=".adapters .model" />
 

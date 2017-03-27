@@ -117,6 +117,13 @@ def get_job_status(job_id):
         return redis.get(key)
 
 
+def get_job_error(job_id):
+    redis = redis_client()
+    if redis is not None:
+        key = job_id_error(job_id)
+        return redis.get(key)
+
+
 def update_job_status(job_id, status, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
@@ -347,6 +354,7 @@ def render_library_job(render_job):
         # 5. Update library
         update_library(package.ntiid, out_path, retry)
         # 6. clean on commit
+
         def after_commit_or_abort(success=False):
             if success:
                 update_job_status(job_id, SUCCESS)
@@ -386,10 +394,10 @@ def render_archive(source, creator, provider='NTI', site=None):
     # 2. store job
     store_job(job)
     # 3. update status
-    result = update_job_status(job.job_id, PENDING)
+    update_job_status(job.job_id, PENDING)
     # 4. queue job
     put_generic_job(CONTENT_UNITS_QUEUE,
                     render_job,
                     job_id=job.job_id,
                     site_name=site_name)
-    return result
+    return job
