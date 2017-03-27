@@ -21,6 +21,8 @@ import tarfile
 import tempfile
 import traceback
 import simplejson
+from ConfigParser import ConfigParser
+from ConfigParser import NoOptionError
 
 import transaction
 
@@ -305,6 +307,17 @@ def update_library(ntiid, path, retry=False):
 def find_renderable(archive):
     if os.path.isfile(archive):
         return archive  # assume renderable
+    nti_conf = os.path.join(archive, 'nti_render_conf.ini')
+    if os.path.exists(nti_conf):
+        config = ConfigParser()
+        with open(nti_conf) as fp:
+            config.readfp(fp)
+            try:
+                tex = config.get('NTI', 'main')
+            except NoOptionError:
+                tex = None
+        if tex and os.path.exists(os.path.join(archive, tex)):
+            return tex
     tex = os.path.basename(archive) + '.tex'
     if os.path.exists(os.path.join(archive, tex)):
         return os.path.join(archive, tex)
