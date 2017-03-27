@@ -11,6 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 import os
 import bz2
+import six
 import sys
 import gzip
 import time
@@ -119,9 +120,15 @@ def get_job_status(job_id):
 
 def get_job_error(job_id):
     redis = redis_client()
-    if redis is not None:
-        key = job_id_error(job_id)
-        return redis.get(key)
+    if redis is None:
+        return None
+    key = job_id_error(job_id)
+    result = redis.get(key)
+    result = simplejson.loads(result) if result else None
+    if isinstance(result, six.string_types):
+        result['message'] = result
+        result['code'] = 'AssertionError'
+    return result
 
 
 def update_job_status(job_id, status, expiry=EXPIRY_TIME):

@@ -63,6 +63,7 @@ setup(
         'nti.site',
         'nti.traversal',
         'nti.zope_catalog',
+        'six',
         'z3c.autoinclude',
         'zc.blist',
         'zope.cachedescriptors',
