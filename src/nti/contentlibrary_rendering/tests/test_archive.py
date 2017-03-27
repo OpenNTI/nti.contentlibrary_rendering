@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 from hamcrest import is_
 from hamcrest import none
 from hamcrest import is_not
+from hamcrest import has_entry
 from hamcrest import ends_with
 from hamcrest import assert_that
 from hamcrest import starts_with
@@ -24,6 +25,7 @@ from io import BytesIO
 
 import fudge
 import fakeredis
+import simplejson
 
 from zope import interface
 
@@ -35,9 +37,11 @@ from nti.contentlibrary_rendering._archive import is_bz2
 from nti.contentlibrary_rendering._archive import is_gzip
 from nti.contentlibrary_rendering._archive import load_job
 from nti.contentlibrary_rendering._archive import store_job
+from nti.contentlibrary_rendering._archive import get_job_status
 from nti.contentlibrary_rendering._archive import process_source
 from nti.contentlibrary_rendering._archive import find_renderable
 from nti.contentlibrary_rendering._archive import generate_job_id
+from nti.contentlibrary_rendering._archive import format_exception
 from nti.contentlibrary_rendering._archive import create_render_job
 from nti.contentlibrary_rendering._archive import update_job_status
 from nti.contentlibrary_rendering._archive import render_library_job
@@ -88,7 +92,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
                 fp.add(out_name, arcname='data.tex')
             source = process_source(tar_name)
             assert_that(source, is_not(none()))
-            assert_that(os.path.isdir(source), is_(True))
+            assert_that(os.path.isdir(source), is_(False))
 
             latex = find_renderable(source)
             assert_that(latex, is_not(none()))
@@ -110,6 +114,8 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         key = update_job_status(jid, "SUCCESS")
         assert_that(key, starts_with(jid))
         assert_that(key, ends_with("=status"))
+        
+        assert_that(get_job_status(jid), is_('SUCCESS'))
 
     @fudge.patch('nti.contentlibrary_rendering._archive.redis_client')
     def test_job_ops(self, mock_rc):
@@ -128,3 +134,14 @@ class TestArchive(ContentlibraryRenderingLayerTest):
             source.data = fp.read()
         job = create_render_job(source, _Principal())
         render_library_job(job)
+
+    def test_format_exception(self):
+        try:
+            raise Exception('bleach')
+        except Exception as e:
+            msg = format_exception(e)
+        assert_that(msg, is_not(none()))
+        msg = simplejson.loads(msg)
+        assert_that(msg, has_entry('message', 'bleach'))
+        assert_that(msg, has_entry('code', 'Exception'))
+        assert_that(msg, has_entry('traceback',  is_not(none())))
