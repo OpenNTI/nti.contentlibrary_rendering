@@ -26,6 +26,8 @@ from ConfigParser import NoOptionError
 
 import transaction
 
+from lxml import etree
+
 from zope import component
 from zope import lifecycleevent
 
@@ -35,10 +37,7 @@ from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
 
-from nti.contentlibrary.filesystem import FilesystemBucket
-
 from nti.contentlibrary.interfaces import IContentPackageLibrary
-from nti.contentlibrary.interfaces import IEclipseContentPackageFactory
 
 from nti.contentlibrary.utils import get_content_package_site
 
@@ -255,17 +254,18 @@ def save_source(source, path=None):
 
 # content pacakges
 
+etree_parse = getattr(etree, 'parse')
+
 
 def content_package_library():
     return component.queryUtility(IContentPackageLibrary)
 
 
-def get_rendered_package(path):
-    name = os.path.split(path)[1]
-    bucket = FilesystemBucket(name=name)
-    bucket.absolute_path = path  # local path
-    factory = IEclipseContentPackageFactory(bucket)
-    package = factory.new_instance(bucket)
+def get_rendered_package_ntiid(path):
+    name = os.path.join(path, 'eclipse-toc.xml')
+    tree = etree_parse(name)
+    root = tree.getroot()
+    package = root.get('ntiid')
     assert package is not None, "Invalid rendered content directory"
     return package
 
@@ -370,9 +370,9 @@ def render_library_job(render_job):
                         tex_file, job_id)
         # 4. Get package info
         out_path = os.path.splitext(tex_file)[0]
-        package = get_rendered_package(out_path)
+        package_ntiid = get_rendered_package_ntiid(out_path)
         # 5. Update library
-        update_library(package.ntiid, out_path, retry)
+        update_library(package_ntiid, out_path, retry)
         # 6. clean on commit
 
         def after_commit_or_abort(success=False):
