@@ -82,7 +82,7 @@ EXPIRY_TIME = 86400  # 24hrs
 
 
 def format_exception(e):
-    result = []
+    result = dict()
     exc_type, exc_value, exc_traceback = sys.exc_info()
     result['message'] = str(e)
     result['code'] = e.__class__.__name__
@@ -227,7 +227,7 @@ def process_source(source):
         tar = tarfile.TarFile(source)
         tar.extractall(target)
         files = os.listdir(target)
-        if files and len(files) == 1 and os.path.isdir(files[0]):
+        if files and len(files) == 1:
             target = os.path.join(target, files[0])
         return process_source(target)
     elif zipfile.is_zipfile(source):
@@ -235,7 +235,7 @@ def process_source(source):
         zf = zipfile.ZipFile(source)
         zf.extractall(target)
         files = os.listdir(target)
-        if files and len(files) == 1 and os.path.isdir(files[0]):
+        if files and len(files) == 1:
             target = os.path.join(target, files[0])
         return process_source(target)
     else:
