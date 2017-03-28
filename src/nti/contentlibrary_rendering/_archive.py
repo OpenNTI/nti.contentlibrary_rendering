@@ -79,7 +79,7 @@ patch_all()
 
 # common
 
-EXPIRY_TIME = 86400  # 24hrs
+EXPIRY_TIME = 172800  # 48hrs
 
 
 def format_exception(e):
