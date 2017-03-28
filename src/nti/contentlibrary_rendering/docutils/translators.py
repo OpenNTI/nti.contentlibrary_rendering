@@ -312,7 +312,7 @@ class ReferenceToPlastexNodeTranslator(TranslatorMixin):
             tex_node.setAttribute('url', rst_node['refuri'])
             return tex_node
         else:
-            raise ValueError('Unsupported link')
+            raise ValueError('Unsupported reference')
 
 
 # Sectioning
