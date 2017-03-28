@@ -53,7 +53,7 @@ from nti.site.hostpolicy import get_host_site
 
 @interface.implementer(IRenderedContentLocator)
 class LocatorMixin(object):
-    
+
     @Lazy
     def _intids(self):
         return component.getUtility(IIntIds)
@@ -92,8 +92,8 @@ class LocatorMixin(object):
 
     def remove(self, bucket):
         logger.info("Removing bucket (%s)", bucket)
-        return self._do_move(bucket)
-    
+        return self._do_remove(bucket)
+
     def move(self, source, root):
         logger.info("Moving %s to (%s)", source, root)
         return self._do_move(source, root)
@@ -137,7 +137,7 @@ class FilesystemLocator(LocatorMixin):
     def _do_remove(self, bucket):
         if os.path.exists(bucket.absolute_path):
             shutil.rmtree(bucket.absolute_path)
-    
+
     def _do_move(self, source, root):
         name = os.path.split(source)[1]
         child = FilesystemBucket(root, name)
