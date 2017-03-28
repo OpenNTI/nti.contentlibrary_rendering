@@ -311,6 +311,9 @@ class ReferenceToPlastexNodeTranslator(TranslatorMixin):
             tex_node = tex_doc.createElement('href')
             tex_node.setAttribute('url', rst_node['refuri'])
             return tex_node
+        elif 'refid' in rst_node:
+            tex_node = tex_doc.createElement('simpleref')
+            tex_node.setAttribute('url', rst_node['refid'])
         else:
             raise ValueError('Unsupported reference')
 
