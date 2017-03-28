@@ -263,6 +263,58 @@ class BulletListToPlastexNodeTranslator(TranslatorMixin):
         return tex_node
 
 
+# reference
+
+
+class TargetToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
+
+    __name__ = 'target'
+
+    
+class ReferenceToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'reference'
+
+    special_chars = {
+        ord('#'): ur'\#',
+        ord('%'): ur'\%',
+        ord('\\'): ur'\\',
+    }
+
+    def has_unbalanced_braces(self, s):
+        """
+        Test whether there are unmatched '{' or '}' characters.
+        """
+        level = 0
+        for ch in s:
+            if ch == '{':
+                level += 1
+            if ch == '}':
+                level -= 1
+            if level < 0:
+                return True
+        return level != 0
+
+    def do_translate(self, rst_node, tex_doc, tex_parent):
+        # external reference (URL)
+        if 'refuri' in rst_node:
+            href = unicode_(rst_node['refuri']).translate(self.special_chars)
+            # problematic chars double caret and unbalanced braces:
+            if href.find('^^') != -1 or self.has_unbalanced_braces(href):
+                raise ValueError(
+                    'External link "%s" not supported by LaTeX.\n'
+                    ' (Must not contain "^^" or unbalanced braces.)' % href)
+
+            if rst_node['refuri'] == rst_node.astext():
+                raise ValueError('refuri "%s" must not be the node text' % href)
+            
+            tex_node = tex_doc.createElement('href')
+            tex_node.setAttribute('url', rst_node['refuri'])
+            return tex_node
+        else:
+            raise ValueError('Unsupported link')
+
+
 # Sectioning
 
 
@@ -444,6 +496,7 @@ def process_children(rst_node, tex_node, tex_doc):
 def skip_node(node):
     # XXX: or should we not just default to including node
     return node.tagname in ('system_message', 'comment')
+
 
 def build_nodes(rst_node, tex_parent, tex_doc):
     """

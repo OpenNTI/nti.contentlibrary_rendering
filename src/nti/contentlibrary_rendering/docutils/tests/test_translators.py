@@ -141,3 +141,8 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         index = self._generate_from_file('label.rst')
         assert_that(index, 
                     contains_string('id="material" ntiid="tag:nextthought.com,2011-10:NTI-HTML-sample.material">'))
+
+    def test_links(self):
+        index = self._generate_from_file('links.rst')
+        assert_that(index, 
+                    contains_string('like <a href="http://www.python.org/">Python</a>'))
