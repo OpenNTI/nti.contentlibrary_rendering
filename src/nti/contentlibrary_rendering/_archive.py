@@ -280,8 +280,8 @@ def move_content(library, path):
     locator.move(path, root)
 
 
-def update_library(ntiid, path, retry=False):
-    library = content_package_library()
+def update_library(ntiid, path, retry=False, library=None):
+    library = content_package_library() if library is None else library
     if library is None:  # tests
         return
     if not retry:  # trx retry
