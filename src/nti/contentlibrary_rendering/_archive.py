@@ -19,7 +19,6 @@ import shutil
 import zipfile
 import tarfile
 import tempfile
-import traceback
 import simplejson
 from ConfigParser import ConfigParser
 from ConfigParser import NoOptionError
@@ -29,6 +28,7 @@ import transaction
 from lxml import etree
 
 from zope import component
+from zope import exceptions
 from zope import lifecycleevent
 
 from zope.security.interfaces import IPrincipal
@@ -87,9 +87,11 @@ def format_exception(e):
     exc_type, exc_value, exc_traceback = sys.exc_info()
     result['message'] = str(e)
     result['code'] = e.__class__.__name__
-    result['traceback'] = repr(traceback.format_exception(exc_type,
-                                                          exc_value,
-                                                          exc_traceback))
+    result['traceback'] = repr(exceptions.format_exception(exc_type,
+                                                           exc_value,
+                                                           exc_traceback,
+                                                           with_filenames=True))
+    del exc_traceback
     return simplejson.dumps(result, indent='\t')
 
 
