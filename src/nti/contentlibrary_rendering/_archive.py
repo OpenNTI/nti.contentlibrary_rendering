@@ -291,11 +291,12 @@ def update_library(ntiid, path, library=None, move=True):
               get_content_package_site(package) != get_site())
     # enumerate all content packages to build new pkgs
     enumeration = library.enumeration
-    content_packages = enumeration.enumerateContentPackages()
-    content_packages = {x.ntiid: x for x in content_packages}
-    assert ntiid in content_packages
-    # replace or add
-    updated = content_packages[ntiid]
+    content_packages = [
+        x for x in enumeration.enumerateContentPackages() if x.ntiid == ntiid
+    ]
+    assert content_packages
+    # add or replace
+    updated = content_packages[0]
     if not is_new:
         library.replace(updated)
     else:
