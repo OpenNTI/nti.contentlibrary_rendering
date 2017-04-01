@@ -278,6 +278,13 @@ def get_rendered_package_ntiid(path):
     return package
 
 
+def remove_content(package):
+    root = getattr(package, 'root', None) \
+        or getattr(package, 'key', None)
+    locator = component.getUtility(IRenderedContentLocator)
+    locator.remove(root)
+    
+
 def move_content(library, path):
     enumeration = library.enumeration
     root = getattr(enumeration, 'root', None) \
