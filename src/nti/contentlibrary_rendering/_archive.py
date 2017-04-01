@@ -226,7 +226,10 @@ def process_source(source):
             shutil.copyfileobj(f_in, f_out)
         return process_source(target)
     elif tarfile.is_tarfile(source):
-        target = tempfile.mkdtemp()
+        _, name = os.path.split(source)
+        if name.lower().endswith('.tar'):
+            name = name[:-4]
+        target = os.path.join(tempfile.mkdtemp(), name) 
         tar = tarfile.TarFile(source)
         tar.extractall(target)
         files = os.listdir(target)
@@ -234,7 +237,10 @@ def process_source(source):
             target = os.path.join(target, files[0])
         return process_source(target)
     elif zipfile.is_zipfile(source):
-        target = tempfile.mkdtemp()
+        _, name = os.path.split(source)
+        if name.lower().endswith('.zip'):
+            name = name[:-4]
+        target = os.path.join(tempfile.mkdtemp(), name) 
         zf = zipfile.ZipFile(source)
         zf.extractall(target)
         files = os.listdir(target)
