@@ -280,11 +280,11 @@ def move_content(library, path):
     locator.move(path, root)
 
 
-def update_library(ntiid, path, retry=False, library=None, move=True):
+def update_library(ntiid, path, library=None, move=True):
     library = content_package_library() if library is None else library
     if library is None:  # tests
         return
-    if move and not retry:  # trx retry
+    if move:  # move False trx retry
         move_content(library, path)
     package = library.get(ntiid)
     is_new = (package is None or
@@ -354,7 +354,7 @@ def render_library_job(render_job):
     creator = render_job.creator
     endInteraction()
     try:
-        retry = False
+        move = True
         update_job_status(job_id, RUNNING)
         tex_file = get_delimited_item(job_id)
         if tex_file is None:
@@ -367,16 +367,15 @@ def render_library_job(render_job):
             # 3. save in case of a retry
             save_delimited_item(job_id, tex_file)
         else:
-            retry = True
+            move = False
             logger.warn("Due to a transaction abort, using data from %s for job %s",
                         tex_file, job_id)
         # 4. Get package info
         out_path = os.path.splitext(tex_file)[0]
         package_ntiid = get_rendered_package_ntiid(out_path)
         # 5. Update library
-        update_library(package_ntiid, out_path, retry)
+        update_library(package_ntiid, out_path, move=move)
         # 6. clean on commit
-
         def after_commit_or_abort(success=False):
             if success:
                 update_job_status(job_id, SUCCESS)
