@@ -39,9 +39,9 @@ def render_package(package, user, provider='NTI', mark_rendered=True):
     if IRenderableContentPackage.providedBy(package):
         site_name = get_site(context=package)
         job = _create_render_job(package, user, provider, mark_rendered)
-        queue_add(CONTENT_UNITS_QUEUE, 
-                  render_package_job, 
-                  job, 
+        queue_add(CONTENT_UNITS_QUEUE,
+                  render_package_job,
+                  job,
                   site_name=site_name)
         return job
 
@@ -53,8 +53,8 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
     job = _create_render_job(package, user, provider, mark_rendered)
     if IRenderableContentPackage.providedBy(package) and is_published(package):
         site_name = get_site(context=package)
-        queue_modified(CONTENT_UNITS_QUEUE, 
-                       render_package_job, 
+        queue_modified(CONTENT_UNITS_QUEUE,
+                       render_package_job,
                        job,
                        site_name=site_name)
     return job
@@ -62,7 +62,9 @@ def render_modified_package(package, user, provider='NTI', mark_rendered=True):
 
 def remove_rendered_package(package, root=None, site_name=None):
     assert IRenderableContentPackage.providedBy(package)
-    root = root or package.root
+    root = root \
+        or getattr(package, 'root', None) \
+        or getattr(package, 'key', None)
     if root is not None:
         site_name = get_site(site_name, context=package)
         queue_remove_rendered_package(package.ntiid, root, site_name)

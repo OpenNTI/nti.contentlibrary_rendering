@@ -253,7 +253,8 @@ def locate_rendered_content(tex_dom, package):
     name_noe, unused = os.path.splitext(name)
     path = os.path.join(path, name_noe)
     # save old location
-    old_root = package.root
+    old_root = getattr(package, 'root', None) \
+            or getattr(package, 'key', None)
     # locate
     locator = component.getUtility(IRenderedContentLocator)
     result = locator.locate(path, package)
