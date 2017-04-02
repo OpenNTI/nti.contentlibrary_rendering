@@ -23,8 +23,6 @@ from nti.base._compat import unicode_
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 
-from nti.coremetadata.interfaces import ICreatedUsername
-
 from nti.site.interfaces import IHostPolicyFolder
 
 from nti.traversal.traversal import find_interface
@@ -94,7 +92,9 @@ class ValidatingCreator(object):
     def __init__(self, obj, default=None):
         try:
             if IContentPackageRenderJob.providedBy(obj):
-                self.creator = ICreatedUsername(obj).creator_username
+                username = getattr(obj.creator, 'username', obj.creator)
+                username = getattr(username, 'id', username)
+                self.creator = (username or '').lower()
         except (AttributeError, TypeError):
             pass
 
