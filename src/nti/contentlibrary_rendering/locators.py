@@ -31,6 +31,7 @@ from nti.contentlibrary import AUTHORED_PREFIX
 
 from nti.contentlibrary.filesystem import FilesystemBucket
 
+from nti.contentlibrary.interfaces import IFilesystemBucket
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 from nti.contentlibrary.interfaces import IDelimitedHierarchyContentPackageEnumeration
 
@@ -135,7 +136,8 @@ class FilesystemLocator(LocatorMixin):
         return root.getChildNamed(name)
 
     def _do_remove(self, bucket):
-        if os.path.exists(bucket.absolute_path):
+        if      IFilesystemBucket.providedBy(bucket) \
+            and os.path.exists(bucket.absolute_path):
             shutil.rmtree(bucket.absolute_path)
 
     def _do_move(self, source, root):
