@@ -129,6 +129,5 @@ def _job_to_package(job):
 @component.adapter(IContentPackageRenderJob)
 @interface.implementer(IContentPackageRenderMetadata)
 def _job_to_meta(job):
-    package = IRenderableContentPackage(job, None)
-    result = IContentPackageRenderMetadata(package, None)
+    result = find_interface(job, IContentPackageRenderMetadata, strict=False)
     return result
