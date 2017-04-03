@@ -134,6 +134,12 @@ class IContentPackageRenderMetadata(IContainer):
         """
     create_job = createJob
 
+    def removeJob(job):
+        """
+        Remove the specified job
+        """
+    remove_job = removeJob
+
     def mostRecentRenderJob():
         """
         Returns the most recent render `IContentPackageRenderJob` or None.
