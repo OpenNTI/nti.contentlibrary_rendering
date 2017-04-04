@@ -443,6 +443,25 @@ class FakeparagraphToPlastexNodeTranslator(TranslatorMixin):
 # Document
 
 
+class MetaToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'meta'
+
+    def do_translate(self, rst_node, tex_doc, tex_parent):
+        title = rst_node.attributes.get('title', None)
+        if title:
+            elements = tex_doc.getElementsByTagName('document')
+            doc_element = elements[0] if elements else None
+            if doc_element is not None:
+                tex_doc.userdata['title'] = title
+                title = tex_doc.createTextNode(title)
+                doc_element.setAttribute('title', title)
+        icon = rst_node.attributes.get('icon', None)
+        if icon:
+            tex_doc.userdata['icon'] = icon
+        return None
+
+
 class DocumentToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'document'

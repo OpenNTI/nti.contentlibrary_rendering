@@ -44,9 +44,11 @@
 	<utility factory=".translators.TitleToPlastexNodeTranslator" name="title" />
 	<utility factory=".translators.SubtitleToPlastexNodeTranslator" name="subtitle" />
 
+	<utility factory=".translators.MetaToPlastexNodeTranslator" name="meta" />
+	<utility factory=".translators.DocumentToPlastexNodeTranslator" name="document" />
+
 	<utility factory=".translators.ChapterToPlastexNodeTranslator" name="chapter" />
 	<utility factory=".translators.SectionToPlastexNodeTranslator" name="section" />
-	<utility factory=".translators.DocumentToPlastexNodeTranslator" name="document" />
 	<utility factory=".translators.ParagraphToPlastexNodeTranslator" name="paragraph" />
 	<utility factory=".translators.BlockQuoteToPlastexNodeTranslator" name="block_quote" />
 	<utility factory=".translators.FakesectionToPlastexNodeTranslator" name="fakesection" />

@@ -148,3 +148,10 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                     contains_string('like <a href="http://www.python.org/">Python</a>'))
         assert_that(index, 
                     contains_string('Click <a href="http://www.google.com">here</a></p>'))
+        
+    def test_meta(self):
+        index = self._generate_from_file('meta.rst')
+        assert_that(index, 
+                    contains_string('<title>Bankai Ichigo</title>'))
+        assert_that(index, 
+                     contains_string('<div class="title">Bankai Ichigo</div>'))
