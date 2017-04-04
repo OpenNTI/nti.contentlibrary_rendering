@@ -5,9 +5,6 @@ entry_points = {
     "z3c.autoinclude.plugin": [
         'target = nti.contentlibrary',
     ],
-    'console_scripts': [
-        "nti_library_renderer = nti.contentlibrary_rendering.scripts.renderer:main",
-    ]
 }
 
 TESTS_REQUIRE = [
