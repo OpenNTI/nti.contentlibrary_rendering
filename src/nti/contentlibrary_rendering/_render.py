@@ -82,6 +82,70 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 patch_all()
 
 
+# metadata
+
+
+class Metadata(object):
+
+    icon = None
+    title = None
+    description = None
+    key_or_bucket = None
+
+
+def create_metadata(tex_dom, key_or_bucket=None):
+    result = Metadata()
+    result.title = tex_dom.title
+    result.key_or_bucket = key_or_bucket
+    result.icon = tex_dom.userdata.get('icon')
+    result.description = tex_dom.userdata.get('description')
+    return result
+
+def save_metadata(job_id, item, expiry=CONTENT_UNITS_HSET_EXPIRY):
+    try:
+        redis = redis_client()
+        if redis is not None:
+            data = dump(item)
+            pipe = redis.pipeline()
+            pipe.hset(CONTENT_UNITS_HSET, job_id, data).expire(job_id, expiry)
+            pipe.execute()
+            return True
+    except Exception:
+        logger.exception("Could not place %s in %s for %s",
+                         item, CONTENT_UNITS_HSET, job_id)
+    return False
+save_delimited_item = save_metadata  # BWC
+
+
+def get_metadata(job_id):
+    try:
+        redis = redis_client()
+        if redis is not None:
+            data = redis.hget(CONTENT_UNITS_HSET, job_id)
+            if data is not None:
+                return unpickle(data)
+    except Exception:
+        logger.exception("Could not get metadata from %s for %s",
+                         CONTENT_UNITS_HSET, job_id)
+    return None
+get_delimited_item = get_metadata  # BWC
+
+
+def delete_metadata(job_id):
+    try:
+        redis = redis_client()
+        if redis is not None:
+            redis.hdel(CONTENT_UNITS_HSET, job_id)
+    except Exception:
+        logger.exception("Could not delete metadata from %s for %s",
+                         CONTENT_UNITS_HSET, job_id)
+    return None
+delete_delimited_item = delete_metadata # BWC
+
+
+# rendering
+
+
 def copy_attributes(source, target, names):
     for name in names or ():
         value = getattr(source, name, None)
@@ -263,45 +327,6 @@ def locate_rendered_content(tex_dom, package):
     return result
 
 
-def save_delimited_item(job_id, item, expiry=CONTENT_UNITS_HSET_EXPIRY):
-    try:
-        redis = redis_client()
-        if redis is not None:
-            data = dump(item)
-            pipe = redis.pipeline()
-            pipe.hset(CONTENT_UNITS_HSET, job_id, data).expire(job_id, expiry)
-            pipe.execute()
-            return True
-    except Exception:
-        logger.exception("Could not place %s in %s for %s",
-                         item, CONTENT_UNITS_HSET, job_id)
-    return False
-
-
-def get_delimited_item(job_id):
-    try:
-        redis = redis_client()
-        if redis is not None:
-            data = redis.hget(CONTENT_UNITS_HSET, job_id)
-            if data is not None:
-                return unpickle(data)
-    except Exception:
-        logger.exception("Could not get item from %s for %s",
-                         CONTENT_UNITS_HSET, job_id)
-    return None
-
-
-def delete_delimited_item(job_id):
-    try:
-        redis = redis_client()
-        if redis is not None:
-            redis.hdel(CONTENT_UNITS_HSET, job_id)
-    except Exception:
-        logger.exception("Could not delete item from %s for %s",
-                         CONTENT_UNITS_HSET, job_id)
-    return None
-
-
 def copy_and_notify(bucket, package, render_job, tex_dom=None):
     # 4. copy from target
     copy_package_data(bucket, package)
@@ -352,8 +377,9 @@ def process_render_job(render_job):
         # 3. Place in target location
         key_or_bucket = locate_rendered_content(tex_dom, package)
         render_job.OutputRoot = key_or_bucket  # save
-        # 3a. save location in redis in case an retrial
-        save_delimited_item(render_job.job_id, key_or_bucket)
+        # 3a. save metadata in redis in case a retry
+        data = create_metadata(tex_dom, key_or_bucket)
+        save_metadata(render_job.job_id, data)
         # copy rendered data and notify
         copy_and_notify(key_or_bucket, package, render_job, tex_dom)
         return package
@@ -386,7 +412,8 @@ def render_package_job(render_job):
     endInteraction()
     try:
         newInteraction(Participation(IPrincipal(creator)))
-        key_or_bucket = get_delimited_item(job_id)
+        metadata = get_metadata(job_id)
+        key_or_bucket = metadata.key_or_bucket if metadata else None
         if key_or_bucket is None or not key_or_bucket.exists():
             process_render_job(render_job)
         else:
