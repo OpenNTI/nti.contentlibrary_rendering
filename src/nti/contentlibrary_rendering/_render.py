@@ -302,7 +302,7 @@ def delete_delimited_item(job_id):
     return None
 
 
-def copy_and_notify(bucket, package, render_job):
+def copy_and_notify(bucket, package, render_job, tex_dom=None):
     # 4. copy from target
     copy_package_data(bucket, package)
 
@@ -355,7 +355,7 @@ def process_render_job(render_job):
         # 3a. save location in redis in case an retrial
         save_delimited_item(render_job.job_id, key_or_bucket)
         # copy rendered data and notify
-        copy_and_notify(key_or_bucket, package, render_job)
+        copy_and_notify(key_or_bucket, package, render_job, tex_dom)
         return package
     finally:
         os.chdir(current_dir)
