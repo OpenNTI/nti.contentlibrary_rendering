@@ -13,6 +13,10 @@ from docutils.nodes import Element
 from docutils.nodes import General
 
 
+class meta(General, Element):
+    pass
+
+
 class label(General, Element):
     pass
 

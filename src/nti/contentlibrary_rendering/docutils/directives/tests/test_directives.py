@@ -44,3 +44,8 @@ class TestDirectives(ContentlibraryRenderingLayerTest):
         from nti.contentlibrary_rendering.docutils.directives import label
         assert_that(label, validly_provides(IDirectivesModule))
         assert_that(docutils_directive('label', None, None), is_(not_none()))
+        
+    def test_meta_directive(self):
+        from nti.contentlibrary_rendering.docutils.directives import meta
+        assert_that(meta, validly_provides(IDirectivesModule))
+        assert_that(docutils_directive('meta', None, None), is_(not_none()))
