@@ -27,15 +27,15 @@ class Meta(Directive):
     option_spec = {
         'icon': directives.unchanged,
         'title': directives.unchanged,
+        'description': directives.unchanged,
     }
 
     def run(self):
         result = meta()
         options = self.options
-        if 'icon' in options and options['icon']:
-            result['icon'] = options['icon']
-        if 'title' in options and options['title']:
-            result['title'] = options['title']
+        for name in self.option_spec.keys():
+            if name in options and options[name]:
+                result[name] = options[name]
         return [result]
 
 
