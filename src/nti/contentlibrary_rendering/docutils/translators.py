@@ -106,9 +106,8 @@ class TitleToPlastexNodeTranslator(TranslatorMixin):
     def _process_document_title(self, rst_node, tex_doc, tex_parent):
         result = tex_doc.createElement('maketitle')
         tex_doc.userdata['title'] = rst_node.astext()
-        tex_doc.userdata['author'] = ''
-        tex_doc.userdata['date'] = ''
-        tex_doc.userdata['thanks'] = ''
+        for name in  ('author', 'date', 'thanks', 'description'):
+            tex_doc.userdata[name] = ''
         # Make sure we remove child node
         rst_node.children = rst_node.children[1:]
         return result
