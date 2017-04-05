@@ -456,9 +456,10 @@ class MetaToPlastexNodeTranslator(TranslatorMixin):
                 tex_doc.userdata['title'] = title
                 title = tex_doc.createTextNode(title)
                 doc_element.setAttribute('title', title)
-        icon = rst_node.attributes.get('icon', None)
-        if icon:
-            tex_doc.userdata['icon'] = icon
+        for name in ('icon', 'description'):
+            value = rst_node.attributes.get(name, None)
+            if value:
+                tex_doc.userdata[name] = value
         return None
 
 
