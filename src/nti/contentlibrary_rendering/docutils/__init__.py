@@ -19,15 +19,16 @@ from docutils.parsers.rst import Parser
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
-def _get_settings():
+def get_settings():
     settings = OptionParser(components=(Parser,)).get_default_values()
     settings.character_level_inline_markup = True
     return settings
+_get_settings = get_settings
 
 
 def get_rst_dom(source, settings=None):
     if not settings:
-        settings = _get_settings()
+        settings = get_settings()
     rst_dom = publish_doctree(source=source,
                               settings=settings)
     return rst_dom
