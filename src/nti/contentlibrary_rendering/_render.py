@@ -86,7 +86,6 @@ patch_all()
 
 
 class Metadata(object):
-
     icon = None
     title = None
     description = None
