@@ -153,7 +153,7 @@ def copy_attributes(source, target, names):
             setattr(target, name, value)
 
 
-def _copy_annotations(package, old_annotations):
+def copy_annotations(package, old_annotations):
     """
     Copy our old annotations into our new package (with new ntiid).
     """
@@ -284,7 +284,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
         os.chdir(current_dir)
 
 
-def _get_contents_to_render(package):
+def get_contents_to_render(package):
     """
     Get the latest published contents for our package, otherwise fall
     back to the current contents on the package.
@@ -299,7 +299,7 @@ def _get_contents_to_render(package):
 
 def transform_content(context, contentType, contents=None):
     if contents is None:
-        contents = _get_contents_to_render(context)
+        contents = get_contents_to_render(context)
     transformer = component.getUtility(IContentTransformer,
                                        name=str(contentType))
     return transformer.transform(contents, context=context)
@@ -327,11 +327,15 @@ def locate_rendered_content(tex_dom, package):
     return result
 
 
-def copy_and_notify(bucket, package, render_job, tex_dom=None):
+def copy_and_notify(bucket, package, render_job, metadata=None):
     # 4. copy from target
     copy_package_data(bucket, package)
 
-    # 5. marked as rendered
+    # 5. copy from metadata
+    if metadata is not None and metadata.icon:
+        package.icon = metadata.icon
+
+    # 6. marked as rendered
     if render_job.MarkRendered:
         interface.alsoProvides(package, IContentRendered)
         event_notify(ContentPackageRenderedEvent(package))
@@ -378,10 +382,10 @@ def process_render_job(render_job):
         key_or_bucket = locate_rendered_content(tex_dom, package)
         render_job.OutputRoot = key_or_bucket  # save
         # 3a. save metadata in redis in case a retry
-        data = create_metadata(tex_dom, key_or_bucket)
-        save_metadata(render_job.job_id, data)
+        metadata = create_metadata(tex_dom, key_or_bucket)
+        save_metadata(render_job.job_id, metadata)
         # copy rendered data and notify
-        copy_and_notify(key_or_bucket, package, render_job, tex_dom)
+        copy_and_notify(key_or_bucket, package, render_job, metadata)
         return package
     finally:
         os.chdir(current_dir)
@@ -424,7 +428,7 @@ def render_package_job(render_job):
             logger.warn("Due to a transaction abort, copying data from %s for package %s",
                         key_or_bucket, package.ntiid)
             old_root = package.root
-            copy_and_notify(key_or_bucket, package, render_job)
+            copy_and_notify(key_or_bucket, package, render_job, metadata)
             render_job.OutputRoot = key_or_bucket  # save
             content_package_pocation_changed(package, old_root, key_or_bucket)
     except Exception as e:
