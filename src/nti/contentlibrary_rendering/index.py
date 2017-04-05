@@ -127,7 +127,7 @@ class EndTimeRawIndex(RawIntegerValueIndex):
 def EndTimeIndex(family=None):
     return NormalizationWrapper(field_name='lastModified',
                                 interface=IContentPackageRenderJob,
-                                index=StartTimeRawIndex(family=family),
+                                index=EndTimeRawIndex(family=family),
                                 normalizer=TimestampToNormalized64BitIntNormalizer())
 
 
