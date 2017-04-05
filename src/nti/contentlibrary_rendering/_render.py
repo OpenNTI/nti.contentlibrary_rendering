@@ -95,9 +95,9 @@ class Metadata(object):
 
 def create_metadata(tex_dom, key_or_bucket=None):
     result = Metadata()
-    result.title = tex_dom.title
     result.key_or_bucket = key_or_bucket
     result.icon = tex_dom.userdata.get('icon')
+    result.title = tex_dom.userdata.get('title')
     result.description = tex_dom.userdata.get('description')
     return result
 
