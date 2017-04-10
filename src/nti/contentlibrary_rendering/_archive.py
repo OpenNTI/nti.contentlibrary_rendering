@@ -41,6 +41,7 @@ from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.contentlibrary.utils import get_content_package_site
 
+from nti.contentlibrary_rendering import NTI_PROVIDER
 from nti.contentlibrary_rendering import CONTENT_UNITS_HSET
 from nti.contentlibrary_rendering import LIBRARY_RENDER_JOB
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
@@ -150,7 +151,7 @@ def update_job_error(job_id, error, expiry=EXPIRY_TIME):
         return key
 
 
-def create_render_job(source, creator, provider='NTI'):
+def create_render_job(source, creator, provider=NTI_PROVIDER):
     result = LibraryRenderJob()
     result.job_id = generate_job_id(source, creator)
     result.source = source
@@ -329,7 +330,7 @@ def find_renderable(archive):
         with open(nti_conf) as fp:
             config.readfp(fp)
             try:
-                tex = config.get('NTI', 'main')
+                tex = config.get(NTI_PROVIDER, 'main')
             except NoOptionError:
                 tex = None
         if tex and os.path.exists(os.path.join(archive, tex)):
@@ -344,7 +345,7 @@ def find_renderable(archive):
     raise ValueError("Cannot find renderable LaTeX file")
 
 
-def render_source(source, provider='NTI', docachefile=False):
+def render_source(source, provider=NTI_PROVIDER, docachefile=False):
     source = os.path.abspath(source)
     archive = process_source(source)
     tex_file = find_renderable(archive)
@@ -422,7 +423,7 @@ def render_job(job_id):
         render_library_job(job)
 
 
-def render_archive(source, creator, provider='NTI', site=None):
+def render_archive(source, creator, provider=NTI_PROVIDER, site=None):
     site_name = get_site(site)
     # 1. create job
     job = create_render_job(source, get_creator(creator), provider)

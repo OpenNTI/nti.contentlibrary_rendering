@@ -25,11 +25,12 @@ from nti.contentlibrary.interfaces import IContentPackage
 
 from nti.contentlibrary_rendering.common import get_creator
 
-from nti.contentlibrary_rendering.interfaces import FAILED, ILibraryRenderJob
+from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
 from nti.contentlibrary_rendering.interfaces import SUCCESS
 
 from nti.contentlibrary_rendering.interfaces import IRenderJob
+from nti.contentlibrary_rendering.interfaces import ILibraryRenderJob
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID

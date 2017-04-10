@@ -11,6 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
+from nti.contentlibrary_rendering import NTI_PROVIDER
 from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
 
 from nti.contentlibrary_rendering._render import render_package_job
@@ -26,13 +27,13 @@ from nti.contentlibrary_rendering.processing import queue_add
 from nti.contentlibrary_rendering.processing import queue_modified
 
 
-def _create_render_job(package, user, provider='NTI', mark_rendered=True):
+def _create_render_job(package, user, provider=NTI_PROVIDER, mark_rendered=True):
     meta = IContentPackageRenderMetadata(package)
     job = meta.createJob(package, user, provider, mark_rendered)
     return job
 
 
-def render_package(package, user, provider='NTI', mark_rendered=True):
+def render_package(package, user, provider=NTI_PROVIDER, mark_rendered=True):
     """
     Render the given package. This may not be performed synchronously.
     """
@@ -46,7 +47,7 @@ def render_package(package, user, provider='NTI', mark_rendered=True):
         return job
 
 
-def render_modified_package(package, user, provider='NTI', mark_rendered=True):
+def render_modified_package(package, user, provider=NTI_PROVIDER, mark_rendered=True):
     """
     Render the updated package (if published). This may not be performed synchronously.
     """

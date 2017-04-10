@@ -13,6 +13,9 @@ from zope import component
 
 from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
 
+#: NTI provider
+NTI_PROVIDER = u'NTI'
+
 #: text mime type
 TEXT_MIMETYPE = b'text/plain'
 

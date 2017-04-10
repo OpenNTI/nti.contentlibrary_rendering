@@ -50,6 +50,7 @@ from nti.contentlibrary.utils import get_published_snapshot
 from nti.contentlibrary.zodb import RenderableContentUnit
 from nti.contentlibrary.zodb import RenderableContentPackage
 
+from nti.contentlibrary_rendering import NTI_PROVIDER
 from nti.contentlibrary_rendering import RST_MIMETYPE
 from nti.contentlibrary_rendering import CONTENT_UNITS_HSET
 from nti.contentlibrary_rendering import CONTENT_UNITS_HSET_EXPIRY
@@ -216,7 +217,7 @@ def copy_package_data(item, target):
     return target
 
 
-def prepare_tex_document(package=None, provider='NTI', jobname=None,
+def prepare_tex_document(package=None, provider=NTI_PROVIDER, jobname=None,
                          context=None, tex_dom=None, outfile_dir=None):
     """
     Build and prepare context for our plasTeX document, returning
@@ -262,7 +263,7 @@ def apply_config_overrides(tex_dom):
 
 
 def render_document(source_doc, package=None, outfile_dir=None,
-                    provider='NTI', jobname=None, content_type=RST_MIMETYPE):
+                    provider=NTI_PROVIDER, jobname=None, content_type=RST_MIMETYPE):
     """
     Render the given source document.
     """
