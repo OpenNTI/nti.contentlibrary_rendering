@@ -94,7 +94,7 @@ class ValidatingCreator(object):
             if IContentPackageRenderJob.providedBy(obj):
                 username = getattr(obj.creator, 'username', obj.creator)
                 username = getattr(username, 'id', username)
-                self.creator = (username or '').lower()
+                self.creator = username
         except (AttributeError, TypeError):
             pass
 
