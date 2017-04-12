@@ -10,6 +10,7 @@ __docformat__ = "restructuredtext en"
 logger = __import__('logging').getLogger(__name__)
 
 import os
+import time
 
 from plasTeX import Base
 from plasTeX import TeXDocument
@@ -408,6 +409,7 @@ def _get_jobs_to_update(render_job):
 
 
 def render_package_job(render_job):
+    start_time = time.time()
     logger.info('Rendering content (%s) (%s)',
                 render_job.PackageNTIID,
                 render_job.job_id)
@@ -436,11 +438,13 @@ def render_package_job(render_job):
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(str(e))
     else:
+        duration = time.time() - start_time
         jobs_to_update = _get_jobs_to_update(render_job)
         for job in jobs_to_update:
-            logger.info('Finished rendering content (%s) (%s)',
+            logger.info('Finished rendering content (%s) (%s) (%.2fs)',
                         job.PackageNTIID,
-                        job.job_id)
+                        job.job_id,
+                        duration)
             job.update_to_success_state()
             lifecycleevent.modified(job)
     finally:
