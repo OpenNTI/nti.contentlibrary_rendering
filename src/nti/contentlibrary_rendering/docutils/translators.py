@@ -84,10 +84,6 @@ class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
         return result
 
 
-class ImageToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
-    __name__ = "image"
-
-
 class MathToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
     __name__ = "math"
 

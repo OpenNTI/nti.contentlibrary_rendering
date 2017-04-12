@@ -27,7 +27,6 @@
 	<!-- Plastex Translators -->
 	<utility factory=".translators.DefaultNodeToPlastexNodeTranslator" />
 	<utility factory=".translators.MathToPlastexNodeTranslator" name="math" />
-	<utility factory=".translators.ImageToPlastexNodeTranslator" name="image" />
 
 	<utility factory=".translators.TextToPlastexNodeTranslator" name="#text" />
 	<utility factory=".translators.StrongToPlastexNodeTranslator" name="strong" />
