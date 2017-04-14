@@ -43,10 +43,7 @@ def _handle_missing_job(job_id, package_ntiid):
     site_name = getSite().__name__
     package = find_object_with_ntiid(package_ntiid)
     meta = IContentPackageRenderMetadata(package, None)
-
-    keys = ''
-    if meta:
-        keys = tuple(meta)
+    keys = tuple(meta) if meta else ''
     logger.info('[%s] Job missing (deleted?); event dropped. (%s) (%s) (%s) (jobs=%s)',
                 site_name,
                 job_id,
