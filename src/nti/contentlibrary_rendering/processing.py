@@ -35,66 +35,33 @@ from nti.site.site import get_site_for_site_names
 
 from nti.site.transient import TrivialSite
 
-#: The max number of times we'll retry a job that is not found.
-MAX_RETRY_COUNT = 5
-
 
 def _dataserver_folder():
     dataserver = component.getUtility(IDataserver)
     return dataserver.root_folder['dataserver2']
 
 
-def _handle_missing_job(func, job_id, package_ntiid, retry_count, **kwargs):
+def _handle_missing_job(job_id, package_ntiid):
     site_name = getSite().__name__
     package = find_object_with_ntiid(package_ntiid)
-    if package is None:
-        logger.error("Cannot find package with NTIID %s in site %s",
-                     package_ntiid, site_name)
-        return
-
     meta = IContentPackageRenderMetadata(package, None)
-    if meta is None:
-        logger.error("Cannot get render metadata for package (%s,%s)",
-                     package.mimeType, package.ntiid)
-        return
 
     keys = ''
     if meta:
         keys = tuple(meta)
-    if retry_count < MAX_RETRY_COUNT:
-        # Re-queue; this may happen because of a race condition of when we open
-        # the db connection (tx) and then pull from the redisqueue.
-        # It's hard to distinguish between this case and when an object is
-        # deleted before this job runs. Unfortunately, this job goes to the end
-        # of the queue, but if we hit this race condition, the queue should be
-        # nearly empty.
-        logger.info('[%s] Job missing (deleted?); will retry. (%s) (%s)',
-                    site_name,
-                    job_id,
-                    package_ntiid)
-        retry_count += 1
-        put_render_job(CONTENT_UNITS_QUEUE,
-                       func,
-                       job_id=job_id,
-                       package_ntiid=package_ntiid,
-                       retry_count=retry_count,
-                       **kwargs)
-    else:
-        logger.info('[%s] Job missing (deleted?); event dropped. (%s) (%s) (retry_count=%s) (%s) (jobs=%s)',
-                    site_name,
-                    job_id,
-                    package_ntiid,
-                    retry_count,
-                    package,
-                    keys)
+    logger.info('[%s] Job missing (deleted?); event dropped. (%s) (%s) (%s) (jobs=%s)',
+                site_name,
+                job_id,
+                package_ntiid,
+                package,
+                keys)
 
 
-def _do_execute_render_job(func, job_id=None, package_ntiid=None, retry_count=0,
+def _do_execute_render_job(func, job_id=None, package_ntiid=None,
                            *args, **kwargs):
     render_job = get_render_job(package_ntiid, job_id)
     if render_job is None:
-        # Job missing
-        _handle_missing_job(func, job_id, package_ntiid, retry_count, **kwargs)
+        _handle_missing_job(job_id, package_ntiid)
     elif render_job.is_finished():
         # Job preemptively completed.
         logger.info('[%s] Job already completed, ignoring (%s) (%s)',
