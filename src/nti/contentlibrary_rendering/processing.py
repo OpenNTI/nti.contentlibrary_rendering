@@ -18,8 +18,6 @@ from zope.component.hooks import site as current_site
 
 from nti.async import create_job
 
-from nti.contentlibrary_rendering import CONTENT_UNITS_QUEUE
-
 from nti.contentlibrary_rendering import get_factory
 
 from nti.contentlibrary_rendering.common import get_site
