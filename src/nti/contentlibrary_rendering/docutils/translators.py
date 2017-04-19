@@ -299,9 +299,6 @@ class ReferenceToPlastexNodeTranslator(TranslatorMixin):
                 raise ValueError(
                     'External link "%s" not supported by LaTeX.\n'
                     ' (Must not contain "^^" or unbalanced braces.)' % href)
-
-            if rst_node['refuri'] == rst_node.astext():
-                raise ValueError('refuri "%s" must not be the node text' % href)
             
             tex_node = tex_doc.createElement('href')
             tex_node.setAttribute('url', rst_node['refuri'])
