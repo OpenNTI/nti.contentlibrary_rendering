@@ -154,4 +154,9 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         assert_that(index, 
                     contains_string('<title>Bankai Ichigo</title>'))
         assert_that(index, 
-                     contains_string('<div class="title">Bankai Ichigo</div>'))
+                    contains_string('<div class="title">Bankai Ichigo</div>'))
+        
+    def test_formats(self):
+        index = self._generate_from_file('formats.rst')
+        assert_that(index, 
+                    contains_string('<em><span class="underline">Examine the differences between the Democratic and Republican Parties</span></em><span class="underline">, the social impact of terrorist organizations, the growing suspicions over the reach of the federal government,</span> <b class="bfseries">and the subsequent end of Reconstruction.</b>'))
