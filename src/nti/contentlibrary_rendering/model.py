@@ -46,7 +46,7 @@ from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from nti.zope_catalog.location import find_interface
+from nti.traversal.location import find_interface
 
 
 @EqHash('JobId')

@@ -40,7 +40,7 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.site.interfaces import IHostPolicyFolder
 
-from nti.zope_catalog.location import find_interface
+from nti.traversal.location import find_interface
 
 TMP_MAX = 10000
 

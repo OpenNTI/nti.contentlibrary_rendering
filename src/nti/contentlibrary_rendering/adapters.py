@@ -39,9 +39,9 @@ from nti.ntiids.ntiids import make_specific_safe
 
 from nti.property.property import alias
 
-from nti.zodb.containers import time_to_64bit_int
+from nti.traversal.location import find_interface
 
-from nti.zope_catalog.location import find_interface
+from nti.zodb.containers import time_to_64bit_int
 
 
 @component.adapter(IRenderableContentPackage)

@@ -58,6 +58,7 @@ setup(
         'nti.namedfile',
         'nti.ntiids',
         'nti.site',
+        'nti.traversal',
         'nti.zope_catalog',
         'six',
         'z3c.autoinclude',
