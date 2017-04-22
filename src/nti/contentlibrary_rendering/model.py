@@ -46,7 +46,7 @@ from nti.schema.field import SchemaConfigured
 
 from nti.schema.fieldproperty import createDirectFieldProperties
 
-from nti.traversal.traversal import find_interface
+from nti.zope_catalog.location import find_interface
 
 
 @EqHash('JobId')
@@ -145,7 +145,7 @@ class ContentPackageRenderJob(RenderJob):
 
     @readproperty
     def creator(self):
-        package = find_interface(self, IContentPackage, strict=False)
+        package = find_interface(self, IContentPackage)
         return get_creator(package) or SYSTEM_USER_ID
 
     @readproperty

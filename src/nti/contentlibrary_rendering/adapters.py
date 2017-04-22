@@ -39,9 +39,9 @@ from nti.ntiids.ntiids import make_specific_safe
 
 from nti.property.property import alias
 
-from nti.traversal.traversal import find_interface
-
 from nti.zodb.containers import time_to_64bit_int
+
+from nti.zope_catalog.location import find_interface
 
 
 @component.adapter(IRenderableContentPackage)
@@ -122,12 +122,12 @@ def render_meta_factory(context):
 @component.adapter(IContentPackageRenderJob)
 @interface.implementer(IRenderableContentPackage)
 def _job_to_package(job):
-    result = find_interface(job, IRenderableContentPackage, strict=False)
+    result = find_interface(job, IRenderableContentPackage)
     return result
 
 
 @component.adapter(IContentPackageRenderJob)
 @interface.implementer(IContentPackageRenderMetadata)
 def _job_to_meta(job):
-    result = find_interface(job, IContentPackageRenderMetadata, strict=False)
+    result = find_interface(job, IContentPackageRenderMetadata)
     return result

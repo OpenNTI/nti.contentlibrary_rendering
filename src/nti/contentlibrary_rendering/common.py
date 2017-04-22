@@ -40,7 +40,7 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 
 from nti.site.interfaces import IHostPolicyFolder
 
-from nti.traversal.traversal import find_interface
+from nti.zope_catalog.location import find_interface
 
 TMP_MAX = 10000
 
@@ -100,7 +100,7 @@ isPublished = is_published
 
 def get_site(site_name=None, context=None):
     if not site_name and context is not None:
-        folder = find_interface(context, IHostPolicyFolder, strict=False)
+        folder = find_interface(context, IHostPolicyFolder)
         site_name = getattr(folder, '__name__', None)
     if not site_name:
         site = getSite()
