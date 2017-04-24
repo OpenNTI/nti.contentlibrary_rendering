@@ -27,8 +27,6 @@ _get_settings = get_settings
 
 
 def get_rst_dom(source, settings=None):
-    if not settings:
-        settings = get_settings()
     rst_dom = publish_doctree(source=source,
                               settings=settings)
     return rst_dom

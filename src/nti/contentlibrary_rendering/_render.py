@@ -102,6 +102,7 @@ def create_metadata(tex_dom, key_or_bucket=None):
     result.description = tex_dom.userdata.get('description')
     return result
 
+
 def save_metadata(job_id, item, expiry=CONTENT_UNITS_HSET_EXPIRY):
     try:
         redis = redis_client()
@@ -141,7 +142,7 @@ def delete_metadata(job_id):
         logger.exception("Could not delete metadata from %s for %s",
                          CONTENT_UNITS_HSET, job_id)
     return None
-delete_delimited_item = delete_metadata # BWC
+delete_delimited_item = delete_metadata  # BWC
 
 
 # rendering
@@ -319,7 +320,7 @@ def locate_rendered_content(tex_dom, package):
     path = os.path.join(path, name_noe)
     # save old location
     old_root = getattr(package, 'root', None) \
-            or getattr(package, 'key', None)
+        or getattr(package, 'key', None)
     # locate
     locator = component.getUtility(IRenderedContentLocator)
     result = locator.locate(path, package)
