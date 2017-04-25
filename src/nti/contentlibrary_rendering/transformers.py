@@ -14,6 +14,8 @@ import os
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import Lazy
+
 from zope.intid.interfaces import IIntIds
 
 from nti.contentlibrary_rendering.common import mkdtemp
@@ -23,8 +25,6 @@ from nti.contentlibrary_rendering.interfaces import IContentTransformer
 from nti.contentrendering.nti_render import process_document
 
 from nti.contentrendering.render_document import parse_tex
-
-from nti.property.property import Lazy
 
 
 class TransformerMixin(object):

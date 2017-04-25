@@ -20,6 +20,7 @@ import boto
 from zope import component
 from zope import interface
 
+from zope.cachedescriptors.property import Lazy
 from zope.cachedescriptors.property import readproperty
 
 from zope.component.hooks import site as getSite
@@ -46,8 +47,6 @@ from nti.contentlibrary_rendering.common import sha1_hex_digest
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 
 from nti.namedfile.file import safe_filename
-
-from nti.property.property import Lazy
 
 from nti.site.hostpolicy import get_host_site
 
