@@ -57,6 +57,7 @@ setup(
         'nti.externalization',
         'nti.namedfile',
         'nti.ntiids',
+        'nti.publishing',
         'nti.site',
         'nti.traversal',
         'nti.zope_catalog',

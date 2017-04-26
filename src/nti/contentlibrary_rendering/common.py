@@ -33,10 +33,11 @@ from nti.contentlibrary import AUTHORED_PREFIX
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
-from nti.coremetadata.interfaces import IPublishable
 from nti.coremetadata.interfaces import IRedisClient
 
 from nti.ntiids.ntiids import find_object_with_ntiid
+
+from nti.publishing.interfaces import IPublishable
 
 from nti.site.interfaces import IHostPolicyFolder
 
