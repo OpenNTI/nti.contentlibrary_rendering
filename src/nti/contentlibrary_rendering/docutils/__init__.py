@@ -24,7 +24,7 @@ def get_settings():
     settings = OptionParser(components=(Parser,)).get_default_values()
     settings.halt_level = 4
     settings.report_level = 2
-    # settings.character_level_inline_markup = True
+    settings.character_level_inline_markup = True
     return settings
 _get_settings = get_settings
 
