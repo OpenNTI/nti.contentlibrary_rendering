@@ -23,7 +23,7 @@ from zope import component
 
 from nti.contentlibrary_rendering._render import render_document
 
-from nti.contentlibrary_rendering.docutils import publish_doctree
+from nti.contentlibrary_rendering.docutils import get_rst_dom
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
@@ -47,7 +47,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         index = None
         name = os.path.join(os.path.dirname(__file__), 'data/%s' % source)
         with open(name, "rb") as fp:
-            source_doc = publish_doctree(fp.read())
+            source_doc = get_rst_dom(fp.read())
         tex_dir = tempfile.mkdtemp(prefix="render_")
         try:
             render_document(source_doc,
