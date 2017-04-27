@@ -67,98 +67,97 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
 
     def test_bullet_list(self):
         index = self._generate_from_file('bullet_list.rst')
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Bullet List Item 1</p> <ul class="itemize">'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Nested Bullet List Item 1-1</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Double Nested Bullet List Item 1-2-1</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Double Nested Bullet List Item 1-2-2</p> </li>'))
         assert_that(index,
                     contains_string('Nested Bullet List Item 1-3</p> </li> <li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Nested Bullet List Item 1-4</p> </li> </ul>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Bullet List Item 2</p> <ul class="itemize">'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Nested Bullet List Item 2-1</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Nested Bullet List Item 2-2</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Nested Bullet List Item 2-3</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Bullet List Item 3</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Bullet List Item 4</p> </li>'))
 
     def test_ordered_list(self):
         index = self._generate_from_file('ordered_list.rst')
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Ordered List Item 1</p> <ol class="enumerate" start="1">'))
         assert_that(index,
                     contains_string('Nested Ordered List Item 1-1</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Nested Ordered List Item 1-2</p> <ol class="enumerate"'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Double Nested Ordered List Item 1-2-1</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Double Nested Ordered List Item 1-2-2</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Nested Ordered List Item 1-3</p> </li>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Nested Ordered List Item 1-4</p> </li>'))
 
     def test_roles(self):
         index = self._generate_from_file('roles.rst')
         assert_that(index,
                     contains_string('<b class="bfseries"><em>ichigo</em></b> kurosaki</p>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<span class="underline">aizen</span> sosuke</p>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<b class="bfseries"><span class="underline">rukia</span></b> kuchiki</p>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<em><span class="underline">Byakuya</span></em> kuchiki</p>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<b class="bfseries"><em><span class="underline">Genryusai</span></em></b> Yamamoto</p>'))
 
     def test_uid(self):
         index = self._generate_from_file('uid.rst')
-        assert_that(index, 
+        assert_that(index,
                     contains_string('id="exceptional" ntiid="t'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<p class="par" id="ichigo">Ichigo has been'))
 
     def test_fakesections(self):
         index = self._generate_from_file('fakesections.rst')
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<div class="subsection title" id="2">this is a fake subsection</div>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<div class="chapter title">this is a fake section</div>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<div class="chapter title">Another title</div>'))
 
     def test_label(self):
         index = self._generate_from_file('label.rst')
-        assert_that(index, 
+        assert_that(index,
                     contains_string('id="material" ntiid="tag:nextthought.com,2011-10:NTI-HTML-sample.material">'))
 
     def test_links(self):
         index = self._generate_from_file('links.rst')
-        assert_that(index, 
+        assert_that(index,
                     contains_string('like <a href="http://www.python.org/">Python</a>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('Click <a href="http://www.google.com">here</a></p>'))
-        
+
     def test_meta(self):
         index = self._generate_from_file('meta.rst')
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<title>Bankai Ichigo</title>'))
-        assert_that(index, 
+        assert_that(index,
                     contains_string('<div class="title">Bankai Ichigo</div>'))
-        
-    @unittest.expectedFailure
+
     def test_formats(self):
         index = self._generate_from_file('formats.rst')
-        assert_that(index, 
-                    contains_string('<em><span class="underline">Examine the differences between the Democratic and Republican Parties</span></em><span class="underline">, the social impact of terrorist organizations, the growing suspicions over the reach of the federal government,</span> <b class="bfseries">and the subsequent end of Reconstruction.</b>'))
+        assert_that(index,
+                    contains_string('<span class="underline">Examine the differences between the Democratic and Republican Parties</span><em>,</em> <em><span class="underline">the social impact of terrorist organizations, the growing suspicions over the reach of the federal government</span></em><em>,</em> <b class="bfseries"><span class="underline">and the subsequent end of Reconstruction.</span></b>'))
