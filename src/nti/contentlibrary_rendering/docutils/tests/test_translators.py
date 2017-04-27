@@ -160,4 +160,4 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
     def test_formats(self):
         index = self._generate_from_file('formats.rst')
         assert_that(index,
-                    contains_string('<span class="underline">Examine the differences between the Democratic and Republican Parties</span><em>,</em> <em><span class="underline">the social impact of terrorist organizations, the growing suspicions over the reach of the federal government</span></em><em>,</em> <b class="bfseries"><span class="underline">and the subsequent end of Reconstruction.</span></b>'))
+                    contains_string('<span class="underline">Examine the differences between the Democratic and Republican Parties</span><em><span class="underline">, the social impact of terrorist organizations, the growing suspicions over the reach of the federal government,</span></em> <b class="bfseries"><span class="underline">and the subsequent end of Reconstruction.</span></b>'))
