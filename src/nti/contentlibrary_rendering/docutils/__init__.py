@@ -22,9 +22,9 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTr
 
 def get_settings():
     settings = OptionParser(components=(Parser,)).get_default_values()
-    settings.halt_level = 3  # stop at error
-    settings.report_level = 3  # errors
-    settings.character_level_inline_markup = True
+    settings.halt_level = 4
+    settings.report_level = 2
+    # settings.character_level_inline_markup = True
     return settings
 _get_settings = get_settings
 
