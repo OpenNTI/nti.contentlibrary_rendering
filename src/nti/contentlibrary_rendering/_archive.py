@@ -208,7 +208,7 @@ def hex_name(name, now=None, bound=20):
     return digest[bound:].upper()  # 40 char string
 
 
-def out_filename(name, bound=15):
+def obfuscate_filename(name, bound=15):
     hostname = socket.gethostname()
     name = "%s_%s_%s.%s" % (RENDERED_PREFIX, hostname,
                             name[:bound], hex_name(name))
