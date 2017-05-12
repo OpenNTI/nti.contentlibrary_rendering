@@ -16,6 +16,7 @@ import sys
 import gzip
 import time
 import shutil
+import socket
 import zipfile
 import tarfile
 import tempfile
@@ -37,6 +38,8 @@ from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
 
+from nti.contentlibrary import RENDERED_PREFIX
+
 from nti.contentlibrary.interfaces import IContentPackageLibrary
 
 from nti.contentlibrary.utils import get_content_package_site
@@ -52,6 +55,7 @@ from nti.contentlibrary_rendering.common import get_site
 from nti.contentlibrary_rendering.common import get_creator
 from nti.contentlibrary_rendering.common import redis_client
 from nti.contentlibrary_rendering.common import Participation
+from nti.contentlibrary_rendering.common import sha1_hex_digest
 
 from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
@@ -70,6 +74,8 @@ from nti.contentrendering.plastexids import patch_all
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
 from nti.zodb.containers import time_to_64bit_int
+
+from nti.namedfile.file import safe_filename
 
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import make_specific_safe
@@ -194,6 +200,21 @@ def get_delimited_item(job_id):
 
 # source
 
+def hex_name(name, now=None, bound=20):
+    now = now or time.time()
+    digest = sha1_hex_digest(six.binary_type(name),
+                             six.binary_type(now),
+                             six.binary_type(socket.gethostname()))
+    return digest[bound:].upper()  # 40 char string
+
+
+def out_filename(name, bound=15):
+    hostname = socket.gethostname()
+    name = "%s_%s_%s.%s" % (RENDERED_PREFIX, hostname,
+                            name[:bound], hex_name(name))
+    name = safe_filename(name)
+    return name
+
 
 def is_archive(source, magic):
     if hasattr(source, "read"):
@@ -230,7 +251,7 @@ def process_source(source):
         _, name = os.path.split(source)
         if name.lower().endswith('.tar'):
             name = name[:-4]
-        target = os.path.join(tempfile.mkdtemp(), name) 
+        target = os.path.join(tempfile.mkdtemp(), name)
         tar = tarfile.TarFile(source)
         tar.extractall(target)
         files = os.listdir(target)
@@ -241,7 +262,7 @@ def process_source(source):
         _, name = os.path.split(source)
         if name.lower().endswith('.zip'):
             name = name[:-4]
-        target = os.path.join(tempfile.mkdtemp(), name) 
+        target = os.path.join(tempfile.mkdtemp(), name)
         zf = zipfile.ZipFile(source)
         zf.extractall(target)
         files = os.listdir(target)
@@ -284,7 +305,7 @@ def remove_content(package):
         or getattr(package, 'key', None)
     locator = component.getUtility(IRenderedContentLocator)
     locator.remove(root)
-    
+
 
 def move_content(library, path):
     enumeration = library.enumeration
@@ -391,6 +412,7 @@ def render_library_job(render_job):
         # 5. Update library
         update_library(package_ntiid, out_path, move=move)
         # 6. clean on commit
+
         def after_commit_or_abort(success=False):
             if success:
                 update_job_status(job_id, SUCCESS)
