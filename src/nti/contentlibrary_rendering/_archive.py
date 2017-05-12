@@ -366,9 +366,26 @@ def find_renderable(archive):
     raise ValueError("Cannot find renderable LaTeX file")
 
 
-def render_source(source, provider=NTI_PROVIDER, docachefile=False):
+def obfuscate_source(source):
+    if os.path.isfile(source):
+        name, ext = os.path.splitext(source)
+        path, name = os.path.split(name)
+        name = obfuscate_filename(name)
+        result = os.path.join(path, name) + ext
+        os.rename(source, result)
+    else:
+        path, name = os.path.split(source)
+        name = obfuscate_filename(name)
+        result = os.path.join(path, name)
+        os.rename(source, result)
+    return result
+
+
+def render_source(source, provider=NTI_PROVIDER, obfuscate=True, docachefile=False):
     source = os.path.abspath(source)
     archive = process_source(source)
+    if obfuscate:
+        archive = obfuscate_source(archive)
     tex_file = find_renderable(archive)
     path, _ = os.path.split(tex_file)
     current_dir = os.getcwd()

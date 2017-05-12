@@ -42,6 +42,7 @@ from nti.contentlibrary_rendering._archive import process_source
 from nti.contentlibrary_rendering._archive import find_renderable
 from nti.contentlibrary_rendering._archive import generate_job_id
 from nti.contentlibrary_rendering._archive import format_exception
+from nti.contentlibrary_rendering._archive import obfuscate_source
 from nti.contentlibrary_rendering._archive import create_render_job
 from nti.contentlibrary_rendering._archive import update_job_status
 from nti.contentlibrary_rendering._archive import render_library_job
@@ -145,3 +146,14 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         assert_that(msg, has_entry('message', 'bleach'))
         assert_that(msg, has_entry('code', 'Exception'))
         assert_that(msg, has_entry('traceback',  is_not(none())))
+        
+    def test_obfuscate_source(self):
+        tmp_dir = tempfile.mkdtemp()
+        try:
+            new_dir = obfuscate_source(tmp_dir)
+            assert_that(tmp_dir, is_not(new_dir))
+            assert_that(os.path.exists(tmp_dir), is_(False))
+            assert_that(os.path.exists(new_dir), is_(True))
+            tmp_dir = new_dir
+        finally:
+            shutil.rmtree(tmp_dir, True)
