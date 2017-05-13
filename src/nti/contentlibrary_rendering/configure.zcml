@@ -26,6 +26,19 @@
              for="nti.contentlibrary.interfaces.IRenderableContentPackage"
              provides="nti.contentlibrary_rendering.interfaces.IContentPackageRenderMetadata" />
 
+	<!-- Subscribers -->
+	<subscriber handler=".subscribers._content_removed"
+	            for="nti.contentlibrary.interfaces.IRenderableContentPackage
+	                 zope.intid.interfaces.IIntIdRemovedEvent"/>
+
+	<subscriber handler=".subscribers._content_package_removed"
+	            for="nti.contentlibrary.interfaces.IRenderableContentPackage
+	                 nti.contentlibrary.interfaces.IContentPackageRemovedEvent"/>
+
+	<subscriber handler=".subscribers._after_id_added_event"
+	            for="nti.contentlibrary.interfaces.IRenderableContentPackage
+	                 zc.intid.interfaces.IAfterIdAddedEvent"/>
+
     <!-- Externalization -->
     <include package="nti.externalization" file="meta.zcml" />
     <include package="nti.externalization" />
