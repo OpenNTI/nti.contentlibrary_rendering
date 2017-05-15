@@ -6,7 +6,7 @@ Adapter implementations.
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -51,8 +51,8 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     A basic `IContentPackageRenderMetadata` implementation.
     """
 
-    __external_class_name__ = u"ContentPackageRenderMetadata"
-    mime_type = mimeType = u'application/vnd.nextthought.content.packagerendermetadata'
+    __external_class_name__ = "ContentPackageRenderMetadata"
+    mime_type = mimeType = 'application/vnd.nextthought.content.packagerendermetadata'
 
     __name__ = None
     __parent__ = None
@@ -74,7 +74,7 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         result = '%s.%s' % (base_ntiid, specific)
         return result
 
-    def createJob(self, package=None, creator=None, provider='NTI', mark_rendered=True):
+    def createJob(self, package=None, creator=None, provider=u'NTI', mark_rendered=True):
         package = package if package is not None else self.__parent__
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
         result.Provider = provider

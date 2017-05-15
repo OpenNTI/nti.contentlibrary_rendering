@@ -19,8 +19,6 @@ from zope.container.contained import Contained
 
 from zope.mimetype.interfaces import IContentTypeAware
 
-from nti.base._compat import unicode_
-
 from nti.contentlibrary.interfaces import IContentPackage
 
 from nti.contentlibrary_rendering.common import get_creator
@@ -124,7 +122,7 @@ class RenderJob(SchemaConfigured,
         """
         self.updateLastMod()
         self.State = FAILED
-        self.Error = unicode_(reason)
+        self.Error = reason
 
     def update_to_success_state(self):
         """

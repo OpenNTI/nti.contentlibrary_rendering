@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -29,10 +29,10 @@ from nti.schema.field import Choice
 from nti.schema.field import IndexedIterable
 from nti.schema.field import TextLine as ValidTextLine
 
-FAILED = 'Failed'
-PENDING = 'Pending'
-RUNNING = 'Running'
-SUCCESS = 'Success'
+FAILED = u'Failed'
+PENDING = u'Pending'
+RUNNING = u'Running'
+SUCCESS = u'Success'
 RENDER_STATES = (SUCCESS, PENDING, FAILED, RUNNING)
 RENDER_STATE_VOCABULARY = SimpleVocabulary(
     [SimpleTerm(x) for x in RENDER_STATES])
@@ -43,21 +43,21 @@ class IRenderJob(ILastModified, ICreated, IZContained):
     Contains status on a specific rendering job
     """
 
-    JobId = ValidTextLine(title="The unique job identifier.")
+    JobId = ValidTextLine(title=u"The unique job identifier.")
 
-    Provider = ValidTextLine(title="Render provider",
+    Provider = ValidTextLine(title=u"Render provider",
                              required=True,
-                             default='NTI')
+                             default=u'NTI')
 
     State = Choice(vocabulary=RENDER_STATE_VOCABULARY,
-                   title='The state for this render job',
+                   title=u"The state for this render job",
                    required=False,
                    default=PENDING)
 
-    Error = Text(title="Rendering error.",
+    Error = Text(title=u"Rendering error.",
                  required=False)
 
-    OutputRoot = interface.Attribute("Render output location")
+    OutputRoot = interface.Attribute(u"Render output location")
     OutputRoot.setTaggedValue('_ext_excluded_out', True)
 
     def is_finished():
@@ -96,13 +96,13 @@ class IContentPackageRenderJob(IRenderJob):
     """
     Contains status on a specific rendering of a :class:`IContentPackage`.
     """
-    PackageNTIID = ValidTextLine(title="The package ntiid.")
+    PackageNTIID = ValidTextLine(title=u"The package ntiid.")
 
-    Version = ValidTextLine(title="Rendered contents version",
+    Version = ValidTextLine(title=u"Rendered contents version",
                             required=False)
     Version.setTaggedValue('_ext_excluded_out', True)
 
-    MarkRendered = Bool(title="Mark package as rendered.",
+    MarkRendered = Bool(title=u"Mark package as rendered.",
                         required=False,
                         default=True)
     MarkRendered.setTaggedValue('_ext_excluded_out', True)
@@ -112,7 +112,7 @@ class ILibraryRenderJob(IRenderJob):
     """
     Contains status on a specific rendering of a source
     """
-    Source = Object(INamedFile, title="The source.")
+    Source = Object(INamedFile, title=u"The source.")
     Source.setTaggedValue('_ext_excluded_out', True)
 
 
@@ -122,7 +122,7 @@ class IContentPackageRenderMetadata(IContainer):
     if available.
     """
 
-    render_jobs = IndexedIterable(title="An iterable of render jobs",
+    render_jobs = IndexedIterable(title=u"An iterable of render jobs",
                                   value_type=Object(IContentPackageRenderJob),
                                   unique=True,
                                   default=(),
@@ -210,11 +210,11 @@ class IRenderedContentLocator(interface.Interface):
 
         :param bucket the :class:`IEnumerableDelimitedHierarchyBucket` bucket
         """
-        
+
     def move(source, root):
         """
         move the specified source files to the root destination
 
         :param source Location of the rendered content
         :param root the library root
-        """ 
+        """

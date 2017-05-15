@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -49,7 +49,7 @@ TMP_MAX = 10000
 @interface.implementer(IParticipation)
 class Participation(object):
 
-    __slots__ = (b'interaction', b'principal')
+    __slots__ = ('interaction', 'principal')
 
     def __init__(self, principal):
         self.interaction = None
