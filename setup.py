@@ -8,15 +8,10 @@ entry_points = {
 }
 
 TESTS_REQUIRE = [
-    'fudge',
     'fakeredis',
-    'nose2[coverage_plugin]',
     'nti.testing',
-    'pyhamcrest',
-    'z3c.baseregistry',
     'zope.testrunner',
 ]
-
 
 def _read(fname):
     with codecs.open(fname, encoding='utf-8') as f:
