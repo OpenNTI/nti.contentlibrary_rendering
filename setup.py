@@ -63,7 +63,6 @@ setup(
         'nti.zope_catalog',
         'six',
         'z3c.autoinclude',
-        'zc.blist',
         'zope.cachedescriptors',
         'zope.catalog',
         'zope.component',

@@ -9,8 +9,6 @@ __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
 
-from zc.blist import BList
-
 from zope import component
 
 from zope.component.hooks import getSite
@@ -69,8 +67,7 @@ def _do_execute_render_job(func, job_id=None, package_ntiid=None,
 
 
 def _do_execute_generic_job(*args, **kwargs):
-    args = BList(args)
-    func = args.pop(0)
+    func, args = args[0], args[1:]
     return func(*args, **kwargs)
 
 
