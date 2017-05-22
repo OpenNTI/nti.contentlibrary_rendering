@@ -50,7 +50,7 @@ class TestRender(ContentlibraryRenderingLayerTest):
             document = self._parse_sample(tmp_dir)
             assert_that(document, is_not(none()))
             # copy to target data
-            bucket = FilesystemBucket(name="sample")
+            bucket = FilesystemBucket(name=u"sample")
             bucket.absolute_path = tmp_dir
             target = RenderableContentPackage()
             target.ntiid = u'tag:nextthought.com,2011-10:NTI-HTML-sample.0'

@@ -37,9 +37,9 @@ class TestExternalization(ContentlibraryRenderingTestLayer):
         ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california'
         job_id = u'123456'
         ext_obj = {
-            'MimeType': ContentPackageRenderJob.mime_type,
-            'JobId': job_id,
-            'PackageNTIID': ntiid
+            u'MimeType': ContentPackageRenderJob.mime_type,
+            u'JobId': job_id,
+            u'PackageNTIID': ntiid
         }
 
         assert_that(internalization.find_factory_for(ext_obj),
@@ -55,7 +55,7 @@ class TestExternalization(ContentlibraryRenderingTestLayer):
                     has_properties('JobId', is_(job_id),
                                    'PackageNTIID', is_(ntiid),
                                    'State', is_(PENDING)))
-        internal.update_to_failed_state('error')
+        internal.update_to_failed_state(u'error')
         ext_obj = to_external_object(internal)
         assert_that(ext_obj,
                     has_entries('JobId', is_(job_id),
