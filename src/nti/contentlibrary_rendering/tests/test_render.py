@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -36,7 +36,7 @@ class TestRender(ContentlibraryRenderingLayerTest):
     def _parse_sample(self, tmp_dir):
         source = os.path.join(os.path.dirname(__file__), 'sample.tex')
         document, _, jobname, _ = parse_tex(source,
-                                            provider='NTI',
+                                            provider=u'NTI',
                                             outdir=tmp_dir,
                                             load_configs=False)
         return process_document(document, jobname=jobname)
@@ -53,7 +53,7 @@ class TestRender(ContentlibraryRenderingLayerTest):
             bucket = FilesystemBucket(name="sample")
             bucket.absolute_path = tmp_dir
             target = RenderableContentPackage()
-            target.ntiid = 'tag:nextthought.com,2011-10:NTI-HTML-sample.0'
+            target.ntiid = u'tag:nextthought.com,2011-10:NTI-HTML-sample.0'
             copy_package_data(bucket, target)
             # check
             assert_that(target,

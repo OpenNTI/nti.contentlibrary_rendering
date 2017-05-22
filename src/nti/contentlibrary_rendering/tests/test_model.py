@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -25,7 +25,7 @@ class TestModel(ContentlibraryRenderingLayerTest):
 
     def test_job(self):
         job = ContentPackageRenderJob()
-        job.JobId = 'foo'
+        job.JobId = u'foo'
         job.State = u'Failed'
         job.PackageNTIID = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california.'
         assert_that(job, validly_provides(ILastModified))

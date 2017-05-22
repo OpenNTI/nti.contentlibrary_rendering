@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 # disable: accessing protected members, too many methods
@@ -35,7 +35,7 @@ class TestExternalization(ContentlibraryRenderingTestLayer):
 
     def test_render_job(self):
         ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california'
-        job_id = '123456'
+        job_id = u'123456'
         ext_obj = {
             'MimeType': ContentPackageRenderJob.mime_type,
             'JobId': job_id,
