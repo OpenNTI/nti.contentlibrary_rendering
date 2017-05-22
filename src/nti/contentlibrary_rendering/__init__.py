@@ -26,10 +26,10 @@ LaTeX_MIMETYPE = b'application/x-latex'
 RST_MIMETYPE = b'text/x-rst'
 
 #: Render job NTIID Type
-RENDER_JOB = 'RenderJob'
+RENDER_JOB = u'RenderJob'
 
 #: Library ender job NTIID Type
-LIBRARY_RENDER_JOB = 'LibraryRenderJob'
+LIBRARY_RENDER_JOB = u'LibraryRenderJob'
 
 #: redis hset
 CONTENT_UNITS_HSET = '++etc++contentlibrary++contentunits++hset'

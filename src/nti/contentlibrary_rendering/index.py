@@ -19,7 +19,7 @@ from zope.location import locate
 
 import BTrees
 
-from nti.base._compat import unicode_
+from nti.base._compat import text_
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 
@@ -59,7 +59,7 @@ class ValidatingSiteName(object):
         if IContentPackageRenderJob.providedBy(obj):
             folder = find_interface(obj, IHostPolicyFolder)
             if folder is not None:
-                self.site = unicode_(folder.__name__)
+                self.site = text_(folder.__name__)
 
     def __reduce__(self):
         raise TypeError()

@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -55,8 +55,8 @@ class RenderJob(SchemaConfigured,
                 Contained):
     createDirectFieldProperties(IRenderJob)
 
-    __external_class_name__ = u"RenderJob"
-    mime_type = mimeType = u'application/vnd.nextthought.content.renderjob'
+    __external_class_name__ = "RenderJob"
+    mime_type = mimeType = 'application/vnd.nextthought.content.renderjob'
 
     id = alias('__name__')
     state = alias('State')
@@ -136,8 +136,8 @@ class RenderJob(SchemaConfigured,
 class ContentPackageRenderJob(RenderJob):
     createDirectFieldProperties(IContentPackageRenderJob)
 
-    __external_class_name__ = u"ContentPackageRenderJob"
-    mime_type = mimeType = u'application/vnd.nextthought.content.packagerenderjob'
+    __external_class_name__ = "ContentPackageRenderJob"
+    mime_type = mimeType = 'application/vnd.nextthought.content.packagerenderjob'
 
     package = alias('PackageNTIID')
 
@@ -155,7 +155,7 @@ class ContentPackageRenderJob(RenderJob):
 class LibraryRenderJob(RenderJob):
     createDirectFieldProperties(ILibraryRenderJob)
 
-    __external_class_name__ = u"LibraryRenderJob"
-    mime_type = mimeType = u'application/vnd.nextthought.content.libraryrenderjob'
+    __external_class_name__ = "LibraryRenderJob"
+    mime_type = mimeType = 'application/vnd.nextthought.content.libraryrenderjob'
 
     source = alias('Source')

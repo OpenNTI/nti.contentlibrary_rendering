@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -68,9 +68,9 @@ class LaTeXTransformer(TransformerMixin):
 class TextTransformer(LaTeXTransformer):
 
     def write_out(self, content, latex_file):
-        with open(latex_file, "wb") as fp:
-            fp.write(b"\\documentclass{book}\n")
-            fp.write(b"%%% Body\n")
-            fp.write(b"\\begin{document}\n")
+        with open(latex_file, "w") as fp:
+            fp.write("\\documentclass{book}\n")
+            fp.write("%%% Body\n")
+            fp.write("\\begin{document}\n")
             fp.write(content)
-            fp.write(b"\n\\end{document}\n")
+            fp.write("\n\\end{document}\n")
