@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -26,7 +26,7 @@ def get_settings():
     settings.report_level = 2
     settings.character_level_inline_markup = True
     return settings
-_get_settings = get_settings
+_get_settings = get_settings # BWC
 
 
 def get_rst_dom(source, settings=None):

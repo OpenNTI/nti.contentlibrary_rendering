@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -19,7 +19,7 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTContentValidati
 @interface.implementer(IRSTContentValidationError)
 class RSTContentValidationError(ContentValidationError):
 
-    mime_type = mimeType = u'application/vnd.nextthought.content.rstvalidationerror'
+    mime_type = mimeType = 'application/vnd.nextthought.content.rstvalidationerror'
 
     def __init__(self, message, warnings=None, *args, **kwargs):
         ContentValidationError.__init__(self, message, *args, **kwargs)
