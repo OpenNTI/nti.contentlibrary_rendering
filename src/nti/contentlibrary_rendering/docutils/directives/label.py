@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -29,11 +29,11 @@ class Label(Directive):
     node_class = None
 
     def run(self):
-        arg = directives.unchanged(self.arguments[0]) or u''
+        arg = directives.unchanged(self.arguments[0]) or ''
         arg = make_specific_safe(arg.replace('\\', ''))  # replace escape chars
         if not arg:
-            raise self.error(
-                'Error in "%s" directive: missing label' % self.name)
+            msg = 'Error in "%s" directive: missing label' % self.name
+            raise self.error(msg)
 
         result = label()
         result['label'] = result['id'] = arg

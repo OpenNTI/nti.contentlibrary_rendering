@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -30,10 +30,10 @@ class BaseFake(Directive):
     node_class = None
 
     def run(self):
-        title = directives.unchanged(self.arguments[0]) or u''
+        title = directives.unchanged(self.arguments[0]) or ''
         if not title:
-            raise self.error(
-                'Error in "%s" directive: missing title' % self.name)
+            msg = 'Error in "%s" directive: missing title' % self.name
+            raise self.error(msg)
 
         result = self.node_class()
         result['title'] = title
