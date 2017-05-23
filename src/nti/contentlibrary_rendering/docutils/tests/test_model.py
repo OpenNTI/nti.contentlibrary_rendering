@@ -34,7 +34,7 @@ class TestModel(ContentlibraryRenderingLayerTest):
         package.ntiid = u'tag:nextthought.com,2011-10:NTI-HTML-human_physiology'
         package.title = u'Human Physiology'
         package.description = u'Human Physiology'
-        package.contentType = 'text/x-rst'
+        package.contentType = b'text/x-rst'
         package.contents = self._get_data("label.rst")
         ext_obj = to_external_object(package, name='exporter')
         assert_that(ext_obj,
