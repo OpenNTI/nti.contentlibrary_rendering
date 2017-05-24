@@ -38,6 +38,8 @@ from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
 
+from nti.base._compat import text_
+
 from nti.contentlibrary import RENDERED_PREFIX
 
 from nti.contentlibrary.interfaces import IContentPackageLibrary
@@ -437,7 +439,7 @@ def render_library_job(render_job):
         transaction.get().addAfterCommitHook(after_commit_or_abort)
     except Exception as e:
         logger.exception('Render job %s failed', job_id)
-        traceback_msg = format_exception(e)
+        traceback_msg = text_(format_exception(e))
         render_job.update_to_failed_state(traceback_msg)
         update_job_status(job_id, FAILED)
         update_job_error(job_id, traceback_msg)

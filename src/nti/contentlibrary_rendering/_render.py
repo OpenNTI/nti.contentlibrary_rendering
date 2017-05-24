@@ -31,6 +31,8 @@ from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
 
+from nti.base._compat import text_
+
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
@@ -437,7 +439,7 @@ def render_package_job(render_job):
     except Exception as e:
         # XXX: Do we want to fail all applicable jobs?
         logger.exception('Render job %s failed', job_id)
-        render_job.update_to_failed_state(str(e))
+        render_job.update_to_failed_state(text_(str(e)))
     else:
         duration = time.time() - start_time
         jobs_to_update = _get_jobs_to_update(render_job)
