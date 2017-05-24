@@ -19,6 +19,8 @@ from zope.container.contained import Contained
 
 from zope.mimetype.interfaces import IContentTypeAware
 
+from nti.base._compat import text_
+
 from nti.contentlibrary.interfaces import IContentPackage
 
 from nti.contentlibrary_rendering.common import get_creator
@@ -122,7 +124,7 @@ class RenderJob(SchemaConfigured,
         """
         self.updateLastMod()
         self.State = FAILED
-        self.Error = reason
+        self.Error = text_(reason)
 
     def update_to_success_state(self):
         """
