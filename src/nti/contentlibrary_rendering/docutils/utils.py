@@ -21,6 +21,7 @@ class DocumentProxy(ProxyBase):
         super(DocumentProxy, self).__init__(*args, **kwds)
         self._v_skip = False
         self._v_store = list()
+        self._v_media_counter = 0
         self._v_paragraph_counter = 0
 
     def __getattr__(self, name):
@@ -59,6 +60,11 @@ class DocumentProxy(ProxyBase):
         self._v_paragraph_counter += 1
         return self._v_paragraph_counter
 
+    # media
+
+    def px_inc_media_counter(self):
+        self._v_media_counter += 1
+        return self._v_media_counter
 
 def rst_traversal_count(rst_node, tagname):
     """
