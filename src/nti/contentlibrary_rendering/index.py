@@ -146,23 +146,13 @@ class ContentRenderJobCatalog(Catalog):
     family = BTrees.family64
 
 
-def get_contentrenderjob_catalog():
-    return component.queryUtility(ICatalog, name=CATALOG_NAME)
+def get_contentrenderjob_catalog(registry=component):
+    return registry.queryUtility(ICatalog, name=CATALOG_NAME)
 
 
-def install_contentrenderjob_catalog(site_manager_container, intids=None):
-    lsm = site_manager_container.getSiteManager()
-    intids = intids if intids is not None else lsm.getUtility(IIntIds)
-    catalog = lsm.queryUtility(ICatalog, name=CATALOG_NAME)
-    if catalog is not None:
-        return catalog
-
-    catalog = ContentRenderJobCatalog(family=intids.family)
-    catalog.__name__ = CATALOG_NAME
-    catalog.__parent__ = site_manager_container
-    intids.register(catalog)
-    lsm.registerUtility(catalog, provided=ICatalog, name=CATALOG_NAME)
-
+def create_contentrenderjob_catalog(catalog=None, family=BTrees.family64):
+    if catalog is None:
+        catalog = ContentRenderJobCatalog(family=family)
     for name, clazz in ((IX_SITE, SiteIndex),
                         (IX_JOBID, JobIdIndex),
                         (IX_STATE, StateIndex),
@@ -171,8 +161,26 @@ def install_contentrenderjob_catalog(site_manager_container, intids=None):
                         (IX_MIMETYPE, MimeTypeIndex),
                         (IX_STARTTIME, StartTimeIndex),
                         (IX_PACKAGE_NTIID, PackageNTIIDIndex)):
-        index = clazz(family=intids.family)
-        intids.register(index)
+        index = clazz(family=family)
         locate(index, catalog, name)
         catalog[name] = index
+    return catalog
+
+
+def install_contentrenderjob_catalog(site_manager_container, intids=None):
+    lsm = site_manager_container.getSiteManager()
+    intids = intids if intids is not None else lsm.getUtility(IIntIds)
+    catalog = get_contentrenderjob_catalog(lsm)
+    if catalog is not None:
+        return catalog
+
+    catalog = create_contentrenderjob_catalog(family=intids.family)
+    locate(catalog, site_manager_container, CATALOG_NAME)
+    intids.register(catalog)
+    lsm.registerUtility(catalog, 
+                        provided=ICatalog, 
+                        name=CATALOG_NAME)
+
+    for index in catalog.values():
+        intids.register(index)
     return catalog
