@@ -4,7 +4,7 @@
 .. $Id$
 """
 
-from __future__ import print_function, unicode_literals, absolute_import, division
+from __future__ import print_function, absolute_import, division
 __docformat__ = "restructuredtext en"
 
 logger = __import__('logging').getLogger(__name__)
@@ -16,14 +16,14 @@ from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
 #: NTI provider
 NTI_PROVIDER = u'NTI'
 
+#: reStructuredText mime type
+RST_MIMETYPE = b'text/x-rst'
+
 #: text mime type
 TEXT_MIMETYPE = b'text/plain'
 
 #: latex mime type
 LaTeX_MIMETYPE = b'application/x-latex'
-
-#: reStructuredText mime type
-RST_MIMETYPE = b'text/x-rst'
 
 #: Render job NTIID Type
 RENDER_JOB = u'RenderJob'
