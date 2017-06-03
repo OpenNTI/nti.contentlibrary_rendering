@@ -15,11 +15,11 @@ from hamcrest import has_entries
 from hamcrest import has_properties
 does_not = is_not
 
+from nti.testing.matchers import validly_provides
+
 from nti.externalization import internalization
 
 from nti.externalization.externalization import to_external_object
-
-from nti.testing.matchers import validly_provides
 
 from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
