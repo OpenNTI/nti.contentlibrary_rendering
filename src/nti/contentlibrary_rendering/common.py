@@ -84,7 +84,7 @@ def sha1_hex_digest(*inputs):
 
 def mkdtemp(tmpdir=None):
     tmpdir = tmpdir or tempfile.gettempdir()
-    for _ in xrange(TMP_MAX):
+    for _ in range(TMP_MAX):
         digest = str(uuid.uuid4())[10:].upper().replace('-', '')
         digest = "%s_%s" % (AUTHORED_PREFIX, digest)
         path = os.path.join(tmpdir, digest)
