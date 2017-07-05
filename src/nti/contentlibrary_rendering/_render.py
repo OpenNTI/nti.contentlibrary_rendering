@@ -150,6 +150,17 @@ delete_delimited_item = delete_metadata  # BWC
 # rendering
 
 
+def is_default_icon(icon=None, package=None):
+    title = getattr(package, 'title', None) or ''
+    icon = getattr(icon, 'absolute_path', None) \
+        or getattr(icon, 'name', None) or icon
+    return not icon \
+        or icon.endswith('icons/chapters/generic_book.png') \
+        or icon.endswith('images/backgrounds/default.png') \
+        or icon.endswith('images/backgrounds/default.jpg') \
+        or icon.endswith("icons/chapters/" + title + "-icon.png")
+
+
 def copy_attributes(source, target, names):
     for name in names or ():
         value = getattr(source, name, None)
@@ -192,7 +203,7 @@ def copy_package_data(item, target):
     copy_attributes(package, target, attributes)
 
     # 4. copy icon
-    if not target.icon and package.icon:
+    if is_default_icon(target.icon) and package.icon:
         target.icon = package.icon
 
     # 5. copy displayable content attributes
