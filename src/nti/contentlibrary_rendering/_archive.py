@@ -91,6 +91,11 @@ patch_all()
 EXPIRY_TIME = 172800  # 48hrs
 
 
+def prepare_json_text(s):
+    result = s.decode('utf-8') if isinstance(s, bytes) else s
+    return result
+
+
 def format_exception(e):
     result = dict()
     exc_type, exc_value, exc_traceback = sys.exc_info()
@@ -136,10 +141,12 @@ def get_job_error(job_id):
         return None
     key = job_id_error(job_id)
     result = redis.get(key)
-    result = simplejson.loads(result) if result else None
+    result = simplejson.loads(prepare_json_text(result)) if result else None
     if isinstance(result, six.string_types):
-        result['message'] = result
-        result['code'] = 'AssertionError'
+        result = {
+            'message': result,
+            'code': 'AssertionError'
+        }
     return result
 
 
