@@ -391,6 +391,10 @@ def obfuscate_source(source):
 
 
 def render_source(source, provider=NTI_PROVIDER, obfuscate=True, docachefile=False):
+    # make sure chameleon cache
+    cache_dir = os.environ.get('CHAMELEON_CACHE', None)
+    if cache_dir and not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
     source = os.path.abspath(source)
     archive = process_source(source)
     if obfuscate:
