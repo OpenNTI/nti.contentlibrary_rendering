@@ -286,6 +286,10 @@ def render_document(source_doc, package=None, outfile_dir=None,
     outfile_dir = outfile_dir or mkdtemp()
     try:
         os.chdir(outfile_dir)
+        # make sure chameleon cache
+        cache_dir = os.environ.get('CHAMELEON_CACHE', None)
+        if cache_dir and not os.path.exists(cache_dir):
+            os.makedirs(cache_dir)
         # Get a suitable tex dom
         tex_dom, jobname = prepare_tex_document(package,
                                                 provider,
