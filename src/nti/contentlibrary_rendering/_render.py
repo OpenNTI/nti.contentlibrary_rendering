@@ -245,7 +245,10 @@ def prepare_environment(tex_dom, jobname, packages_path):
             continue
         module = importlib.import_module(name)
         location = module.__path__[0]
-        xhtmltemplates.append(location)
+        for postfix in ('', 'plastexpackages', 'zpts'):
+            path = os.path.join(location, postfix)
+            if os.path.exists(path):
+                xhtmltemplates.append(path)
     os.environ['XHTMLTEMPLATES'] = os.path.pathsep.join(xhtmltemplates) 
     setup_environ(tex_dom, jobname, packages_path)
 
