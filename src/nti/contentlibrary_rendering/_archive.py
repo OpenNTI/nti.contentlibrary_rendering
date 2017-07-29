@@ -20,9 +20,11 @@ import socket
 import zipfile
 import tarfile
 import tempfile
-import simplejson
+import importlib
 from ConfigParser import ConfigParser
 from ConfigParser import NoOptionError
+
+import simplejson
 
 import transaction
 
@@ -37,6 +39,8 @@ from zope.security.interfaces import IPrincipal
 from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
+
+from z3c.autoinclude.plugin import find_plugins
 
 from nti.base._compat import text_
 
@@ -72,6 +76,8 @@ from nti.contentlibrary_rendering.processing import put_generic_job
 from nti.contentrendering.nti_render import render as nti_render
 
 from nti.contentrendering.plastexids import patch_all
+
+from nti.contentrendering.render_document import PP_CONTENT_RENDERING
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
@@ -390,6 +396,22 @@ def obfuscate_source(source):
     return result
 
 
+def prepare_environment():
+    xhtmltemplates = []
+    for plugin in find_plugins(PP_CONTENT_RENDERING.__name__):
+        name = plugin.project_name.replace('-', '_')
+        if name == PP_CONTENT_RENDERING.__name__:
+            continue
+        module = importlib.import_module(name)
+        location = module.__path__[0]
+        for postfix in ('', 'plastexpackages', 'zpts'):
+            path = os.path.join(location, postfix)
+            if os.path.exists(path):
+                xhtmltemplates.append(path)
+    os.environ['XHTMLTEMPLATES'] = os.path.pathsep.join(xhtmltemplates) 
+    return os.environ['XHTMLTEMPLATES']
+
+
 def render_source(source, provider=NTI_PROVIDER, obfuscate=True, docachefile=False):
     # make sure chameleon cache
     cache_dir = os.environ.get('CHAMELEON_CACHE', None)
@@ -402,8 +424,10 @@ def render_source(source, provider=NTI_PROVIDER, obfuscate=True, docachefile=Fal
     tex_file = find_renderable(archive)
     path, _ = os.path.split(tex_file)
     current_dir = os.getcwd()
+    xhtmltemplates = os.environ.get('XHTMLTEMPLATES', '')
     try:
         os.chdir(path)
+        prepare_environment()
         nti_render(tex_file,
                    provider,
                    load_configs=False,
@@ -411,6 +435,7 @@ def render_source(source, provider=NTI_PROVIDER, obfuscate=True, docachefile=Fal
                    set_chameleon_cache=False)
     finally:
         os.chdir(current_dir)
+        os.environ['XHTMLTEMPLATES'] = xhtmltemplates
     return tex_file
 
 
