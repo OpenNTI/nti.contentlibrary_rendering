@@ -11,6 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 import os
 import time
+import importlib
 
 from plasTeX import Base
 from plasTeX import TeXDocument
@@ -30,6 +31,8 @@ from zope.security.interfaces import IPrincipal
 from zope.security.management import endInteraction
 from zope.security.management import newInteraction
 from zope.security.management import restoreInteraction
+
+from z3c.autoinclude.plugin import find_plugins
 
 from nti.base._compat import text_
 
@@ -72,6 +75,8 @@ from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadat
 from nti.contentrendering import nti_render
 
 from nti.contentrendering.plastexids import patch_all
+
+from nti.contentrendering.render_document import PP_CONTENT_RENDERING
 
 from nti.contentrendering.render_document import load_packages
 from nti.contentrendering.render_document import setup_environ
@@ -232,6 +237,19 @@ def copy_package_data(item, target):
     return target
 
 
+def prepare_environment(tex_dom, jobname, packages_path):
+    xhtmltemplates = []
+    for plugin in find_plugins(PP_CONTENT_RENDERING.__name__):
+        name = plugin.project_name.replace('-', '_')
+        if name == PP_CONTENT_RENDERING.__name__:
+            continue
+        module = importlib.import_module(name)
+        location = module.__path__[0]
+        xhtmltemplates.append(location)
+    os.environ['XHTMLTEMPLATES'] = os.path.pathsep.join(xhtmltemplates) 
+    setup_environ(tex_dom, jobname, packages_path)
+
+
 def prepare_tex_document(package=None, provider=NTI_PROVIDER, jobname=None,
                          context=None, tex_dom=None, outfile_dir=None):
     """
@@ -259,9 +277,9 @@ def prepare_tex_document(package=None, provider=NTI_PROVIDER, jobname=None,
                               working_dir=outfile_dir,
                               specific_ntiid=specific_ntiid)
     # Pull in all necessary plugins/configs/templates.
-    unused_ctx, packages_path = load_packages(context=context,
-                                              load_configs=False)
-    setup_environ(tex_dom, jobname, packages_path)
+    context, packages_path = load_packages(context=context,
+                                           load_configs=False)
+    prepare_environment(tex_dom, jobname, packages_path)
     return tex_dom, jobname
 
 
@@ -284,6 +302,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
     """
     current_dir = os.getcwd()
     outfile_dir = outfile_dir or mkdtemp()
+    xhtmltemplates = os.environ.get('XHTMLTEMPLATES', '')
     try:
         os.chdir(outfile_dir)
         # make sure chameleon cache
@@ -301,7 +320,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
         return nti_render.process_document(tex_dom, jobname, docachefile=False)
     finally:
         os.chdir(current_dir)
-
+        os.environ['XHTMLTEMPLATES'] = xhtmltemplates
 
 def get_contents_to_render(package):
     """
