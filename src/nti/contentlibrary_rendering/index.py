@@ -55,7 +55,7 @@ class ValidatingSiteName(object):
 
     __slots__ = ('site',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         if IContentPackageRenderJob.providedBy(obj):
             folder = find_interface(obj, IHostPolicyFolder, strict=False)
             if folder is not None:
@@ -89,7 +89,7 @@ class ValidatingCreator(object):
 
     __slots__ = ('creator',)
 
-    def __init__(self, obj, default=None):
+    def __init__(self, obj, unused_default=None):
         try:
             if IContentPackageRenderJob.providedBy(obj):
                 username = getattr(obj.creator, 'username', obj.creator)
@@ -102,7 +102,7 @@ class ValidatingCreator(object):
         raise TypeError()
 
 
-def CreatorIndex(family=None):
+def CreatorIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='creator',
                                 interface=ValidatingCreator,
                                 index=RawValueIndex(family=family),
@@ -113,7 +113,7 @@ class StartTimeRawIndex(RawIntegerValueIndex):
     pass
 
 
-def StartTimeIndex(family=None):
+def StartTimeIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='createdTime',
                                 interface=IContentPackageRenderJob,
                                 index=StartTimeRawIndex(family=family),
@@ -124,7 +124,7 @@ class EndTimeRawIndex(RawIntegerValueIndex):
     pass
 
 
-def EndTimeIndex(family=None):
+def EndTimeIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='lastModified',
                                 interface=IContentPackageRenderJob,
                                 index=EndTimeRawIndex(family=family),
@@ -135,7 +135,7 @@ class StateRawIndex(RawValueIndex):
     pass
 
 
-def StateIndex(family=None):
+def StateIndex(family=BTrees.family64):
     return NormalizationWrapper(field_name='State',
                                 interface=IContentPackageRenderJob,
                                 index=StateRawIndex(family=family),
