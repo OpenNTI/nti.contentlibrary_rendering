@@ -16,9 +16,6 @@ from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
 #: NTI provider
 NTI_PROVIDER = u'NTI'
 
-#: reStructuredText mime type
-RST_MIMETYPE = b'text/x-rst'
-
 #: text mime type
 TEXT_MIMETYPE = b'text/plain'
 

@@ -36,6 +36,8 @@ from z3c.autoinclude.plugin import find_plugins
 
 from nti.base._compat import text_
 
+from nti.contentlibrary import RST_MIMETYPE
+
 from nti.contentlibrary.interfaces import IContentUnit
 from nti.contentlibrary.interfaces import IContentPackage
 from nti.contentlibrary.interfaces import IContentRendered
@@ -57,7 +59,6 @@ from nti.contentlibrary.zodb import RenderableContentUnit
 from nti.contentlibrary.zodb import RenderableContentPackage
 
 from nti.contentlibrary_rendering import NTI_PROVIDER
-from nti.contentlibrary_rendering import RST_MIMETYPE
 from nti.contentlibrary_rendering import CONTENT_UNITS_HSET
 from nti.contentlibrary_rendering import CONTENT_UNITS_HSET_EXPIRY
 
