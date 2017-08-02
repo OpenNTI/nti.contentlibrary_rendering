@@ -215,6 +215,7 @@ def get_delimited_item(job_id):
 
 # source
 
+
 def hex_name(name, now=None, bound=20):
     now = now or time.time()
     digest = sha1_hex_digest(six.binary_type(name),
@@ -467,7 +468,6 @@ def render_library_job(render_job):
         # 5. Update library
         update_library(package_ntiid, out_path, move=move)
         # 6. clean on commit
-
         def after_commit_or_abort(success=False):
             if success:
                 update_job_status(job_id, SUCCESS)
