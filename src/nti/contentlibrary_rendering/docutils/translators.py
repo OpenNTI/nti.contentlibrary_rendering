@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 
 from zope import interface
 
-from nti.base._compat import unicode_
+from nti.base._compat import text_
 
 from nti.contentlibrary_rendering.docutils import get_translator
 
@@ -79,7 +79,7 @@ class DefaultNodeToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = u''
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement(rst_node.tagname)
         return result
 
@@ -99,7 +99,7 @@ class TitleToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "title"
 
-    def _process_document_title(self, rst_node, tex_doc, tex_parent):
+    def _process_document_title(self, rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement('maketitle')
         tex_doc.userdata['title'] = rst_node.astext()
         for name in  ('author', 'date', 'thanks', 'description'):
@@ -108,7 +108,7 @@ class TitleToPlastexNodeTranslator(TranslatorMixin):
         rst_node.children = rst_node.children[1:]
         return result
 
-    def _process_title(self, rst_node, tex_doc, tex_parent):
+    def _process_title(self, rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement(rst_node.tagname)
         assert rst_node.children
         # We actually get the text from the child node
@@ -140,7 +140,7 @@ class SubtitleToPlastexNodeTranslator(TranslatorMixin):
         title_node = node_translator.translate(title_child, tex_doc, tex_node)
         tex_node.setAttribute('title', title_node)
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement('section')
         self._set_title(rst_node, tex_doc, result)
         # This title gets rendered, so we need to make sure
@@ -156,7 +156,7 @@ class TextToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "#text"
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createTextNode(rst_node.astext())
         return result
 
@@ -165,7 +165,7 @@ class StrongToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'strong'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement("textbf")
         return result
 
@@ -174,7 +174,7 @@ class EmphasisToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'emphasis'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement("emph")
         return result
 
@@ -183,7 +183,7 @@ class UnderlineToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "underline"
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, unused_tex_doc, unused_tex_parent):
         result = uline()
         return result
 
@@ -196,7 +196,7 @@ class BoldItalicToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "bolditalic"
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement("bolditalic")
         return result
 
@@ -205,7 +205,7 @@ class BoldUnderlinedToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "boldunderlined"
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement("boldunderlined")
         return result
 
@@ -214,7 +214,7 @@ class ItalicUnderlinedToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "italicunderlined"
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement("italicunderlined")
         return result
 
@@ -223,7 +223,7 @@ class BoldItalicUnderlinedToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = "bolditalicunderlined"
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement("bolditalicunderlined")
         return result
 
@@ -235,7 +235,7 @@ class ListItemToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'list_item'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         tex_node = tex_doc.createElement('list_item')
         return tex_node
 
@@ -244,7 +244,7 @@ class EnumeratedListToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'enumerated_list'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         tex_node = tex_doc.createElement('enumerate')
         return tex_node
 
@@ -253,7 +253,7 @@ class BulletListToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'bullet_list'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
         tex_node = tex_doc.createElement('itemize')
         return tex_node
 
@@ -290,10 +290,10 @@ class ReferenceToPlastexNodeTranslator(TranslatorMixin):
                 return True
         return level != 0
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         # external reference (URL)
         if 'refuri' in rst_node:
-            href = unicode_(rst_node['refuri']).translate(self.special_chars)
+            href = text_(rst_node['refuri']).translate(self.special_chars)
             # problematic chars double caret and unbalanced braces:
             if href.find('^^') != -1 or self.has_unbalanced_braces(href):
                 raise ValueError(
@@ -315,7 +315,7 @@ class ReferenceToPlastexNodeTranslator(TranslatorMixin):
 
 class LabelMixin(TranslatorMixin):
 
-    def _handle_label(self, rst_node, tex_doc, tex_node):
+    def _handle_label(self, rst_node, unused_tex_doc, tex_node):
         children = rst_node.children
         nid = rst_node.attributes.get('id')
         if not nid and children and children[0].tagname == 'label':
@@ -341,9 +341,9 @@ class ParagraphToPlastexNodeTranslator(LabelMixin):
         title = rst_node.attributes.get('title') \
             or  rst_node.attributes.get('id') \
             or 'par_%s' % tex_doc.px_inc_paragraph_counter()
-        tex_node.title = unicode_(title)
+        tex_node.title = text_(title)
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         tex_node = tex_doc.createElement('par')
         self._handle_title(rst_node, tex_node, tex_doc)
         self._handle_label(rst_node, tex_node, tex_doc)
@@ -357,7 +357,7 @@ class ChapterToPlastexNodeTranslator(LabelMixin):
 
     __name__ = 'chapter'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         tex_node = tex_doc.createElement('chapter')
         self._handle_label(rst_node, tex_node, tex_doc)
         return tex_node
@@ -394,7 +394,7 @@ class SectionToPlastexNodeTranslator(LabelMixin):
         # Make sure we remove the node
         rst_node.children = rst_node.children[1:]
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         section_tag = self._get_section_tag(rst_node)
         result = tex_doc.createElement(section_tag)
         self._handle_title(rst_node, tex_doc, result)
@@ -406,7 +406,7 @@ class FakesectionToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'fakesection'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         tex_node = tex_doc.createElement('fakesection')
         tex_node.setAttribute('title', rst_node['title'])
         return tex_node
@@ -416,7 +416,7 @@ class FakesubsectionToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'fakesubsection'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         tex_node = tex_doc.createElement('fakesubsection')
         tex_node.setAttribute('title', rst_node['title'])
         return tex_node
@@ -426,7 +426,7 @@ class FakeparagraphToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'fakeparagraph'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         tex_node = tex_doc.createElement('fakeparagraph')
         tex_node.setAttribute('title', rst_node['title'])
         return tex_node
@@ -439,7 +439,7 @@ class MetaToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'meta'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         title = rst_node.attributes.get('title', None)
         if title:
             elements = tex_doc.getElementsByTagName('document')
@@ -459,7 +459,7 @@ class DocumentToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'document'
 
-    def do_translate(self, rst_node, tex_doc, tex_parent):
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         result = tex_doc.createElement(rst_node.tagname)
         title = rst_node.attributes.get('title')
         if title:
@@ -475,7 +475,7 @@ def handle_uid(rst_node, tex_node):
     if hasattr(rst_node, 'attributes'):  # check for docid
         uid = rst_node.attributes.get('uid')
         if uid and not tex_node.getAttribute('id'):
-            tex_node.id = unicode_(uid)
+            tex_node.id = text_(uid)
             tex_node.setAttribute('id', tex_node.id)
             return tex_node.id
     return None
