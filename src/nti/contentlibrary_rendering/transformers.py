@@ -18,6 +18,8 @@ from zope.cachedescriptors.property import Lazy
 
 from zope.intid.interfaces import IIntIds
 
+from nti.contentlibrary.utils import NTI
+
 from nti.contentlibrary_rendering.common import mkdtemp
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
@@ -47,7 +49,7 @@ class LaTeXTransformer(TransformerMixin):
     def render_latex(cls, source, out_dir):
         document, _, jobname, _ = parse_tex(source,
                                             outdir=out_dir,
-                                            provider='NTI')
+                                            provider=NTI)
         return process_document(document, jobname=jobname)
 
     def write_out(self, content, latex_file):
