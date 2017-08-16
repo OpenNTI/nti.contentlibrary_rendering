@@ -46,8 +46,8 @@ class DocumentProxy(ProxyBase):
     def px_clear(self):
         self._v_store = list()
 
-    # skip 
-    
+    # skip
+
     def px_skipping(self):
         return self._v_skip
 
@@ -65,6 +65,7 @@ class DocumentProxy(ProxyBase):
     def px_inc_media_counter(self):
         self._v_media_counter += 1
         return self._v_media_counter
+
 
 def rst_traversal_count(rst_node, tagname):
     """
@@ -90,14 +91,14 @@ def rst_lineage(resource):
 
 
 def rst_find_interface(resource, clazz):
-    test = lambda arg: isinstance(arg, clazz)
+    def test(arg): return isinstance(arg, clazz)
     for location in rst_lineage(resource):
         if test(location):
             return location
 
 
 def rst_find_all_interface(resource, clazz):
-    test = lambda arg: isinstance(arg, clazz)
+    def test(arg): return isinstance(arg, clazz)
     for location in rst_lineage(resource):
         if test(location):
             yield location
