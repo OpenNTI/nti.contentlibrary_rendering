@@ -23,5 +23,5 @@ class TextValidator(object):
         if not content:
             raise EmptyContentError()
 
-    def validate(self, content=b'', context=None):
+    def validate(self, content=b'', unused_context=None):
         self._do_validate(content)
