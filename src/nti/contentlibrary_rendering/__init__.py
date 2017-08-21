@@ -11,7 +11,7 @@ logger = __import__('logging').getLogger(__name__)
 
 from zope import component
 
-from nti.contentlibrary.utils import NTI
+from nti.contentlibrary import NTI
 
 from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
 
