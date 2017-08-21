@@ -344,7 +344,7 @@ def transform_content(context, contentType, contents=None):
         contents = get_contents_to_render(context)
     transformer = component.getUtility(IContentTransformer,
                                        name=str(contentType))
-    return transformer.transform(contents, context=context)
+    return transformer.transform(contents, context)
 
 
 def content_package_pocation_changed(package, old, new):
