@@ -24,6 +24,7 @@ from nti.containers.containers import CaseInsensitiveCheckingLastModifiedBTreeCo
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
 from nti.contentlibrary_rendering import RENDER_JOB
+from nti.contentlibrary_rendering import NTI_PROVIDER
 
 from nti.contentlibrary_rendering.common import get_creator
 
@@ -74,7 +75,7 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         result = '%s.%s' % (base_ntiid, specific)
         return result
 
-    def createJob(self, package=None, creator=None, provider=u'NTI', mark_rendered=True):
+    def createJob(self, package=None, creator=None, provider=NTI_PROVIDER, mark_rendered=True):
         package = package if package is not None else self.__parent__
         result = ContentPackageRenderJob(PackageNTIID=package.ntiid)
         result.Provider = provider
