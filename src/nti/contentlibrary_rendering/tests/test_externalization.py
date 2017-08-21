@@ -19,8 +19,6 @@ from nti.testing.matchers import validly_provides
 
 from nti.externalization import internalization
 
-from nti.externalization.externalization import to_external_object
-
 from nti.contentlibrary_rendering.interfaces import FAILED
 from nti.contentlibrary_rendering.interfaces import PENDING
 
@@ -28,10 +26,12 @@ from nti.contentlibrary_rendering.interfaces import IContentPackageRenderJob
 
 from nti.contentlibrary_rendering.model import ContentPackageRenderJob
 
-from nti.contentlibrary_rendering.tests import ContentlibraryRenderingTestLayer
+from nti.externalization.externalization import to_external_object
+
+from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 
-class TestExternalization(ContentlibraryRenderingTestLayer):
+class TestExternalization(ContentlibraryRenderingLayerTest):
 
     def test_render_job(self):
         ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california'

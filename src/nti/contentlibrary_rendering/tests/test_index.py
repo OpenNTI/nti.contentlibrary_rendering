@@ -22,10 +22,10 @@ from nti.contentlibrary_rendering.index import create_contentrenderjob_catalog
 
 from nti.contentlibrary_rendering.model import ContentPackageRenderJob
 
-from nti.contentlibrary_rendering.tests import ContentlibraryRenderingTestLayer
+from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 
-class TestIndex(ContentlibraryRenderingTestLayer):
+class TestIndex(ContentlibraryRenderingLayerTest):
 
     def test_catalog(self):
         ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california'
