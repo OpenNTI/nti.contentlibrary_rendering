@@ -24,18 +24,18 @@ from nti.recorder.interfaces import ITransactionRecordHistory
 
 
 @component.adapter(IRenderableContentPackage, IIntIdRemovedEvent)
-def _content_removed(package, event=None):
+def _content_removed(package, unused_event=None):
     meta = IContentPackageRenderMetadata(package, None)
     if meta is not None:
         meta.clear()
 
 
 @component.adapter(IRenderableContentPackage, IContentPackageRemovedEvent)
-def _content_package_removed(package, event=None):
+def _content_package_removed(package, unused_event=None):
     _content_removed(package)
 
 
 @component.adapter(IRenderableContentPackage, IAfterIdAddedEvent)
-def _after_id_added_event(package, event):
+def _after_id_added_event(package, unused_event):
     # init record history
     ITransactionRecordHistory(package)

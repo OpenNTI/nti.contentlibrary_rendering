@@ -24,6 +24,6 @@ class RSTTransformer(TransformerMixin):
     Transforms an RST textual source into an RST DOM.
     """
 
-    def transform(self, content, context):
+    def transform(self, content, unused_context):
         rst_dom = get_rst_dom(source=content)
         return rst_dom

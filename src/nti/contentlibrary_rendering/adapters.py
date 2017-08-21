@@ -65,7 +65,7 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
 
     @property
     def _extra(self):
-        return str(uuid.uuid4()).split('-')[0].upper()
+        return str(uuid.uuid4().get_time_low()).upper()
 
     def _create_unique_job_key(self, job):
         current_time = time_to_64bit_int(time.time())

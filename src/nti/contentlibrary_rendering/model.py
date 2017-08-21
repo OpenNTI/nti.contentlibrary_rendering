@@ -73,7 +73,7 @@ class RenderJob(SchemaConfigured,
         SchemaConfigured.__init__(self, *args, **kwargs)
         PersistentCreatedModDateTrackingObject.__init__(self, *args, **kwargs)
 
-    def __str__(self, *args, **kwargs):
+    def __str__(self, *unused_args, **unused_kwargs):
         return '%s (%s)' % (self.JobId, self.State)
     __repr__ = __str__
 

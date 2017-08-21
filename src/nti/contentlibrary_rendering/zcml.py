@@ -40,7 +40,7 @@ class ImmediateQueueRunner(object):
 @interface.implementer(IContentQueueFactory)
 class _ImmediateQueueFactory(object):
 
-    def get_queue(self, name):
+    def get_queue(self, unused_name):
         return ImmediateQueueRunner()
 
 

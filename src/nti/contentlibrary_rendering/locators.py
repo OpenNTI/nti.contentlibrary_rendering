@@ -209,7 +209,7 @@ class S3Locator(LocatorMixin):
         finally:
             connection.close()
 
-    def _do_locate(self, path, root, context, debug=True):
+    def _do_locate(self, path, unused_root, unused_context, debug=True):
         prefix = os.path.split(path)[0]
         return self._transfer(path, self.bucket_name,
                               debug=debug,
@@ -232,7 +232,7 @@ class S3Locator(LocatorMixin):
             connection.close()
         return True
 
-    def _do_move(self, source, root=None):
+    def _do_move(self, source, unused_root=None):
         prefix = os.path.split(source)[1]
         self._do_remove(prefix)
         self._transfer(source, self.bucket_name,

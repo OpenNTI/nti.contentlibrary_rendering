@@ -13,9 +13,11 @@ TESTS_REQUIRE = [
     'zope.testrunner',
 ]
 
+
 def _read(fname):
     with codecs.open(fname, encoding='utf-8') as f:
         return f.read()
+
 
 setup(
     name='nti.contentlibrary_rendering',
@@ -34,6 +36,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: Implementation :: CPython',
     ],
+    url="https://github.com/NextThought/nti.contentlibrary_rendering",
     zip_safe=True,
     packages=find_packages('src'),
     package_dir={'': 'src'},
