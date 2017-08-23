@@ -326,6 +326,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
         os.chdir(current_dir)
         os.environ['XHTMLTEMPLATES'] = xhtmltemplates
 
+
 def get_contents_to_render(package):
     """
     Get the latest published contents for our package, otherwise fall
