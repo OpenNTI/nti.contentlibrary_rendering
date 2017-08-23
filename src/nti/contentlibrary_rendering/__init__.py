@@ -34,7 +34,7 @@ LIBRARY_RENDER_JOB = u'LibraryRenderJob'
 CONTENT_UNITS_HSET = '++etc++contentlibrary++contentunits++hset'
 
 #: redis hset
-CONTENT_UNITS_HSET_EXPIRY = 3600  # 1 hr
+CONTENT_UNITS_HSET_EXPIRY = 7200  # 2 hr
 
 #: Rendering redis queue name
 CONTENT_UNITS_QUEUE = '++etc++contentlibrary++queue++contentunits'
