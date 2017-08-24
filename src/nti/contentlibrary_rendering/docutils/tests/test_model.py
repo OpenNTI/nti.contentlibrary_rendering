@@ -38,8 +38,8 @@ class TestModel(ContentlibraryRenderingLayerTest):
         package.contents = self._get_data("label.rst")
         ext_obj = to_external_object(package, name='exporter')
         assert_that(ext_obj,
-                    has_entries(u'isPublished', is_(False),
-                                u'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
-                                u'NTIID', 'tag:nextthought.com,2011-10:NTI-HTML-human_physiology',
-                                u'title', is_('Human Physiology'),
-                                u'contents', has_length(200)))
+                    has_entries('isPublished', is_(False),
+                                'MimeType', 'application/vnd.nextthought.renderablecontentpackage',
+                                'NTIID', 'tag:nextthought.com,2011-10:NTI-HTML-human_physiology',
+                                'title', is_('Human Physiology'),
+                                'contents', has_length(200)))
