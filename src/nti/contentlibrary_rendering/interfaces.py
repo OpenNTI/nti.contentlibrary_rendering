@@ -180,12 +180,13 @@ class IPlastexDocumentGenerator(interface.Interface):
     document.
     """
 
-    def generate(source_doc, tex_doc=None):
+    def generate(source_doc, tex_doc=None, context=None):
         """
         Translate the specified source document into a plasTeX document.
 
         :param source_doc The source document
         :param tex_doc If provided, the plasTeX document to build.
+        :param context Source context object
         :return a plasTeX document
         """
 

@@ -532,10 +532,14 @@ class PlastexDocumentGenerator(object):
     Transforms an RST document into a plasTeX document.
     """
 
+    def __init__(self, context=None):
+        self.context = context
+
     def build_nodes(self, rst_node, tex_parent, tex_doc):
         build_nodes(rst_node, tex_parent, tex_doc)
 
-    def generate(self, rst_document=None, tex_doc=None):
+    def generate(self, rst_document=None, tex_doc=None, context=None):
+        context = self.context if context is None else context
         # XXX: By default, we skip any preamble and start directly in the
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
@@ -543,6 +547,7 @@ class PlastexDocumentGenerator(object):
         if 'idgen' not in tex_doc.userdata:
             tex_doc.userdata['idgen'] = IdGen()
         # Proxy allows us to set useful state fields without modified original
-        doc_proxy = DocumentProxy(tex_doc)
+        # context object is available in node translators
+        doc_proxy = DocumentProxy(tex_doc, context=context)
         self.build_nodes(rst_document, tex_doc, doc_proxy)
         return tex_doc

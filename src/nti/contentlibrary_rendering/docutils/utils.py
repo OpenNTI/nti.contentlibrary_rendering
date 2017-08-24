@@ -14,13 +14,15 @@ from zope.proxy import ProxyBase
 
 class DocumentProxy(ProxyBase):
 
-    def __new__(cls, *args, **kwds):
-        return super(DocumentProxy, cls).__new__(cls, *args, **kwds)
+    def __new__(cls, *args, **unused_kwds):
+        return super(DocumentProxy, cls).__new__(cls, *args)
 
     def __init__(self, *args, **kwds):
+        context = kwds.pop('context', None)
         super(DocumentProxy, self).__init__(*args, **kwds)
         self._v_skip = False
         self._v_store = list()
+        self._v_context = context
         self._v_media_counter = 0
         self._v_paragraph_counter = 0
 
@@ -34,6 +36,11 @@ class DocumentProxy(ProxyBase):
             self.__dict__[name] = value
         else:
             return ProxyBase.__setattr__(self, name, value)
+
+    # context
+
+    def px_context(self):
+        return self._v_context
 
     # store
 

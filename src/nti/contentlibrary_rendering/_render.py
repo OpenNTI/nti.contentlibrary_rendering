@@ -287,10 +287,10 @@ def prepare_tex_document(package=None, provider=NTI_PROVIDER, jobname=None,
     return tex_dom, jobname
 
 
-def generate_document(source_doc, tex_dom, content_type=RST_MIMETYPE):
+def generate_document(source_doc, tex_dom, content_type=RST_MIMETYPE, context=None):
     generator = component.getUtility(IPlastexDocumentGenerator,
                                      name=str(content_type))
-    generator.generate(source_doc, tex_dom)
+    generator.generate(source_doc, tex_dom, context)
     return tex_dom
 
 
@@ -320,7 +320,7 @@ def render_document(source_doc, package=None, outfile_dir=None,
                                                 outfile_dir=outfile_dir)
         apply_config_overrides(tex_dom)
         # Generate our plasTeX DOM and render.
-        generate_document(source_doc, tex_dom, content_type)
+        generate_document(source_doc, tex_dom, content_type, package)
         return nti_render.process_document(tex_dom, jobname, docachefile=False)
     finally:
         os.chdir(current_dir)

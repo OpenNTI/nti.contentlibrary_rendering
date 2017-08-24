@@ -17,5 +17,5 @@ from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 @interface.implementer(IPlastexDocumentGenerator)
 class _IdDocumentGenerator(object):
 
-    def generate(self, document, unused_tex_doc=None):
+    def generate(self, document, unused_tex_doc=None, unused_context=None):
         return document
