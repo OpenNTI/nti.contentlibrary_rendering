@@ -26,12 +26,6 @@ from zope.event import notify as event_notify
 
 from zope.intid.interfaces import IIntIds
 
-from zope.security.interfaces import IPrincipal
-
-from zope.security.management import endInteraction
-from zope.security.management import newInteraction
-from zope.security.management import restoreInteraction
-
 from z3c.autoinclude.plugin import find_plugins
 
 from nti.base._compat import text_
@@ -66,7 +60,6 @@ from nti.contentlibrary_rendering.common import dump
 from nti.contentlibrary_rendering.common import mkdtemp
 from nti.contentlibrary_rendering.common import unpickle
 from nti.contentlibrary_rendering.common import redis_client
-from nti.contentlibrary_rendering.common import Participation
 
 from nti.contentlibrary_rendering.interfaces import IContentTransformer
 from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
@@ -456,10 +449,7 @@ def render_package_job(render_job):
                 render_job.PackageNTIID,
                 render_job.job_id)
     job_id = render_job.job_id
-    creator = render_job.creator
-    endInteraction()
     try:
-        newInteraction(Participation(IPrincipal(creator)))
         metadata = get_metadata(job_id)
         key_or_bucket = metadata.key_or_bucket if metadata else None
         if key_or_bucket is None or not key_or_bucket.exists():
@@ -490,5 +480,4 @@ def render_package_job(render_job):
             job.update_to_success_state()
             lifecycleevent.modified(job)
     finally:
-        restoreInteraction()
         lifecycleevent.modified(render_job)

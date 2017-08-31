@@ -34,12 +34,6 @@ from zope import component
 from zope import exceptions
 from zope import lifecycleevent
 
-from zope.security.interfaces import IPrincipal
-
-from zope.security.management import endInteraction
-from zope.security.management import newInteraction
-from zope.security.management import restoreInteraction
-
 from z3c.autoinclude.plugin import find_plugins
 
 from nti.base._compat import text_
@@ -60,7 +54,6 @@ from nti.contentlibrary_rendering.common import unpickle
 from nti.contentlibrary_rendering.common import get_site
 from nti.contentlibrary_rendering.common import get_creator
 from nti.contentlibrary_rendering.common import redis_client
-from nti.contentlibrary_rendering.common import Participation
 from nti.contentlibrary_rendering.common import sha1_hex_digest
 
 from nti.contentlibrary_rendering.interfaces import FAILED
@@ -443,15 +436,12 @@ def render_source(source, provider=NTI_PROVIDER, obfuscate=True, docachefile=Fal
 def render_library_job(render_job):
     logger.info('Rendering content (%s)', render_job.job_id)
     job_id = render_job.job_id
-    creator = render_job.creator
-    endInteraction()
     try:
         move = True
         update_job_status(job_id, RUNNING)
         tex_file = get_delimited_item(job_id)
         if tex_file is None:
             tmp_dir = tempfile.mkdtemp()
-            newInteraction(Participation(IPrincipal(creator)))
             # 1. save source to a local path
             source = save_source(render_job.source, tmp_dir)
             # 2. render contents
@@ -484,7 +474,6 @@ def render_library_job(render_job):
         render_job.update_to_success_state()
         lifecycleevent.modified(render_job)
     finally:
-        restoreInteraction()
         lifecycleevent.modified(render_job)
     return render_job
 
