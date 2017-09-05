@@ -13,12 +13,16 @@ import os
 import six
 import uuid
 import zlib
-import pickle
 import hashlib
 import binascii
 import tempfile
 from io import BytesIO
 from datetime import datetime
+
+try:
+    from six.moves import cPickle as pickle
+except ImportError:
+    import pickle
 
 import isodate
 
