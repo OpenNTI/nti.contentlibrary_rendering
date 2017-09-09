@@ -27,7 +27,6 @@ from nti.contentrendering.nti_render import process_document
 
 from nti.contentrendering.render_document import parse_tex
 
-
 from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 

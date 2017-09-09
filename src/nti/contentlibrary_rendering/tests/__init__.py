@@ -39,7 +39,7 @@ class ContentlibraryRenderingTestLayer(ZopeComponentLayer,
         zope.testing.cleanup.cleanUp()
 
     @classmethod
-    def testSetUp(cls, test=None):
+    def testSetUp(cls, unused_test=None):
         # If we installed any annotations, clear them, since
         # they are tracked by NTIID and would otherwise persist
         annotations = component.getUtility(IContentUnitAnnotationUtility)

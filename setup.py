@@ -11,6 +11,7 @@ TESTS_REQUIRE = [
     'fakeredis',
     'nti.testing',
     'zope.testrunner',
+    'zope.dottedname',
 ]
 
 
