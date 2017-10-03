@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import bz2
@@ -81,13 +80,14 @@ from nti.namedfile.file import safe_filename
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import make_specific_safe
 
-
-# Patch our plastex early.
-patch_all()
-
 # common
 
 EXPIRY_TIME = 172800  # 48hrs
+
+logger = __import__('logging').getLogger(__name__)
+
+# Patch our plastex early.
+patch_all()
 
 
 def prepare_json_text(s):
