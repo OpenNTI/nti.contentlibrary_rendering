@@ -114,7 +114,7 @@ def format_exception(e):
 def generate_job_id(source, creator=None):
     creator = get_creator(creator) or SYSTEM_USER_ID
     current_time = time_to_64bit_int(time.time())
-    specific = "%s_%s_%s" % (creator, source.filename, current_time)
+    specific = u"%s_%s_%s" % (creator, source.filename, current_time)
     specific = make_specific_safe(specific)
     return make_ntiid(nttype=LIBRARY_RENDER_JOB, specific=specific)
 
