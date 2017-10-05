@@ -41,9 +41,9 @@ from nti.property.property import alias
 
 from nti.schema.eqhash import EqHash
 
-from nti.schema.field import SchemaConfigured
-
 from nti.schema.fieldproperty import createDirectFieldProperties
+
+from nti.schema.schema import SchemaConfigured
 
 from nti.traversal.location import find_interface
 
@@ -71,7 +71,7 @@ class RenderJob(SchemaConfigured,
     parameters = {}
 
     def __init__(self, *args, **kwargs):
-        SchemaConfigured.__init__(self, *args, **kwargs)
+        SchemaConfigured.__init__(self, **kwargs)
         PersistentCreatedModDateTrackingObject.__init__(self, *args, **kwargs)
 
     def __str__(self, *unused_args, **unused_kwargs):
