@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import interface
 
@@ -27,6 +26,7 @@ from nti.schema.field import Text
 from nti.schema.field import Object
 from nti.schema.field import Choice
 from nti.schema.field import IndexedIterable
+from nti.schema.field import DecodingValidTextLine
 from nti.schema.field import TextLine as ValidTextLine
 
 FAILED = u'Failed'
@@ -35,7 +35,8 @@ RUNNING = u'Running'
 SUCCESS = u'Success'
 RENDER_STATES = (SUCCESS, PENDING, FAILED, RUNNING)
 RENDER_STATE_VOCABULARY = SimpleVocabulary(
-    [SimpleTerm(x) for x in RENDER_STATES])
+    [SimpleTerm(x) for x in RENDER_STATES]
+)
 
 
 class IRenderJob(ILastModified, ICreated, IZContained):
@@ -114,6 +115,9 @@ class ILibraryRenderJob(IRenderJob):
     """
     Source = Object(INamedFile, title=u"The source.")
     Source.setTaggedValue('_ext_excluded_out', True)
+    
+    PackageNTIID = DecodingValidTextLine(title=u"The package ntiid.",
+                                         required=False)
 
 
 class IContentPackageRenderMetadata(IContainer):

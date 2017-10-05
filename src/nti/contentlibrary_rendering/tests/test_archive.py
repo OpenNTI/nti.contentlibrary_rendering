@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -14,6 +15,7 @@ from hamcrest import has_entry
 from hamcrest import ends_with
 from hamcrest import assert_that
 from hamcrest import starts_with
+from hamcrest import has_property
 
 import os
 import bz2
@@ -48,6 +50,10 @@ from nti.contentlibrary_rendering._archive import update_job_error
 from nti.contentlibrary_rendering._archive import create_render_job
 from nti.contentlibrary_rendering._archive import update_job_status
 from nti.contentlibrary_rendering._archive import render_library_job
+from nti.contentlibrary_rendering._archive import get_job_package_ntiid
+from nti.contentlibrary_rendering._archive import update_job_package_ntiid
+
+from nti.ntiids.ntiids import ROOT
 
 from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
@@ -137,6 +143,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
             source.data = fp.read()
         job = create_render_job(source, _Principal())
         render_library_job(job)
+        assert_that(job, has_property('PackageNTIID', is_not(none())))
 
     def test_format_exception(self):
         try:
@@ -158,6 +165,14 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         error = get_job_error("bankai")
         assert_that(error, has_entry('message', 'bleach'))
         assert_that(error, has_entry('code', 'AssertionError'))
+        
+    @fudge.patch('nti.contentlibrary_rendering._archive.redis_client')
+    def test_job_packate_ntiid(self, mock_rc):
+        redis = fakeredis.FakeStrictRedis()
+        mock_rc.is_callable().with_args().returns(redis)
+        update_job_package_ntiid("jobId", ROOT)
+        ntiid = get_job_package_ntiid("jobId")
+        assert_that(ntiid, is_(ROOT))
         
     def test_obfuscate_source(self):
         tmp_dir = tempfile.mkdtemp()

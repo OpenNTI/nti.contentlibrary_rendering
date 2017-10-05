@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import six
@@ -18,11 +17,7 @@ import binascii
 import tempfile
 from io import BytesIO
 from datetime import datetime
-
-try:
-    from six.moves import cPickle as pickle
-except ImportError:
-    import pickle
+from six.moves import cPickle as pickle
 
 import isodate
 
@@ -48,6 +43,8 @@ from nti.site.interfaces import IHostPolicyFolder
 from nti.traversal.location import find_interface
 
 TMP_MAX = 10000
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(IParticipation)

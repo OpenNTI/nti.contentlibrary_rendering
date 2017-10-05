@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from functools import total_ordering
 
@@ -47,6 +46,8 @@ from nti.schema.field import SchemaConfigured
 from nti.schema.fieldproperty import createDirectFieldProperties
 
 from nti.traversal.location import find_interface
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @EqHash('JobId')
@@ -161,3 +162,4 @@ class LibraryRenderJob(RenderJob):
     mime_type = mimeType = 'application/vnd.nextthought.content.libraryrenderjob'
 
     source = alias('Source')
+    package_ntiid = alias('PackageNTIID')

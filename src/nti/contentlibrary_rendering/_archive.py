@@ -127,10 +127,21 @@ def job_id_error(job_id):
     return "%s=error" % job_id
 
 
+def job_id_package_ntiid(job_id):
+    return "%s=package_ntiid" % job_id
+
+
 def get_job_status(job_id):
     redis = redis_client()
     if redis is not None:
         key = job_id_status(job_id)
+        return redis.get(key)
+
+
+def get_job_package_ntiid(job_id):
+    redis = redis_client()
+    if redis is not None:
+        key = job_id_package_ntiid(job_id)
         return redis.get(key)
 
 
@@ -162,6 +173,14 @@ def update_job_error(job_id, error, expiry=EXPIRY_TIME):
     if redis is not None:
         key = job_id_error(job_id)
         redis.setex(key, value=error, time=expiry)
+        return key
+
+
+def update_job_package_ntiid(job_id, ntiid, expiry=EXPIRY_TIME):
+    redis = redis_client()
+    if redis is not None:
+        key = job_id_package_ntiid(job_id)
+        redis.setex(key, value=ntiid, time=expiry)
         return key
 
 
@@ -402,7 +421,7 @@ def prepare_environment():
             path = os.path.join(location, postfix)
             if os.path.exists(path):
                 xhtmltemplates.append(path)
-    os.environ['XHTMLTEMPLATES'] = os.path.pathsep.join(xhtmltemplates) 
+    os.environ['XHTMLTEMPLATES'] = os.path.pathsep.join(xhtmltemplates)
     return os.environ['XHTMLTEMPLATES']
 
 
@@ -472,6 +491,8 @@ def render_library_job(render_job):
     else:
         logger.info('Render (%s) completed', job_id)
         render_job.update_to_success_state()
+        render_job.package_ntiid = package_ntiid
+        update_job_package_ntiid(job_id, package_ntiid)
         lifecycleevent.modified(render_job)
     finally:
         lifecycleevent.modified(render_job)
