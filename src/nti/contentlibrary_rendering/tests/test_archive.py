@@ -18,12 +18,9 @@ from hamcrest import starts_with
 from hamcrest import has_property
 
 import os
-import bz2
-import gzip
 import shutil
 import tarfile
 import tempfile
-from io import BytesIO
 
 import fudge
 import fakeredis
@@ -35,8 +32,6 @@ from zope.security.interfaces import IPrincipal
 
 from nti.base.interfaces import INamedFile
 
-from nti.contentlibrary_rendering._archive import is_bz2
-from nti.contentlibrary_rendering._archive import is_gzip
 from nti.contentlibrary_rendering._archive import load_job
 from nti.contentlibrary_rendering._archive import store_job
 from nti.contentlibrary_rendering._archive import get_job_error
@@ -73,22 +68,6 @@ class _Principal(object):
 class TestArchive(ContentlibraryRenderingLayerTest):
 
     data = b'ichigo and aizen'
-
-    def test_is_gzip(self):
-        bio = BytesIO()
-        with gzip.GzipFile(fileobj=bio, mode="wb") as fp:
-            fp.write(self.data)
-        assert_that(is_gzip(bio), is_(True))
-
-    def test_is_bz2(self):
-        tmp_dir = tempfile.mkdtemp()
-        try:
-            out_name = os.path.join(tmp_dir, 'data.dat')
-            with bz2.BZ2File(out_name, mode="wb") as fp:
-                fp.write(self.data)
-            assert_that(is_bz2(out_name), is_(True))
-        finally:
-            shutil.rmtree(tmp_dir, True)
 
     def test_process_source_tar_gz(self):
         tmp_dir = tempfile.mkdtemp()

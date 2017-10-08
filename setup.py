@@ -49,7 +49,7 @@ setup(
         'boto',
         'docutils',
         'isodate',
-        'nti.async',
+        'nti.common',
         'nti.contentlibrary',
         'nti.contentrendering',
         'nti.coremetadata',

@@ -9,15 +9,11 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
-import bz2
 import six
 import sys
-import gzip
 import time
 import shutil
 import socket
-import zipfile
-import tarfile
 import tempfile
 import importlib
 from ConfigParser import ConfigParser
@@ -36,6 +32,8 @@ from zope import lifecycleevent
 from z3c.autoinclude.plugin import find_plugins
 
 from nti.base._compat import text_
+
+from nti.common.io import extract_all as process_source
 
 from nti.contentlibrary import RENDERED_PREFIX
 
@@ -85,6 +83,7 @@ from nti.ntiids.ntiids import make_specific_safe
 EXPIRY_TIME = 172800  # 48hrs
 
 logger = __import__('logging').getLogger(__name__)
+
 
 # Patch our plastex early.
 patch_all()
@@ -242,63 +241,6 @@ def obfuscate_filename(name, bound=15):
                             name[:bound], hex_name(name))
     name = safe_filename(name)
     return name
-
-
-def is_archive(source, magic):
-    if hasattr(source, "read"):
-        source.seek(0)
-        file_start = source.read(len(magic))
-    else:
-        with open(source, "rb") as fp:
-            file_start = fp.read(len(magic))
-    return file_start.startswith(magic)
-
-
-def is_gzip(source):
-    return is_archive(source, b"\x1f\x8b\x08")
-
-
-def is_bz2(source):
-    return is_archive(source, b"\x42\x5a\x68")
-
-
-def process_source(source):
-    if not os.path.isfile(source):
-        return source
-    if is_gzip(source):
-        target, _ = os.path.splitext(source)
-        with gzip.open(source, "rb") as f_in, open(target, "wb") as f_out:
-            shutil.copyfileobj(f_in, f_out)
-        return process_source(target)
-    elif is_bz2(source):
-        target, _ = os.path.splitext(source)
-        with bz2.BZ2File(source) as f_in, open(target, "wb") as f_out:
-            shutil.copyfileobj(f_in, f_out)
-        return process_source(target)
-    elif tarfile.is_tarfile(source):
-        _, name = os.path.split(source)
-        if name.lower().endswith('.tar'):
-            name = name[:-4]
-        target = os.path.join(tempfile.mkdtemp(), name)
-        tar = tarfile.TarFile(source)
-        tar.extractall(target)
-        files = os.listdir(target)
-        if files and len(files) == 1:
-            target = os.path.join(target, files[0])
-        return process_source(target)
-    elif zipfile.is_zipfile(source):
-        _, name = os.path.split(source)
-        if name.lower().endswith('.zip'):
-            name = name[:-4]
-        target = os.path.join(tempfile.mkdtemp(), name)
-        zf = zipfile.ZipFile(source)
-        zf.extractall(target)
-        files = os.listdir(target)
-        if files and len(files) == 1:
-            target = os.path.join(target, files[0])
-        return process_source(target)
-    else:
-        return source  # assume renderable
 
 
 def save_source(source, path=None):
