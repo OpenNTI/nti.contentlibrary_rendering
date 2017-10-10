@@ -1,0 +1,1 @@
+-e git+https://github.com/NextThought/nti.base.git@master#egg=nti.base
