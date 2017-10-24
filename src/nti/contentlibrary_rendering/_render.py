@@ -228,7 +228,6 @@ def copy_package_data(item, target):
     # structures
     if library is not None:  # tests
         library.add(target, event=False)
-
     return target
 
 
@@ -244,7 +243,7 @@ def prepare_environment(tex_dom, jobname, packages_path):
             path = os.path.join(location, postfix)
             if os.path.exists(path):
                 xhtmltemplates.append(path)
-    os.environ['XHTMLTEMPLATES'] = os.path.pathsep.join(xhtmltemplates) 
+    os.environ['XHTMLTEMPLATES'] = os.path.pathsep.join(xhtmltemplates)
     setup_environ(tex_dom, jobname, packages_path)
 
 

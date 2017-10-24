@@ -86,7 +86,7 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
         self[result.JobId] = result
         return result
     create_job = createJob
-    
+
     def removeJob(self, job):
         key = getattr(job, 'JobId', job)
         del self[key]

@@ -21,6 +21,7 @@ import socket
 import shutil
 import tempfile
 
+from nti.contentlibrary import DELETED_MARKER
 from nti.contentlibrary import AUTHORED_PREFIX
 
 from nti.contentlibrary.filesystem import FilesystemBucket
@@ -51,7 +52,8 @@ class TestLocator(ContentlibraryRenderingLayerTest):
             assert_that(bucket.absolute_path, starts_with(target_dir))
             assert_that(os.path.exists(bucket.absolute_path), is_(True))
             assert_that(os.path.isdir(bucket.absolute_path), is_(True))
-            assert_that(os.path.exists(source_dir), is_(False))
+            assert_that(os.path.exists(os.path.join(source_dir, DELETED_MARKER)),
+                        is_(True))
             assert_that(os.path.exists(os.path.join(bucket.absolute_path, 'sample.tex')),
                         is_(True))
         finally:

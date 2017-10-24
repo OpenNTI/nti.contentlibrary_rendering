@@ -28,6 +28,7 @@ from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
 
+from nti.contentlibrary import DELETED_MARKER
 from nti.contentlibrary import AUTHORED_PREFIX
 
 from nti.contentlibrary.filesystem import FilesystemBucket
@@ -110,6 +111,17 @@ class FilesystemLocator(LocatorMixin):
         name = safe_filename(name)
         return name
 
+    def _del_dir(self, path):
+        """
+        Since shutil.rmtree is unreliable when deleting a directory (especially
+        when nfs is involved), we mark deleted dirs with DELETED_MARKER and
+        rely on another process to clean these up periodically. Such dirs are
+        ignored during sync.
+        """
+        # TODO: transactional
+        path = os.path.join(path, DELETED_MARKER)
+        open(path, 'w').close()
+
     def _move_content(self, source, destination, remove=True):
         # Make the destination so perms are correct.
         if not os.path.isdir(destination):
@@ -119,7 +131,7 @@ class FilesystemLocator(LocatorMixin):
             source_path = os.path.join(source, child)
             shutil.move(source_path, dest_path)
         if remove:
-            shutil.rmtree(source, ignore_errors=True)
+            self._del_dir(source)
 
     def _do_locate(self, path, root, context):
         assert isinstance(root, FilesystemBucket)
@@ -128,6 +140,7 @@ class FilesystemLocator(LocatorMixin):
         if child is not None:
             logger.warn("Removing %s", child)
             destination = child.absolute_path
+            # XXX: is this safe?
             shutil.rmtree(child.absolute_path)
         else:
             destination = os.path.join(root.absolute_path, name)
@@ -137,7 +150,7 @@ class FilesystemLocator(LocatorMixin):
     def _do_remove(self, bucket):
         if      IFilesystemBucket.providedBy(bucket) \
             and os.path.exists(bucket.absolute_path):
-            shutil.rmtree(bucket.absolute_path)
+            self._del_dir(bucket.absolute_path)
 
     def _do_move(self, source, root):
         name = os.path.split(source)[1]
