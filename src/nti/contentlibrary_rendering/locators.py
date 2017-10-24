@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import os
 import six
@@ -50,6 +49,8 @@ from nti.contentlibrary_rendering.interfaces import IRenderedContentLocator
 from nti.namedfile.file import safe_filename
 
 from nti.site.hostpolicy import get_host_site
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(IRenderedContentLocator)
@@ -160,6 +161,13 @@ class FilesystemLocator(LocatorMixin):
 
 
 @interface.implementer(IRenderedContentLocator)
+class DevFilesystemLocator(FilesystemLocator):
+
+    def _del_dir(self, path):
+        shutil.rmtree(path, True)
+
+
+@interface.implementer(IRenderedContentLocator)
 class S3Locator(LocatorMixin):
 
     prefix = '/'
@@ -230,7 +238,7 @@ class S3Locator(LocatorMixin):
                               headers=self.headers)
 
     def _do_remove(self, bucket, debug=True):
-        prefix = str(getattr(bucket,'name', None) or bucket)
+        prefix = str(getattr(bucket, 'name', None) or bucket)
         connection = self._connection(debug)
         try:
             bucket = connection.get_bucket(self.bucket_name)

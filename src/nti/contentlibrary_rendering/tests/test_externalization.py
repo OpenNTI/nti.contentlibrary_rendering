@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 # disable: accessing protected members, too many methods
 # pylint: disable=W0212,R0904
@@ -37,9 +38,9 @@ class TestExternalization(ContentlibraryRenderingLayerTest):
         ntiid = u'tag:nextthought.com,2011-10:USSC-HTML-Cohen.cohen_v._california'
         job_id = u'123456'
         ext_obj = {
-            u'MimeType': ContentPackageRenderJob.mime_type,
-            u'JobId': job_id,
-            u'PackageNTIID': ntiid
+            'MimeType': ContentPackageRenderJob.mime_type,
+            'JobId': job_id,
+            'PackageNTIID': ntiid
         }
 
         assert_that(internalization.find_factory_for(ext_obj),

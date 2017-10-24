@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 
@@ -30,6 +29,8 @@ from nti.ntiids.ntiids import find_object_with_ntiid
 from nti.site.site import get_site_for_site_names
 
 from nti.site.transient import TrivialSite
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def _dataserver_folder():

@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from nti.contentlibrary.interfaces import IRenderableContentPackage
 
@@ -25,6 +24,8 @@ from nti.contentlibrary_rendering.unpublish import queue_remove_rendered_package
 
 from nti.contentlibrary_rendering.processing import queue_add
 from nti.contentlibrary_rendering.processing import queue_modified
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def _create_render_job(package, user, provider=NTI_PROVIDER, mark_rendered=True):
