@@ -16,8 +16,7 @@ import shutil
 import socket
 import tempfile
 import importlib
-from ConfigParser import ConfigParser
-from ConfigParser import NoOptionError
+from six.moves import configparser
 
 import simplejson
 
@@ -317,12 +316,12 @@ def find_renderable(archive):
         return archive  # assume renderable
     nti_conf = os.path.join(archive, 'nti_render_conf.ini')
     if os.path.exists(nti_conf):
-        config = ConfigParser()
+        config = configparser.ConfigParser()
         with open(nti_conf) as fp:
             config.readfp(fp)
             try:
                 tex = config.get(NTI_PROVIDER, 'main')
-            except NoOptionError:
+            except configparser.NoOptionError:
                 tex = None
         if tex and os.path.exists(os.path.join(archive, tex)):
             return tex
