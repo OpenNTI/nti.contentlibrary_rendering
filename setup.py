@@ -26,8 +26,12 @@ setup(
     version=_read('version.txt').strip(),
     author='Jason Madden',
     author_email='jason@nextthought.com',
-    description="NTI ContentLibrary / Rendering",
-    long_description=_read('README.rst'),
+    description="NTI ContentLibrary Rendering",
+    long_description=(
+        _read('README.rst')
+        + '\n\n'
+        + _read("CHANGES.rst")
+    ),
     license='Apache',
     keywords='content library rendering',
     classifiers=[
