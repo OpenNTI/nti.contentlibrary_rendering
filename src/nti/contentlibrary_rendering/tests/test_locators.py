@@ -15,12 +15,12 @@ from hamcrest import assert_that
 from hamcrest import starts_with
 from hamcrest import contains_string
 
-import fudge
-
 import os
 import socket
 import shutil
 import tempfile
+
+import fudge
 
 from nti.contentlibrary import DELETED_MARKER
 from nti.contentlibrary import AUTHORED_PREFIX

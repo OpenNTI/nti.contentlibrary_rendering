@@ -70,12 +70,12 @@ from nti.contentrendering.render_document import PP_CONTENT_RENDERING
 
 from nti.coremetadata.interfaces import SYSTEM_USER_ID
 
-from nti.zodb.containers import time_to_64bit_int
-
 from nti.namedfile.file import safe_filename
 
 from nti.ntiids.ntiids import make_ntiid
 from nti.ntiids.ntiids import make_specific_safe
+
+from nti.zodb.containers import time_to_64bit_int
 
 # common
 

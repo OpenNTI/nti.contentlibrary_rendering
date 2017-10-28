@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 import re
 
@@ -21,6 +20,8 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTContentValidati
 # XXX: Do we want to try to retain line number etc?
 # ex: '<string>:2: (SEVERE/4) Unexpected section title or transition.\n\n========'
 MSG_PATTERN = r'<.*\) (.*)'
+
+logger = __import__('logging').getLogger(__name__)
 
 
 @interface.implementer(IRSTContentValidationError)

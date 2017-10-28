@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from zope import component
 
@@ -18,6 +17,8 @@ from docutils.frontend import OptionParser
 from docutils.parsers.rst import Parser
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
+
+logger = __import__('logging').getLogger(__name__)
 
 
 def get_settings():

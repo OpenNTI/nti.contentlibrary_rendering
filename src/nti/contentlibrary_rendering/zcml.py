@@ -23,7 +23,7 @@ from nti.contentlibrary_rendering import QUEUE_NAMES
 
 from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
 
-from nti.dataserver.interfaces import IRedisClient
+from nti.coremetadata.interfaces import IRedisClient
 
 logger = __import__('logging').getLogger(__name__)
 

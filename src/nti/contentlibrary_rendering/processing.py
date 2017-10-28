@@ -22,7 +22,7 @@ from nti.contentlibrary_rendering.common import get_render_job
 
 from nti.contentlibrary_rendering.interfaces import IContentPackageRenderMetadata
 
-from nti.dataserver.interfaces import IDataserver
+from nti.coremetadata.interfaces import IDataserver
 
 from nti.ntiids.ntiids import find_object_with_ntiid
 

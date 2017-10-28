@@ -4,10 +4,9 @@
 .. $Id$
 """
 
-from __future__ import print_function, absolute_import, division
-__docformat__ = "restructuredtext en"
-
-logger = __import__('logging').getLogger(__name__)
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 from plasTeX import TeXDocument
 
@@ -28,6 +27,8 @@ from nti.contentlibrary_rendering.docutils.utils import rst_traversal_count
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
 from nti.contentrendering.plastexpackages.ulem import uline
+
+logger = __import__('logging').getLogger(__name__)
 
 
 class IdGen(object):
