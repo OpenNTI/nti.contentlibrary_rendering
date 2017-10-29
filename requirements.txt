@@ -1,6 +1,14 @@
 -e git+https://github.com/NextThought/nti.base.git@master#egg=nti.base
+-e git+https://github.com/NextThought/nti.async.git@master#egg=nti.async
 -e git+https://github.com/NextThought/nti.ntiids.git@master#egg=nti.ntiids
+-e git+https://github.com/NextThought/nti.plasTeX.git@master#egg=nti.plasTeX
+-e git+https://github.com/NextThought/nti.recorder.git@master#egg=nti.recorder
+-e git+https://github.com/NextThought/nti.publishing.git@master#egg=nti.publishing
+-e git+https://github.com/NextThought/nti.contentrendering.git@master#egg=nti.contentrendering
 -e svn+https://repos.nextthought.com/svn/nti-svn/nti.common/trunk#egg=nti.common
+-e svn+https://repos.nextthought.com/svn/nti-svn/nti.namedfile/trunk#egg=nti.namedfile
+-e svn+https://repos.nextthought.com/svn/nti-svn/nti.traversal/trunk#egg=nti.traversal
 -e svn+https://repos.nextthought.com/svn/nti-svn/nti.containers/trunk#egg=nti.containers
 -e svn+https://repos.nextthought.com/svn/nti-svn/nti.dublincore/trunk#egg=nti.dublincore
+-e svn+https://repos.nextthought.com/svn/nti-svn/nti.coremetadata/trunk#egg=nti.coremetadata
 -e svn+https://repos.nextthought.com/svn/nti-svn/nti.contentlibrary/trunk#egg=nti.contentlibrary
