@@ -20,12 +20,14 @@ class DocumentProxy(ProxyBase):
 
     def __init__(self, *args, **kwds):
         context = kwds.pop('context', None)
+        rst_document = kwds.pop('rst_document', None)
         super(DocumentProxy, self).__init__(*args, **kwds)
         self._v_skip = False
         self._v_store = list()
         self._v_context = context
         self._v_media_counter = 0
         self._v_paragraph_counter = 0
+        self._v_rst_document = rst_document
 
     def __getattr__(self, name):
         if name.startswith('_v'):
@@ -42,6 +44,9 @@ class DocumentProxy(ProxyBase):
 
     def px_context(self):
         return self._v_context
+    
+    def px_rst_document(self):
+        return self._v_rst_document
 
     # store
 
