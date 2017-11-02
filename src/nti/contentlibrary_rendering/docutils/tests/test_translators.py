@@ -28,6 +28,8 @@ from nti.contentlibrary_rendering.docutils import get_rst_dom
 
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTranslator
 
+from nti.contentlibrary_rendering.docutils.translators import PlastexDocumentGenerator
+
 from nti.contentlibrary_rendering.tests import ContentlibraryRenderingLayerTest
 
 
@@ -161,3 +163,19 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         index = self._generate_from_file('formats.rst')
         assert_that(index,
                     contains_string('<span class="underline">Examine the differences between the Democratic and Republican Parties</span><em><span class="underline">, the social impact of terrorist organizations, the growing suspicions over the reach of the federal government,</span></em> <b class="bfseries"><span class="underline">and the subsequent end of Reconstruction.</span></b>'))
+
+    def test_codeblock(self):
+        source = """\
+        .. code:: python
+        
+          def my_function():
+              '''
+              Test the lexer.
+              '''
+        
+              # and now for something completely different
+              print 8/2
+        """
+        rst_document = get_rst_dom(source)
+        generator = PlastexDocumentGenerator()
+        generator.generate(rst_document)

@@ -11,6 +11,7 @@ from __future__ import absolute_import
 from plasTeX import TeXDocument
 
 from plasTeX.Logging import getLogger
+
 logger = getLogger(__name__)
 
 from zope import interface
@@ -23,6 +24,8 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTToPlastexNodeTr
 
 from nti.contentlibrary_rendering.docutils.utils import DocumentProxy
 from nti.contentlibrary_rendering.docutils.utils import rst_traversal_count
+
+from nti.contentlibrary_rendering.docutils.writers import HTMLTranslator
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
@@ -433,6 +436,23 @@ class FakeparagraphToPlastexNodeTranslator(TranslatorMixin):
         return tex_node
 
 
+# Codeblocks
+
+
+class LiteralBlockToPlastexNodeTranslator(TranslatorMixin):
+    
+    __name__ = 'literal_block'
+
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
+        tex_doc.px_toggle_skip()
+        rst_document = tex_doc.px_rst_document()
+        translator = HTMLTranslator(rst_document)
+        rst_node.walkabout(translator)
+
+    def do_depart(self, unused_rst_node, unused_tex_node, tex_doc):
+        tex_doc.px_toggle_skip()
+
+
 # Document
 
 
@@ -549,6 +569,7 @@ class PlastexDocumentGenerator(object):
             tex_doc.userdata['idgen'] = IdGen()
         # Proxy allows us to set useful state fields without modified original
         # context object is available in node translators
-        doc_proxy = DocumentProxy(tex_doc, context=context)
+        doc_proxy = DocumentProxy(tex_doc, context=context, 
+                                  rst_document=rst_document)
         self.build_nodes(rst_document, tex_doc, doc_proxy)
         return tex_doc

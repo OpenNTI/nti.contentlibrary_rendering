@@ -27,6 +27,7 @@ def get_settings():
     settings.report_level = 2
     settings.stylesheet = None
     settings.math_output = 'HTML'
+    settings.compact_lists = None
     settings.stylesheet_path = None
     settings.xml_declaration = None
     settings.initial_header_level = 0

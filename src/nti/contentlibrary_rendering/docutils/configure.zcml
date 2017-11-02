@@ -61,6 +61,8 @@
 	<utility factory=".translators.TargetToPlastexNodeTranslator" name="target" />
 	<utility factory=".translators.ReferenceToPlastexNodeTranslator" name="reference" />
 
+	<utility factory=".translators.LiteralBlockToPlastexNodeTranslator" name="literal_block" />
+
 	<!-- Transformers -->
 	<utility factory=".transformers.RSTTransformer" name="rst" />
 	<utility factory=".transformers.RSTTransformer" name="text/x-rst" />
