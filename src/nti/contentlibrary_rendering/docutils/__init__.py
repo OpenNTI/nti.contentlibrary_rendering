@@ -25,6 +25,11 @@ def get_settings():
     settings = OptionParser(components=(Parser,)).get_default_values()
     settings.halt_level = 4
     settings.report_level = 2
+    settings.stylesheet = None
+    settings.math_output = 'HTML'
+    settings.stylesheet_path = None
+    settings.xml_declaration = None
+    settings.initial_header_level = 0
     settings.character_level_inline_markup = True
     return settings
 
