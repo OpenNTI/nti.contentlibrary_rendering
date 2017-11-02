@@ -77,6 +77,7 @@ setup(
         'nti.traversal',
         'nti.zodb',
         'nti.zope_catalog',
+        'Pillow',
         'Pygments',
         'simplejson',
         'six',
