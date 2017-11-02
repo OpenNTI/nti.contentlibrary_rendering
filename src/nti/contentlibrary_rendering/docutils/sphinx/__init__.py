@@ -14,7 +14,6 @@ import tempfile
 
 try:
     from sphinx import application
-    from sphinx.config import Config
 
     # reduce verbosity
     logger = application.logger
