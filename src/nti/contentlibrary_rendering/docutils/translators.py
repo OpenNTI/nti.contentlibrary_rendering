@@ -29,6 +29,8 @@ from nti.contentlibrary_rendering.docutils.writers import HTMLTranslator
 
 from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
+from nti.contentrendering.plastexpackages.ntihtml import ntirawhtml
+
 from nti.contentrendering.plastexpackages.ulem import uline
 
 logger = __import__('logging').getLogger(__name__)
@@ -448,6 +450,9 @@ class LiteralBlockToPlastexNodeTranslator(TranslatorMixin):
         rst_document = tex_doc.px_rst_document()
         translator = HTMLTranslator(rst_document)
         rst_node.walkabout(translator)
+        result = ntirawhtml()
+        result.set_html(''.join(translator.body))
+        return result
 
     def do_depart(self, unused_rst_node, unused_tex_node, tex_doc):
         tex_doc.px_toggle_skip()
