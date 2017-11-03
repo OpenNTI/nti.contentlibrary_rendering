@@ -130,8 +130,9 @@ class HTMLTranslator(BaseHTMLTranslator):
                 try:
                     source = imagepath.encode(sys.getfilesystemencoding())
                     img = PIL.Image.open(source)
-                except (IOError, UnicodeEncodeError):
-                    pass  # TODO: warn?
+                except (IOError, UnicodeEncodeError) as e:
+                    logger.warn("Error while opening image. %s", e)
+                    pass
                 else:
                     self.settings.record_dependencies.add(imagepath.replace('\\', '/'))
                     if 'width' not in atts:
@@ -145,7 +146,8 @@ class HTMLTranslator(BaseHTMLTranslator):
                     assert match
                     atts[att_name] = '%s%s' % (
                         float(match.group(1)) * (float(node['scale']) / 100),
-                        match.group(2))
+                        match.group(2)
+                    )
         style = []
         for att_name in 'width', 'height':
             if att_name in atts:
