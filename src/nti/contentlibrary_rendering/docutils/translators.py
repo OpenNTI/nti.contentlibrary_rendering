@@ -10,10 +10,6 @@ from __future__ import absolute_import
 
 from plasTeX import TeXDocument
 
-from plasTeX.Logging import getLogger
-
-logger = getLogger(__name__)
-
 from zope import interface
 
 from nti.base._compat import text_
