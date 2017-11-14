@@ -329,8 +329,13 @@ class LabelMixin(TranslatorMixin):
 # Paragraph
 
 
-class BlockQuoteToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
+class BlockQuoteToPlastexNodeTranslator(TranslatorMixin):
+
     __name__ = 'block_quote'
+
+    def do_translate(self, unused_rst_node, tex_doc, unused_tex_parent):
+        tex_node = tex_doc.createElement('ntiblockquote')
+        return tex_node
 
 
 class ParagraphToPlastexNodeTranslator(LabelMixin):

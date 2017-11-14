@@ -68,7 +68,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
     def test_bullet_list(self):
         index = self._generate_from_file('bullet_list.rst')
         assert_that(index,
-                    contains_string('Bullet List Item 1</p> <ul class="itemize">'))
+                    contains_string('<ul class="itemize">'))
         assert_that(index,
                     contains_string('Nested Bullet List Item 1-1</p> </li>'))
         assert_that(index,
@@ -80,7 +80,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         assert_that(index,
                     contains_string('Nested Bullet List Item 1-4</p> </li> </ul>'))
         assert_that(index,
-                    contains_string('Bullet List Item 2</p> <ul class="itemize">'))
+                    contains_string('Bullet List Item 2</p> <blockquote class="ntiblockquote"><ul class="itemize">'))
         assert_that(index,
                     contains_string('Nested Bullet List Item 2-1</p> </li>'))
         assert_that(index,
@@ -95,7 +95,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
     def test_ordered_list(self):
         index = self._generate_from_file('ordered_list.rst')
         assert_that(index,
-                    contains_string('Ordered List Item 1</p> <ol class="enumerate" start="1">'))
+                    contains_string('Ordered List Item 1</p> <blockquote class="ntiblockquote"><ol class="enumerate" start="1">'))
         assert_that(index,
                     contains_string('Nested Ordered List Item 1-1</p> </li>'))
         assert_that(index,
