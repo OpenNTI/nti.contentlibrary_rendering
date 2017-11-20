@@ -4,6 +4,7 @@
 -e git+https://github.com/NextThought/nti.plasTeX.git@master#egg=nti.plasTeX
 -e git+https://github.com/NextThought/nti.recorder.git@master#egg=nti.recorder
 -e git+https://github.com/NextThought/nti.publishing.git@master#egg=nti.publishing
+-e git+https://github.com/NextThought/nti.plone.namedfile.git@master#egg=nti.plone.namedfile
 -e git+https://github.com/NextThought/nti.contentrendering.git@master#egg=nti.contentrendering
 -e svn+https://repos.nextthought.com/svn/nti-svn/nti.common/trunk#egg=nti.common
 -e svn+https://repos.nextthought.com/svn/nti-svn/nti.namedfile/trunk#egg=nti.namedfile
