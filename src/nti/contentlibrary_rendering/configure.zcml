@@ -14,7 +14,7 @@
 
 	<include package="." file="meta.zcml" />
 
-	<include package="nti.async" />
+	<include package="nti.asynchronous" />
 	<include package="nti.contentlibrary" />
 	<include package="nti.contentrendering" />
 

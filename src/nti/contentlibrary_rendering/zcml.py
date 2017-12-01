@@ -13,11 +13,11 @@ from zope import interface
 
 from zope.component.zcml import utility
 
-from nti.async import get_job_queue as async_queue
+from nti.asynchronous import get_job_queue as async_queue
 
-from nti.async.interfaces import IRedisQueue
+from nti.asynchronous.interfaces import IRedisQueue
 
-from nti.async.redis_queue import PriorityQueue as RedisQueue
+from nti.asynchronous.redis_queue import PriorityQueue as RedisQueue
 
 from nti.contentlibrary_rendering import QUEUE_NAMES
 
