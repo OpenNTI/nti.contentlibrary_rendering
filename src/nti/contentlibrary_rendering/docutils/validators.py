@@ -19,7 +19,8 @@ from nti.contentlibrary_rendering.docutils.interfaces import IRSTContentValidati
 # We'd like to try to clean up all the boilerplate text.
 # Do we want to try to retain line number etc?
 # ex: '<string>:2: (SEVERE/4) Unexpected section title or transition.\n\n========'
-MSG_PATTERN = r'<.*>.*(\(.*\))\s*(.*)'
+MSG_PATTERN_STRING = r'<.*>.*(\(.*\))\s*(.*)'
+MSG_PATTERN = re.compile(MSG_PATTERN_STRING,re.U | re.M)
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -30,7 +31,7 @@ class RSTContentValidationError(ContentValidationError):
     mime_type = mimeType = 'application/vnd.nextthought.content.rstvalidationerror'
 
     def __init__(self, message, warnings=None, *args, **kwargs):
-        match = re.match(MSG_PATTERN, message)
+        match = MSG_PATTERN.match(message)
         if match and match.groups():
             message = match.groups()[1]
         ContentValidationError.__init__(self, message, *args, **kwargs)
