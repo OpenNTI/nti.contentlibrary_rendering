@@ -17,7 +17,7 @@ from nti.contentlibrary.validators import ContentValidationError
 from nti.contentlibrary_rendering.docutils.interfaces import IRSTContentValidationError
 
 # We'd like to try to clean up all the boilerplate text.
-# XXX: Do we want to try to retain line number etc?
+# Do we want to try to retain line number etc?
 # ex: '<string>:2: (SEVERE/4) Unexpected section title or transition.\n\n========'
 MSG_PATTERN = r'<.*\) (.*)'
 

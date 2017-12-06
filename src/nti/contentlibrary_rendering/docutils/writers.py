@@ -132,7 +132,6 @@ class HTMLTranslator(BaseHTMLTranslator):
                     img = PIL.Image.open(source)
                 except (IOError, UnicodeEncodeError) as e:
                     logger.warn("Error while opening image. %s", e)
-                    pass
                 else:
                     self.settings.record_dependencies.add(imagepath.replace('\\', '/'))
                     if 'width' not in atts:
