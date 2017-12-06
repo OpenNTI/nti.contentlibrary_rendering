@@ -343,7 +343,7 @@ class ParagraphToPlastexNodeTranslator(LabelMixin):
     __name__ = 'paragraph'
 
     def _handle_title(self, rst_node, tex_node, tex_doc):
-        # XXX: We need a title for a paragraph b/c the renderer uses it
+        # We need a title for a paragraph b/c the renderer uses it
         # to generate and ntiid for it
         title = rst_node.attributes.get('title') \
             or  rst_node.attributes.get('id') \
@@ -524,7 +524,7 @@ def handle_node(rst_node, tex_parent, tex_doc):
     if result is not None and tex_parent is not None:
         tex_parent.append(result)
     # If no-op, keep parsing but do so for our tex_parent.
-    # XXX: Is this what we want?
+    # Is this what we want?
     if result is None:
         result = tex_parent
     return result
@@ -536,7 +536,7 @@ def process_children(rst_node, tex_node, tex_doc):
 
 
 def skip_node(node):
-    # XXX: or should we not just default to including node
+    # should we not just default to including node?
     return node.tagname in ('system_message', 'comment')
 
 
@@ -567,7 +567,7 @@ class PlastexDocumentGenerator(object):
 
     def generate(self, rst_document=None, tex_doc=None, context=None):
         context = self.context if context is None else context
-        # XXX: By default, we skip any preamble and start directly in the
+        # By default, we skip any preamble and start directly in the
         # body. docutils stores the title info in the preamble.
         if tex_doc is None:
             tex_doc = TeXDocument()
