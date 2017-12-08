@@ -58,7 +58,6 @@ setup(
         'isodate',
         'lxml',
         'nti.asynchronous',
-        'nti.async',
         'nti.base',
         'nti.common',
         'nti.containers',
