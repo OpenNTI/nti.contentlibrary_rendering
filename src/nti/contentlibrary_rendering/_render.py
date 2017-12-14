@@ -114,7 +114,7 @@ def save_metadata(job_id, item, expiry=CONTENT_UNITS_HSET_EXPIRY):
             pipe.hset(CONTENT_UNITS_HSET, job_id, data).expire(job_id, expiry)
             pipe.execute()
             return True
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         logger.exception("Could not place %s in %s for %s",
                          item, CONTENT_UNITS_HSET, job_id)
     return False
@@ -128,7 +128,7 @@ def get_metadata(job_id):
             data = redis.hget(CONTENT_UNITS_HSET, job_id)
             if data is not None:
                 return unpickle(data)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         logger.exception("Could not get metadata from %s for %s",
                          CONTENT_UNITS_HSET, job_id)
     return None
@@ -140,7 +140,7 @@ def delete_metadata(job_id):
         redis = redis_client()
         if redis is not None:
             redis.hdel(CONTENT_UNITS_HSET, job_id)
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         logger.exception("Could not delete metadata from %s for %s",
                          CONTENT_UNITS_HSET, job_id)
     return None
@@ -184,6 +184,8 @@ def copy_package_data(item, target):
     """
     copy rendered data to target
     """
+    # pylint: disable=too-many-function-args
+    # pylint: disable=no-value-for-parameter
     factory = IEclipseContentPackageFactory(item)
     package = factory.new_instance(item,
                                    RenderableContentPackage,
@@ -253,7 +255,7 @@ def prepare_tex_document(package=None, provider=NTI_PROVIDER, jobname=None,
     Build and prepare context for our plasTeX document, returning
     the new plasTeX document and the jobname.nose2
     """
-    # XXX: Do we need to read in render_conf? How about cross-document refs?
+    # Do we need to read in render_conf? How about cross-document refs?
     tex_dom = TeXDocument() if tex_dom is None else tex_dom
     Base.document.filenameoverride = property(lambda unused: 'index')
     # Generate a jobname, this is used in the eventual NTIID.
@@ -350,7 +352,7 @@ def locate_rendered_content(tex_dom, package):
     # get path to rendered contents
     output_dir = tex_dom.userdata['working-dir']
     path, name = os.path.split(output_dir)
-    name_noe, unused = os.path.splitext(name)
+    name_noe, unused_ext = os.path.splitext(name)
     path = os.path.join(path, name_noe)
     # save old location
     old_root = getattr(package, 'root', None) \
@@ -439,8 +441,9 @@ def _get_jobs_to_update(render_job):
     """
     meta = _get_metadata(render_job)
     baseline = render_job.created
-    return [x for x in meta.values()
-            if x.is_pending() and x.created >= baseline]
+    return [
+        x for x in meta.values() if x.is_pending() and x.created >= baseline
+    ]
 
 
 def render_package_job(render_job):
@@ -459,14 +462,14 @@ def render_package_job(render_job):
             # simply copy the contents again from previous
             # render operation
             package = get_package(render_job)
-            logger.warn("Due to a transaction abort, copying data from %s for package %s",
-                        key_or_bucket, package.ntiid)
+            logger.warning("Due to a transaction abort, copying data from %s for package %s",
+                           key_or_bucket, package.ntiid)
             old_root = package.root
             copy_and_notify(key_or_bucket, package, render_job, metadata)
             render_job.OutputRoot = key_or_bucket  # save
             content_package_pocation_changed(package, old_root, key_or_bucket)
-    except Exception as e:
-        # XXX: Do we want to fail all applicable jobs?
+    except Exception as e:  # pylint: disable=broad-except
+        # Do we want to fail all applicable jobs?
         logger.exception('Render job %s failed', job_id)
         render_job.update_to_failed_state(text_(str(e)))
     else:

@@ -91,7 +91,7 @@ class RenderJob(SchemaConfigured,
             return NotImplemented
 
     @readproperty
-    def creator(self):
+    def creator(self):  # pylint: disable=method-hidden 
         return SYSTEM_USER_ID
 
     def is_finished(self):
@@ -123,6 +123,7 @@ class RenderJob(SchemaConfigured,
         """
         Mark this job as failing.
         """
+        # pylint: disable=attribute-defined-outside-init
         self.updateLastMod()
         self.State = FAILED
         self.Error = text_(reason)
@@ -131,6 +132,7 @@ class RenderJob(SchemaConfigured,
         """
         Mark this job as successful.
         """
+        # pylint: disable=attribute-defined-outside-init
         self.updateLastMod()
         self.State = SUCCESS
 
@@ -145,7 +147,7 @@ class ContentPackageRenderJob(RenderJob):
     package = alias('PackageNTIID')
 
     @readproperty
-    def creator(self):
+    def creator(self):  # pylint: disable=method-hidden 
         package = find_interface(self, IContentPackage)
         return get_creator(package) or SYSTEM_USER_ID
 

@@ -15,7 +15,7 @@ import sys
 
 try:
     from urllib import url2pathname
-except ImportError:
+except ImportError: # pragma: no cover
     from urllib.request import url2pathname
 
 from docutils import nodes

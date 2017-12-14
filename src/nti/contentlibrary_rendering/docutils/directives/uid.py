@@ -28,7 +28,7 @@ class UIDAttribute(Transform):
 
     default_priority = 210  # same as Class
 
-    def apply(self):
+    def apply(self):  # pylint: disable=arguments-differ
         child = pending = self.startnode
         parent = pending.parent
         while parent:
@@ -42,6 +42,7 @@ class UIDAttribute(Transform):
                 pending.parent.remove(pending)
                 return
             else:
+                # pylint: disable=useless-else-on-loop
                 # At end of section or container; apply to sibling
                 child = parent
                 parent = parent.parent

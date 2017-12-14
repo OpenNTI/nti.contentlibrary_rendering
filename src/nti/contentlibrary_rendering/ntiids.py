@@ -41,6 +41,6 @@ class _ContentRenderJobResolver(object):
             if meta is not None:
                 try:
                     return meta[key]
-                except KeyError:
+                except KeyError:  # pragma: no cover
                     pass
         return None

@@ -62,9 +62,6 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
     parameters = {}
     id = alias('__name__')
 
-    def __init__(self):
-        super(DefaultContentPackageRenderMetadata, self).__init__()
-
     @property
     def _extra(self):
         return str(uuid.uuid4().time_low).upper()
@@ -111,6 +108,7 @@ class DefaultContentPackageRenderMetadata(CaseInsensitiveCheckingLastModifiedBTr
 
 def render_meta_factory(context):
     try:
+        # pylint: disable=protected-access
         result = context._package_render_metadata
         return result
     except AttributeError:

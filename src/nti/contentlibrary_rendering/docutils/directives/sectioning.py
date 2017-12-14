@@ -36,6 +36,7 @@ class BaseFake(Directive):
             msg = 'Error in "%s" directive: missing title' % self.name
             raise self.error(msg)
 
+        # pylint: disable=not-callable
         result = self.node_class()
         result['title'] = title
         return [result]

@@ -37,6 +37,7 @@ class TransformerMixin(object):
         return component.getUtility(IIntIds)
 
     def _get_id(self, context):
+        # pylint: disable=no-member
         return str(self._intids.getId(context))
 
     def _out_file(self, context):

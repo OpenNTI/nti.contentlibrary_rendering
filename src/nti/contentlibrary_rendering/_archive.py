@@ -393,9 +393,9 @@ def render_source(source, provider=NTI_PROVIDER, obfuscate=True, docachefile=Fal
     return tex_file
 
 
-def render_library_job(render_job):
-    logger.info('Rendering content (%s)', render_job.job_id)
-    job_id = render_job.job_id
+def render_library_job(job):
+    logger.info('Rendering content (%s)', job.job_id)
+    job_id = job.job_id
     try:
         move = True
         update_job_status(job_id, RUNNING)
@@ -403,9 +403,9 @@ def render_library_job(render_job):
         if tex_file is None:
             tmp_dir = tempfile.mkdtemp()
             # 1. save source to a local path
-            source = save_source(render_job.source, tmp_dir)
+            source = save_source(job.source, tmp_dir)
             # 2. render contents
-            tex_file = render_source(source, render_job.Provider)
+            tex_file = render_source(source, job.Provider)
             # 3. save in case of a retry
             save_delimited_item(job_id, tex_file)
         else:
@@ -423,21 +423,21 @@ def render_library_job(render_job):
                 update_job_status(job_id, SUCCESS)
                 shutil.rmtree(tmp_dir, ignore_errors=True)
         transaction.get().addAfterCommitHook(after_commit_or_abort)
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-except
         logger.exception('Render job %s failed', job_id)
         traceback_msg = text_(format_exception(e))
-        render_job.update_to_failed_state(traceback_msg)
+        job.update_to_failed_state(traceback_msg)
         update_job_status(job_id, FAILED)
         update_job_error(job_id, traceback_msg)
     else:
         logger.info('Render (%s) completed', job_id)
-        render_job.update_to_success_state()
-        render_job.package_ntiid = package_ntiid
+        job.update_to_success_state()
+        job.package_ntiid = package_ntiid
         update_job_package_ntiid(job_id, package_ntiid)
-        lifecycleevent.modified(render_job)
+        lifecycleevent.modified(job)
     finally:
-        lifecycleevent.modified(render_job)
-    return render_job
+        lifecycleevent.modified(job)
+    return job
 
 
 def render_job(job_id):

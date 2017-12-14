@@ -5,8 +5,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-# disable: accessing protected members, too many methods
-# pylint: disable=W0212,R0904
+# pylint: disable=protected-access,too-many-public-methods
 
 from hamcrest import is_
 from hamcrest import none
@@ -127,7 +126,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
     def test_format_exception(self):
         try:
             raise Exception('bleach')
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             msg = format_exception(e)
         assert_that(msg, is_not(none()))
         msg = simplejson.loads(msg)

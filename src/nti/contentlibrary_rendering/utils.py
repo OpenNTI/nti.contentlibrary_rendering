@@ -30,6 +30,7 @@ logger = __import__('logging').getLogger(__name__)
 
 def _create_render_job(package, user, provider=NTI_PROVIDER, mark_rendered=True):
     meta = IContentPackageRenderMetadata(package)
+    # pylint: disable=too-many-function-args
     job = meta.createJob(package, user, provider, mark_rendered)
     return job
 

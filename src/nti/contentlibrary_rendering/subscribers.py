@@ -28,6 +28,7 @@ logger = __import__('logging').getLogger(__name__)
 def _content_removed(package, unused_event=None):
     meta = IContentPackageRenderMetadata(package, None)
     if meta is not None:
+        # pylint: disable=too-many-function-args
         meta.clear()
 
 

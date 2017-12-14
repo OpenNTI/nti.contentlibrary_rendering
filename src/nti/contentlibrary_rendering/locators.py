@@ -22,7 +22,7 @@ from zope import interface
 from zope.cachedescriptors.property import Lazy
 from zope.cachedescriptors.property import readproperty
 
-from zope.component.hooks import site as getSite
+from zope.component.hooks import getSite
 from zope.component.hooks import site as current_site
 
 from zope.intid.interfaces import IIntIds
@@ -61,6 +61,7 @@ class LocatorMixin(object):
         return component.getUtility(IIntIds)
 
     def _get_id(self, context):
+        # pylint: disable=no-member
         return str(self._intids.getId(context))
 
     def _do_locate(self, path, root, context):
@@ -94,6 +95,7 @@ class LocatorMixin(object):
 
     def remove(self, bucket):
         logger.info("Removing bucket (%s)", bucket)
+        # pylint: disable=no-value-for-parameter
         return self._do_remove(bucket)
 
     def move(self, source, root):
@@ -119,7 +121,7 @@ class FilesystemLocator(LocatorMixin):
         rely on another process to clean these up periodically. Such dirs are
         ignored during sync.
         """
-        # TODO: transactional
+        # transactional. TODO.
         path = os.path.join(path, DELETED_MARKER)
         open(path, 'w').close()
 
@@ -141,14 +143,14 @@ class FilesystemLocator(LocatorMixin):
         if child is not None:
             logger.warning("Removing %s", child)
             destination = child.absolute_path
-            # XXX: is this safe?
+            # is this safe?
             shutil.rmtree(child.absolute_path)
         else:
             destination = os.path.join(root.absolute_path, name)
         self._move_content(path, destination)
         return root.getChildNamed(name)
 
-    def _do_remove(self, bucket):
+    def _do_remove(self, bucket):  # pylint: disable=arguments-differ 
         if      IFilesystemBucket.providedBy(bucket) \
             and os.path.exists(bucket.absolute_path):
             self._del_dir(bucket.absolute_path)
@@ -181,14 +183,17 @@ class S3Locator(LocatorMixin):
 
     @readproperty
     def aws_access_key_id(self):
+        # pylint: disable=no-member
         return self.settings.get('AWS_ACCESS_KEY_ID')
 
     @readproperty
     def aws_secret_access_key(self):
+        # pylint: disable=no-member
         return self.settings.get('AWS_SECRET_ACCESS_KEY')
 
     @readproperty
     def bucket_name(self):
+        # pylint: disable=no-value-for-parameter
         return getSite().__name__
 
     def _connection(self, debug=True):
@@ -231,6 +236,7 @@ class S3Locator(LocatorMixin):
         finally:
             connection.close()
 
+    # pylint: disable=arguments-differ 
     def _do_locate(self, path, unused_root, unused_context, debug=True):
         prefix = os.path.split(path)[0]
         return self._transfer(path, self.bucket_name,
@@ -238,7 +244,7 @@ class S3Locator(LocatorMixin):
                               prefix=prefix,
                               headers=self.headers)
 
-    def _do_remove(self, bucket, debug=True):
+    def _do_remove(self, bucket, debug=True):  # pylint: disable=arguments-differ 
         prefix = str(getattr(bucket, 'name', None) or bucket)
         connection = self._connection(debug)
         try:
@@ -246,7 +252,7 @@ class S3Locator(LocatorMixin):
             keys = [k.name for k in bucket.list(prefix=prefix)]
             if keys:
                 bucket.delete_keys(keys)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             logger.exception("Could not remove '%s/*' files in bucket %s",
                              prefix, self.bucket_name)
             return False
