@@ -139,7 +139,7 @@ class FilesystemLocator(LocatorMixin):
         name = self._out_name(context)
         child = root.getChildNamed(name)
         if child is not None:
-            logger.warn("Removing %s", child)
+            logger.warning("Removing %s", child)
             destination = child.absolute_path
             # XXX: is this safe?
             shutil.rmtree(child.absolute_path)
@@ -164,6 +164,7 @@ class FilesystemLocator(LocatorMixin):
 class DevFilesystemLocator(FilesystemLocator):
 
     def _del_dir(self, path):
+        logger.warning("Removing %s", path)
         shutil.rmtree(path, True)
 
 
