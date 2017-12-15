@@ -166,8 +166,10 @@ class FilesystemLocator(LocatorMixin):
 class DevFilesystemLocator(FilesystemLocator):
 
     def _del_dir(self, path):
-        logger.warning("Removing %s", path)
+        logger.debug("Removing %s", path)
         shutil.rmtree(path, True)
+        if os.path.exists(path):
+            FilesystemLocator._del_dir(self, path)
 
 
 @interface.implementer(IRenderedContentLocator)
