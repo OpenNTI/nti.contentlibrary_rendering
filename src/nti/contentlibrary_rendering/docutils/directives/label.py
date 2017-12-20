@@ -13,9 +13,9 @@ from zope import interface
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst import directives
 
-from nti.contentlibrary_rendering.docutils.directives.nodes import label
+from nti.base._compat import text_
 
-from nti.ntiids.ntiids import make_specific_safe
+from nti.contentlibrary_rendering.docutils.directives.nodes import label
 
 logger = __import__('logging').getLogger(__name__)
 
@@ -31,7 +31,8 @@ class Label(Directive):
 
     def run(self):
         arg = directives.unchanged(self.arguments[0]) or ''
-        arg = make_specific_safe(arg.replace('\\', ''))  # replace escape chars
+        # We want to support non-ascii here.
+        arg = text_(arg)
         if not arg:
             msg = 'Error in "%s" directive: missing label' % self.name
             raise self.error(msg)
