@@ -321,7 +321,8 @@ class LabelMixin(TranslatorMixin):
         children = rst_node.children
         nid = rst_node.attributes.get('id')
         if not nid and children and children[0].tagname == 'label':
-            tex_node.id = children[0]['id']
+            tex_node.id = children[0]['id'].encode("latin-1", 'replace')
+            tex_node.id = text_(tex_node.id)
             tex_node.setAttribute('id', tex_node.id)
             rst_node.children = children[1:]
 
