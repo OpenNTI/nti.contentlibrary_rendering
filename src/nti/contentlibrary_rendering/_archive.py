@@ -273,7 +273,7 @@ def remove_content(package):
     root = getattr(package, 'root', None) \
         or getattr(package, 'key', None)
     locator = component.getUtility(IRenderedContentLocator)
-    locator.remove(root)
+    return locator.remove(root)
 
 
 def move_content(library, path):
@@ -281,7 +281,7 @@ def move_content(library, path):
     root = getattr(enumeration, 'root', None) \
         or getattr(enumeration, 'bucket', None)
     locator = component.getUtility(IRenderedContentLocator)
-    locator.move(path, root)
+    return locator.move(path, root)
 
 
 def update_library(ntiid, path, library=None, move=True):

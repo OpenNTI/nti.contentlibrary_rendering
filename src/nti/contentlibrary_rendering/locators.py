@@ -267,6 +267,6 @@ class S3Locator(LocatorMixin):
     def _do_move(self, source, unused_root=None):
         prefix = os.path.split(source)[1]
         self._do_remove(prefix)
-        self._transfer(source, self.bucket_name,
-                       prefix=prefix,
-                       headers=self.headers)
+        return self._transfer(source, self.bucket_name,
+                              prefix=prefix,
+                              headers=self.headers)
