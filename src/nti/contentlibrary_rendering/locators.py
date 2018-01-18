@@ -151,15 +151,17 @@ class FilesystemLocator(LocatorMixin):
         return root.getChildNamed(name)
 
     def _do_remove(self, bucket):  # pylint: disable=arguments-differ 
-        if      IFilesystemBucket.providedBy(bucket) \
-            and os.path.exists(bucket.absolute_path):
+        if IFilesystemBucket.providedBy(bucket) and os.path.exists(bucket.absolute_path):
             self._del_dir(bucket.absolute_path)
+            return True
+        return False
 
     def _do_move(self, source, root):
         name = os.path.split(source)[1]
         child = FilesystemBucket(root, name)
         self._do_remove(child)
         self._move_content(source, child.absolute_path, False)
+        return child
 
 
 @interface.implementer(IRenderedContentLocator)
