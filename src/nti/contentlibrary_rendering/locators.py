@@ -159,7 +159,7 @@ class FilesystemLocator(LocatorMixin):
     def _do_move(self, source, root):
         name = os.path.split(source)[1]
         child = FilesystemBucket(root, name)
-        # XXX: We do not want to remove the child here. All we do is place a
+        # We do not want to remove the child here. All we do is place a
         # deleted marker in our eventual destination. This means we are not
         # properly sanitizing before we move.
         self._move_content(source, child.absolute_path, False)
