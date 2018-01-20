@@ -156,9 +156,21 @@ class FilesystemLocator(LocatorMixin):
             return True
         return False
 
+    def _empty_dir(self, path):
+        for filename in os.listdir(path):
+            filepath = os.path.join(path, filename)
+            if os.path.isdir(filepath):
+                shutil.rmtree(filepath)
+            else:
+                os.remove(filepath)
+
     def _do_move(self, source, root):
         name = os.path.split(source)[1]
         child = FilesystemBucket(root, name)
+        if os.path.exists(child.absolute_path):
+            logger.warning("Moving content to an existing location %s", 
+                           child)
+            # self._empty_dir(child.absolute_path)
         # We do not want to remove the child here. All we do is place a
         # deleted marker in our eventual destination. This means we are not
         # properly sanitizing before we move.
@@ -174,6 +186,13 @@ class DevFilesystemLocator(FilesystemLocator):
         shutil.rmtree(path, True)
         if os.path.exists(path):
             FilesystemLocator._del_dir(self, path)
+    
+    def _do_move(self, source, root):
+        name = os.path.split(source)[1]
+        child = FilesystemBucket(root, name)
+        self._do_remove(child)
+        self._move_content(source, child.absolute_path, False)
+        return child
 
 
 @interface.implementer(IRenderedContentLocator)
