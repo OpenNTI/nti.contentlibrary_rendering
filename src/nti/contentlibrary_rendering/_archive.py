@@ -298,7 +298,7 @@ def update_library(ntiid, path, library=None, move=True):
     content_packages = [
         x for x in enumeration.enumerateContentPackages() if x.ntiid == ntiid
     ]
-    assert content_packages
+    assert content_packages and len(content_packages) == 1
     # add or replace
     updated = content_packages[0]
     if not is_new:

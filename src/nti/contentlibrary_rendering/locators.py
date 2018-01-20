@@ -150,7 +150,7 @@ class FilesystemLocator(LocatorMixin):
         self._move_content(path, destination)
         return root.getChildNamed(name)
 
-    def _do_remove(self, bucket):  # pylint: disable=arguments-differ 
+    def _do_remove(self, bucket):  # pylint: disable=arguments-differ
         if IFilesystemBucket.providedBy(bucket) and os.path.exists(bucket.absolute_path):
             self._del_dir(bucket.absolute_path)
             return True
@@ -159,7 +159,9 @@ class FilesystemLocator(LocatorMixin):
     def _do_move(self, source, root):
         name = os.path.split(source)[1]
         child = FilesystemBucket(root, name)
-        self._do_remove(child)
+        # XXX: We do not want to remove the child here. All we do is place a
+        # deleted marker in our eventual destination. This means we are not
+        # properly sanitizing before we move.
         self._move_content(source, child.absolute_path, False)
         return child
 
@@ -240,7 +242,7 @@ class S3Locator(LocatorMixin):
         finally:
             connection.close()
 
-    # pylint: disable=arguments-differ 
+    # pylint: disable=arguments-differ
     def _do_locate(self, path, unused_root, unused_context, debug=True):
         prefix = os.path.split(path)[0]
         return self._transfer(path, self.bucket_name,
@@ -248,7 +250,7 @@ class S3Locator(LocatorMixin):
                               prefix=prefix,
                               headers=self.headers)
 
-    def _do_remove(self, bucket, debug=True):  # pylint: disable=arguments-differ 
+    def _do_remove(self, bucket, debug=True):  # pylint: disable=arguments-differ
         prefix = str(getattr(bucket, 'name', None) or bucket)
         connection = self._connection(debug)
         try:
