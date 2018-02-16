@@ -64,10 +64,9 @@ def render_modified_package(package, user, provider=NTI_PROVIDER, mark_rendered=
 
 
 def remove_rendered_package(package, root=None, site_name=None):
-    if IRenderableContentPackage.providedBy(package):
-        root = root \
-            or getattr(package, 'root', None) \
-            or getattr(package, 'key', None)
-        if root is not None:
-            site_name = get_site(site_name, context=package)
-            queue_remove_rendered_package(package.ntiid, root, site_name)
+    root = root \
+        or getattr(package, 'root', None) \
+        or getattr(package, 'key', None)
+    if root is not None:
+        site_name = get_site(site_name, context=package)
+        queue_remove_rendered_package(package.ntiid, root, site_name)
