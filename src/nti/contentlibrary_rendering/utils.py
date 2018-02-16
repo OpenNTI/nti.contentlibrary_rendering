@@ -64,6 +64,9 @@ def render_modified_package(package, user, provider=NTI_PROVIDER, mark_rendered=
 
 
 def remove_rendered_package(package, root=None, site_name=None):
+    """
+    Queue an IO removal job for the specified package
+    """
     root = root \
         or getattr(package, 'root', None) \
         or getattr(package, 'key', None)
