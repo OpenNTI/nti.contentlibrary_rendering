@@ -246,7 +246,7 @@ def save_source(source, path=None):
     path = path or tempfile.mkdtemp()
     name = os.path.split(source.filename)[1]
     name = os.path.join(path, name)
-    with open(name, "wb") as fp:
+    with open(name, "w") as fp:
         fp.write(source.data)
     return name
 
@@ -291,8 +291,9 @@ def update_library(ntiid, path, library=None, move=True):
     if move:  # move False trx retry
         move_content(library, path)
     package = library.get(ntiid)
-    is_new = (package is None or
-              get_content_package_site(package) != get_site())
+    is_new = (
+        package is None or get_content_package_site(package) != get_site()
+    )
     # enumerate all content packages to build new pkgs
     enumeration = library.enumeration
     content_packages = [
@@ -410,8 +411,8 @@ def render_library_job(job):
             save_delimited_item(job_id, tex_file)
         else:
             move = False
-            logger.warn("Due to a transaction abort, using data from %s for job %s",
-                        tex_file, job_id)
+            logger.warning("Due to a transaction abort, using data from %s for job %s",
+                           tex_file, job_id)
         # 4. Get package info
         out_path = os.path.splitext(tex_file)[0]
         package_ntiid = get_rendered_package_ntiid(out_path)
