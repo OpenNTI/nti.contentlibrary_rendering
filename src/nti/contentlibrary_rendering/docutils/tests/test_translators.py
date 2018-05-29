@@ -169,3 +169,12 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                     contains_string('<span class="name function">my_function</span><span class="punctuation">():</span>'))
         assert_that(index,
                     contains_string('<span class="comment single"># and now for something completely different</span>'))
+        
+    def test_sidebar(self):
+        index = self._generate_from_file('sidebar.rst')
+        assert_that(index,
+                    contains_string('<div class="sidebar-title">Genesis</div>'))
+        assert_that(index,
+                    contains_string('<div class="sidebar" data-ntiid="tag:nextthought.com,2011-10:NTI-HTML:NTISidebar-sample.sidebar.genesis'))
+        assert_that(index,
+                    contains_string('In the beginning God created'))

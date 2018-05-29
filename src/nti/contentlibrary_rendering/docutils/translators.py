@@ -27,6 +27,8 @@ from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
 from nti.contentrendering.plastexpackages.ntihtml import ntirawhtml
 
+from nti.contentrendering.plastexpackages.ntisidebar import sidebar
+
 from nti.contentrendering.plastexpackages.ulem import uline
 
 logger = __import__('logging').getLogger(__name__)
@@ -458,6 +460,22 @@ class LiteralBlockToPlastexNodeTranslator(TranslatorMixin):
 
     def do_depart(self, unused_rst_node, unused_tex_node, tex_doc):
         tex_doc.px_toggle_skip()
+
+
+# sidebars
+
+
+class SidebarToPlastexNodeTranslator(TranslatorMixin):
+    
+    __name__ = 'sidebar'
+
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
+        result = sidebar()
+        result.ownerDocument = tex_doc
+        if rst_node.children and rst_node.children[0].tagname == 'title':
+            result.title = rst_node.children[0].astext()
+            rst_node.children = rst_node.children[1:]
+        return result
 
 
 # Document
