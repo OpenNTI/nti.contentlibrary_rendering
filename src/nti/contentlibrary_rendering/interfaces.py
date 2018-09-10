@@ -23,11 +23,11 @@ from nti.base.interfaces import ICreated
 from nti.base.interfaces import INamedFile
 from nti.base.interfaces import ILastModified
 
-from nti.schema.field import Bool, ListOrTuple
+from nti.schema.field import Bool
 from nti.schema.field import Text
 from nti.schema.field import Object
 from nti.schema.field import Choice
-from nti.schema.field import IndexedIterable
+from nti.schema.field import ListOrTuple
 from nti.schema.field import DecodingValidTextLine
 from nti.schema.field import TextLine as ValidTextLine
 
