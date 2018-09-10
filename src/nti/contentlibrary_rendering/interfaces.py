@@ -23,7 +23,7 @@ from nti.base.interfaces import ICreated
 from nti.base.interfaces import INamedFile
 from nti.base.interfaces import ILastModified
 
-from nti.schema.field import Bool
+from nti.schema.field import Bool, ListOrTuple
 from nti.schema.field import Text
 from nti.schema.field import Object
 from nti.schema.field import Choice
@@ -128,11 +128,11 @@ class IContentPackageRenderMetadata(IContainer):
     if available.
     """
 
-    render_jobs = IndexedIterable(title=u"An iterable of render jobs",
-                                  value_type=Object(IContentPackageRenderJob),
-                                  unique=True,
-                                  default=(),
-                                  required=False)
+    render_jobs = ListOrTuple(title=u"An iterable of render jobs",
+                              value_type=Object(IContentPackageRenderJob),
+                              unique=True,
+                              default=(),
+                              required=False)
 
     def createJob(package, creator, provider=None, mark_rendered=True):
         """
