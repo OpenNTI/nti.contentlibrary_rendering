@@ -18,10 +18,10 @@ from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
 NTI_PROVIDER = NTI
 
 #: text mime type
-TEXT_MIMETYPE = b'text/plain'
+TEXT_MIMETYPE = 'text/plain'
 
 #: latex mime type
-LaTeX_MIMETYPE = b'application/x-latex'
+LaTeX_MIMETYPE = 'application/x-latex'
 
 #: Render job NTIID Type
 RENDER_JOB = u'RenderJob'
