@@ -9,6 +9,7 @@
 	<module module=".uid" />
 	<module module=".meta" />
 	<module module=".label" />
+	<module module=".embedwidget" />
 	<module module=".sectioning" />
 
 </configure>

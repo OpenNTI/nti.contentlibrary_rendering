@@ -36,3 +36,7 @@ class fakesubsection(General, Element):
 
 class fakesubsubsection(General, Element):
     pass
+
+
+class embedwidget(General, Element):
+    pass

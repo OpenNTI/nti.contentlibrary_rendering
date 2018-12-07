@@ -48,3 +48,8 @@ class TestDirectives(ContentlibraryRenderingLayerTest):
         from nti.contentlibrary_rendering.docutils.directives import meta
         assert_that(meta, validly_provides(IDirectivesModule))
         assert_that(docutils_directive('meta', None, None), is_(not_none()))
+
+    def test_embedwidget_directive(self):
+        from nti.contentlibrary_rendering.docutils.directives import embedwidget
+        assert_that(embedwidget, validly_provides(IDirectivesModule))
+        assert_that(docutils_directive('embedwidget', None, None), is_(not_none()))

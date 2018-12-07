@@ -27,6 +27,8 @@ from nti.contentlibrary_rendering.interfaces import IPlastexDocumentGenerator
 
 from nti.contentrendering.plastexpackages.ntihtml import ntirawhtml
 
+from nti.contentrendering.plastexpackages.ntilatexmacros import ntiembedwidget
+
 from nti.contentrendering.plastexpackages.ntisidebar import sidebar
 
 from nti.contentrendering.plastexpackages.ulem import uline
@@ -475,6 +477,24 @@ class SidebarToPlastexNodeTranslator(TranslatorMixin):
         if rst_node.children and rst_node.children[0].tagname == 'title':
             result.title = rst_node.children[0].astext()
             rst_node.children = rst_node.children[1:]
+        return result
+
+
+# embedwidgets
+
+
+class EmbedWidgetToPlastexNodeTranslator(TranslatorMixin):
+
+    __name__ = 'embedwidget'
+
+    def do_translate(self, rst_node, tex_doc, unused_tex_parent):
+        result = ntiembedwidget()
+        result.ownerDocument = tex_doc
+
+        result.setAttribute('url', rst_node.attributes['url'])
+        result.setAttribute('height', rst_node.attributes['height'])
+        result.setAttribute('width', rst_node.attributes['width'])
+        result.setAttribute('no-sandboxing', rst_node.attributes['no-sandboxing'])
         return result
 
 
