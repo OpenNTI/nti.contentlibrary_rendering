@@ -43,7 +43,7 @@ class EmbedWidget(Directive):
         return [node]
 
 def register_directives():
-    directives.register_directive("embedwidget", EmbedWidget)
+    directives.register_directive("nti:embedwidget", EmbedWidget)
 register_directives()
 
 
