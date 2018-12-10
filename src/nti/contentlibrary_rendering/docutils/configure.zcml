@@ -65,6 +65,8 @@
 
 	<utility factory=".translators.LiteralBlockToPlastexNodeTranslator" name="literal_block" />
 
+	<utility factory=".translators.EmbedWidgetToPlastexNodeTranslator" name="embedwidget" />
+
 	<!-- Transformers -->
 	<utility factory=".transformers.RSTTransformer" name="rst" />
 	<utility factory=".transformers.RSTTransformer" name="text/x-rst" />

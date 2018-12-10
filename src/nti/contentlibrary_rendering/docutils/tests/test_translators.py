@@ -178,3 +178,14 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                     contains_string('<div class="sidebar" data-ntiid="tag:nextthought.com,2011-10:NTI-HTML:NTISidebar-sample.sidebar.genesis'))
         assert_that(index,
                     contains_string('In the beginning God created'))
+
+    def test_embed_widget(self):
+        index = self._generate_from_file('embedwidget.rst')
+        assert_that(index,
+                    contains_string('<div class="title">EmbedWidget Test</div>'))
+        assert_that(index,
+                    contains_string('<param name="source" value="https://cdnapisec.kaltura.com/p/2401761/sp/240176100/embedIframeJs/uiconf_id/42593641/partner_id/2401761?iframeembed=true&amp;playerId=kaltura_player&amp;entry_id=0_4vwjecdg&amp;flashvars[streamerType]=auto&amp;flashvars[localizationCode]=en&amp;flashvars[leadWithHTML5]=true&amp;flashvars[sideBarContainer.plugin]=true&amp;flashvars[sideBarContainer.position]=left&amp;flashvars[sideBarContainer.clickToClose]=true&amp;flashvars[chapters.plugin]=true&amp;flashvars[chapters.layout]=vertical&amp;flashvars[chapters.thumbnailRotator]=false&amp;flashvars[streamSelector.plugin]=true&amp;flashvars[EmbedPlayer.SpinnerTarget]=videoHolder&amp;flashvars[dualScreen.plugin]=true&amp;flashvars[raptMedia.plugin]=true&amp;flashvars[raptMedia.parent]=videoHolder&amp;flashvars[raptMedia.behaviorOnEnd]=pause&amp;flashvars[scrubber.plugin]=false&amp;flashvars[durationLabel.plugin]=false&amp;flashvars[playPauseBtn.plugin]=false&amp;flashvars[raptMediaScrubber.plugin]=true&amp;flashvars[raptMediaDurationLabel.plugin]=true&amp;flashvars[raptMediaPlayPauseBtn.plugin]=true&amp;flashvars[EmbedPlayer.WebKitPlaysInline]=true&amp;flashvars[forceMobileHTML5]=true&amp;&amp;wid=0_21lfx0zk" />'))
+        assert_that(index,
+                    contains_string('<param name="no-sandboxing" value="true" />'))
+        assert_that(index,
+                    contains_string('<param name="height" value="285px" />'))
