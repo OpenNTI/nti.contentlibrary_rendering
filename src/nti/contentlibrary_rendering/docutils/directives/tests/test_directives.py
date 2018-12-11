@@ -52,4 +52,4 @@ class TestDirectives(ContentlibraryRenderingLayerTest):
     def test_embedwidget_directive(self):
         from nti.contentlibrary_rendering.docutils.directives import embedwidget
         assert_that(embedwidget, validly_provides(IDirectivesModule))
-        assert_that(docutils_directive('embedwidget', None, None), is_(not_none()))
+        assert_that(docutils_directive('nti:embedwidget', None, None), is_(not_none()))
