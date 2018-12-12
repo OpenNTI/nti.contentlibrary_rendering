@@ -169,7 +169,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                     contains_string('<span class="name function">my_function</span><span class="punctuation">():</span>'))
         assert_that(index,
                     contains_string('<span class="comment single"># and now for something completely different</span>'))
-        
+
     def test_sidebar(self):
         index = self._generate_from_file('sidebar.rst')
         assert_that(index,
@@ -189,3 +189,9 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                     contains_string('<param name="no-sandboxing" value="true" />'))
         assert_that(index,
                     contains_string('<param name="height" value="285px" />'))
+        assert_that(index,
+                    contains_string('<param name="width" value="400px" />'))
+        assert_that(index,
+                    contains_string('<param name="title" value="embed_title" />'))
+        assert_that(index,
+                    contains_string('<param name="arbitrary_1" value="arbitrary_val1" />'))

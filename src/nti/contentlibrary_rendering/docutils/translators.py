@@ -271,7 +271,7 @@ class TargetToPlastexNodeTranslator(NoOpPlastexNodeTranslator):
 
     __name__ = 'target'
 
-    
+
 class ReferenceToPlastexNodeTranslator(TranslatorMixin):
 
     __name__ = 'reference'
@@ -305,7 +305,7 @@ class ReferenceToPlastexNodeTranslator(TranslatorMixin):
                 raise ValueError(
                     'External link "%s" not supported by LaTeX.\n'
                     ' (Must not contain "^^" or unbalanced braces.)' % href)
-            
+
             tex_node = tex_doc.createElement('href')
             tex_node.setAttribute('url', rst_node['refuri'])
             return tex_node
@@ -448,7 +448,7 @@ class FakeparagraphToPlastexNodeTranslator(TranslatorMixin):
 
 
 class LiteralBlockToPlastexNodeTranslator(TranslatorMixin):
-    
+
     __name__ = 'literal_block'
 
     def do_translate(self, rst_node, tex_doc, unused_tex_parent):
@@ -468,7 +468,7 @@ class LiteralBlockToPlastexNodeTranslator(TranslatorMixin):
 
 
 class SidebarToPlastexNodeTranslator(TranslatorMixin):
-    
+
     __name__ = 'sidebar'
 
     def do_translate(self, rst_node, tex_doc, unused_tex_parent):
@@ -490,11 +490,9 @@ class EmbedWidgetToPlastexNodeTranslator(TranslatorMixin):
     def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         result = ntiembedwidget()
         result.ownerDocument = tex_doc
-
-        result.setAttribute('url', rst_node.attributes['url'])
-        result.setAttribute('height', rst_node.attributes['height'])
-        result.setAttribute('width', rst_node.attributes['width'])
-        result.setAttribute('no-sandboxing', rst_node.attributes['no-sandboxing'])
+        for key, val in rst_node.attributes.items():
+            if val:
+                result.setAttribute(key, val)
         return result
 
 
@@ -614,7 +612,7 @@ class PlastexDocumentGenerator(object):
             tex_doc.userdata['idgen'] = IdGen()
         # Proxy allows us to set useful state fields without modified original
         # context object is available in node translators
-        doc_proxy = DocumentProxy(tex_doc, context=context, 
+        doc_proxy = DocumentProxy(tex_doc, context=context,
                                   rst_document=rst_document)
         self.build_nodes(rst_document, tex_doc, doc_proxy)
         return tex_doc
