@@ -29,18 +29,34 @@ class EmbedWidget(Directive):
     def run(self):
         if not self.arguments:
             raise self.error('A URL must be supplied.')
-
         url = directives.unchanged_required(self.arguments[0])
         node = embedwidget(self.block_text, **self.options)
         # arbitrary key/value pairs
-        args = []
+        # We have to parse this ourselves, taking care to remove the colons
+        # from the attribute name. We also must consume tokens after an
+        # attribute name to handle whitespace in values.
         to_be_parsed_args = self.arguments[1:]
+        args = []
+        arg_value = None
         for arg in to_be_parsed_args:
-            # Strip ':'
             if arg.startswith(':'):
+                # New attr name; close out old arg_value and
+                # handle the new attr name.
                 arg = arg[1:]
                 arg = arg[:-1]
-            args.append(arg)
+                if arg_value is not None:
+                    args.append(arg_value)
+                args.append(arg)
+                arg_value = None
+            elif arg_value:
+                # Existing with an additional value token; assume single space.
+                arg_value = '%s %s' % (arg_value, arg)
+            else:
+                # A first value for an attribute
+                arg_value = arg
+        # Close out our arg value for our last attr.
+        args.append(arg_value)
+
         # Turn into a key/val dict
         arg_dict = dict(zip(*[iter(args)]*2))
         for key, val in arg_dict.items():

@@ -181,6 +181,7 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
 
     def test_embed_widget(self):
         index = self._generate_from_file('embedwidget.rst')
+        from IPython.terminal.debugger import set_trace;set_trace()
         assert_that(index,
                     contains_string('<div class="title">EmbedWidget Test</div>'))
         assert_that(index,
@@ -192,6 +193,6 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
         assert_that(index,
                     contains_string('<param name="width" value="400px" />'))
         assert_that(index,
-                    contains_string('<param name="title" value="embed_title" />'))
+                    contains_string('<param name="title" value="embed title" />'))
         assert_that(index,
-                    contains_string('<param name="arbitrary_1" value="arbitrary_val1" />'))
+                    contains_string('<param name="arbitrary_1" value="arbitrary val1" />'))
