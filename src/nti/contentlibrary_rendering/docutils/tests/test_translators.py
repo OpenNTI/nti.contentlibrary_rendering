@@ -181,7 +181,6 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
 
     def test_embed_widget(self):
         index = self._generate_from_file('embedwidget.rst')
-        from IPython.terminal.debugger import set_trace;set_trace()
         assert_that(index,
                     contains_string('<div class="title">EmbedWidget Test</div>'))
         assert_that(index,
