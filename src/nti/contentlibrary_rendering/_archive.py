@@ -162,7 +162,7 @@ def update_job_status(job_id, status, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
         key = job_id_status(job_id)
-        redis.setex(key, value=status, time=expiry)
+        redis.setex(key, time=expiry, value=status)
         return key
 
 
@@ -170,7 +170,7 @@ def update_job_error(job_id, error, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
         key = job_id_error(job_id)
-        redis.setex(key, value=error, time=expiry)
+        redis.setex(key, time=expiry, value=error)
         return key
 
 
@@ -178,7 +178,7 @@ def update_job_package_ntiid(job_id, ntiid, expiry=EXPIRY_TIME):
     redis = redis_client()
     if redis is not None:
         key = job_id_package_ntiid(job_id)
-        redis.setex(key, value=ntiid, time=expiry)
+        redis.setex(key, time=expiry, value=ntiid)
         return key
 
 
@@ -193,7 +193,7 @@ def create_render_job(source, creator, provider=NTI_PROVIDER):
 
 def store_job(job, expiry=EXPIRY_TIME):
     redis = redis_client()
-    redis.setex(job.job_id, value=dump(job), time=expiry)
+    redis.setex(job.job_id, time=expiry, value=dump(job))
     return job
 
 
