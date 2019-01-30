@@ -9,3 +9,6 @@ EmbedWidget Test
    :no-sandboxing: true
    :allowfullscreen: true
    :title: embed title
+   :url: abc
+   :source: you
+   :src: https

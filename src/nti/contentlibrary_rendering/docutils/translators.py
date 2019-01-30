@@ -490,7 +490,12 @@ class EmbedWidgetToPlastexNodeTranslator(TranslatorMixin):
     def do_translate(self, rst_node, tex_doc, unused_tex_parent):
         result = ntiembedwidget()
         result.ownerDocument = tex_doc
+        result.setAttribute('url', rst_node.attributes['source'])
         for key, val in rst_node.attributes.items():
+            if key.lower() in ('src', 'source', 'url'):
+                # For src, it must be the same value as the source, otherwise it would cause rendering error in UI.
+                # Don't set it for now.
+                continue
             if val:
                 result.setAttribute(key, val)
         return result
