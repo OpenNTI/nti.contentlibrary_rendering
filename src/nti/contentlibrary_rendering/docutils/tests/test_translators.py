@@ -8,6 +8,7 @@ from __future__ import absolute_import
 # pylint: disable=protected-access,too-many-public-methods
 
 from hamcrest import is_
+from hamcrest import is_not
 from hamcrest import assert_that
 from hamcrest import has_property
 from hamcrest import contains_string
@@ -195,3 +196,10 @@ class TestTranslators(ContentlibraryRenderingLayerTest):
                     contains_string('<param name="title" value="embed title" />'))
         assert_that(index,
                     contains_string('<param name="arbitrary_1" value="arbitrary val1" />'))
+
+        assert_that(index,
+                    is_not(contains_string('<param name="src"')))
+        assert_that(index,
+                    is_not(contains_string('<param name="source" value="abc" />')))
+        assert_that(index,
+                    is_not(contains_string('<param name="url"')))
