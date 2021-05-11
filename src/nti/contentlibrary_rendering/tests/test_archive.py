@@ -101,7 +101,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         key = update_job_status(jid, "SUCCESS")
         assert_that(key, starts_with(jid))
         assert_that(key, ends_with("=status"))
-        
+
         assert_that(get_job_status(jid), is_('SUCCESS'))
 
     @fudge.patch('nti.contentlibrary_rendering._archive.redis_client')
@@ -133,7 +133,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         assert_that(msg, has_entry('message', 'bleach'))
         assert_that(msg, has_entry('code', 'Exception'))
         assert_that(msg, has_entry('traceback',  is_not(none())))
-    
+
     @fudge.patch('nti.contentlibrary_rendering._archive.redis_client')
     def test_job_error(self, mock_rc):
         redis = fakeredis.FakeStrictRedis()
@@ -143,7 +143,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         error = get_job_error("bankai")
         assert_that(error, has_entry('message', 'bleach'))
         assert_that(error, has_entry('code', 'AssertionError'))
-        
+
     @fudge.patch('nti.contentlibrary_rendering._archive.redis_client')
     def test_job_packate_ntiid(self, mock_rc):
         redis = fakeredis.FakeStrictRedis()
@@ -151,7 +151,7 @@ class TestArchive(ContentlibraryRenderingLayerTest):
         update_job_package_ntiid("jobId", ROOT)
         ntiid = get_job_package_ntiid("jobId")
         assert_that(ntiid, is_(ROOT))
-        
+
     def test_obfuscate_source(self):
         tmp_dir = tempfile.mkdtemp()
         try:

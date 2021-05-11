@@ -74,7 +74,7 @@
 
 	<!-- Rendering -->
 	<configure zcml:condition="have testmode">
-		<renderer:registerImmediateProcessingQueue />
+		<renderer:registerTestImmediateProcessingQueue />
 	</configure>
 
 	<configure zcml:condition="not-have testmode">

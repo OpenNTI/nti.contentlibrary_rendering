@@ -15,6 +15,10 @@
 						schema=".interfaces.IContentQueueFactory"
 						handler=".zcml.registerImmediateProcessingQueue" />
 
+        <meta:directive name="registerTestImmediateProcessingQueue"
+                        schema=".interfaces.IContentQueueFactory"
+                        handler=".zcml.registerTestImmediateProcessingQueue" />
+
 		<meta:directive	name="registerProcessingQueue"
 						schema=".interfaces.IContentQueueFactory"
 						handler=".zcml.registerProcessingQueue" />

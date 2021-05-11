@@ -19,6 +19,9 @@ from nti.asynchronous.interfaces import IRedisQueue
 
 from nti.asynchronous.redis_queue import PriorityQueue as RedisQueue
 
+from nti.asynchronous.scheduled import ImmediateQueueRunner
+from nti.asynchronous.scheduled import NonRaisingImmediateQueueRunner
+
 from nti.contentlibrary_rendering import QUEUE_NAMES
 
 from nti.contentlibrary_rendering.interfaces import IContentQueueFactory
@@ -28,21 +31,18 @@ from nti.coremetadata.interfaces import IRedisClient
 logger = __import__('logging').getLogger(__name__)
 
 
-class ImmediateQueueRunner(object):
-    """
-    A queue that immediately runs the given job. This is generally
-    desired for test or dev mode.
-    """
-
-    def put(self, job):
-        job()
-
-
 @interface.implementer(IContentQueueFactory)
 class _ImmediateQueueFactory(object):
 
     def get_queue(self, unused_name):
         return ImmediateQueueRunner()
+
+
+@interface.implementer(IContentQueueFactory)
+class _TestImmediateQueueFactory(object):
+
+    def get_queue(self, unused_name):
+        return NonRaisingImmediateQueueRunner()
 
 
 @interface.implementer(IContentQueueFactory)
@@ -74,6 +74,12 @@ class _ContentRenderingQueueFactory(_AbstractProcessingQueueFactory):
 def registerImmediateProcessingQueue(_context):
     logger.info("Registering immediate content rendering queue")
     factory = _ImmediateQueueFactory()
+    utility(_context, provides=IContentQueueFactory, component=factory)
+
+
+def registerTestImmediateProcessingQueue(_context):
+    logger.info("Registering immediate content rendering queue")
+    factory = _TestImmediateQueueFactory()
     utility(_context, provides=IContentQueueFactory, component=factory)
 
 
